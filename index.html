@@ -324,7 +324,7 @@
                         </div>
                         <h3 class="text-xl font-bold">Temi T-Shirt</h3>
                         <p class="text-gray-600 mb-4">₹ 1100</p>
-                        <button class="buy-now-btn bg-coral text-white font-bold py-3 px-8 rounded-full hover:bg-rust transition-colors duration-300" data-product-name="Temi T-Shirt" data-price="1100">Buy Now</button>
+                        <a href="https://rzp.io/rzp/M8lTAZS" target="_blank" class="bg-coral text-white font-bold py-3 px-8 rounded-full hover:bg-rust transition-colors duration-300 inline-block">Buy Now</a>
                     </div>
                     <!-- Product 2 -->
                     <div class="text-center" data-aos="fade-up" data-aos-delay="300">
@@ -333,7 +333,7 @@
                         </div>
                         <h3 class="text-xl font-bold">"Nisabdh" by Sekhar Sharma</h3>
                         <p class="text-gray-600 mb-4">₹ 350</p>
-                        <button class="buy-now-btn bg-coral text-white font-bold py-3 px-8 rounded-full hover:bg-rust transition-colors duration-300" data-product-name="Nisabdh by Sekhar Sharma" data-price="350">Buy Now</button>
+                        <a href="https://rzp.io/rzp/5uhPfy0" target="_blank" class="bg-coral text-white font-bold py-3 px-8 rounded-full hover:bg-rust transition-colors duration-300 inline-block">Buy Now</a>
                     </div>
                     <!-- Product 3 -->
                     <div class="text-center" data-aos="fade-up" data-aos-delay="400">
@@ -342,7 +342,7 @@
                         </div>
                         <h3 class="text-xl font-bold">"The Skilled Eye" Art Print</h3>
                         <p class="text-gray-600 mb-4">₹ 3500</p>
-                        <button class="buy-now-btn bg-coral text-white font-bold py-3 px-8 rounded-full hover:bg-rust transition-colors duration-300" data-product-name="The Skilled Eye Art Print" data-price="3500">Buy Now</button>
+                        <a href="https://rzp.io/rzp/T8y73n2" target="_blank" class="bg-coral text-white font-bold py-3 px-8 rounded-full hover:bg-rust transition-colors duration-300 inline-block">Buy Now</a>
                     </div>
                 </div>
             </div>
@@ -403,36 +403,6 @@
         </div>
     </footer>
 
-    <!-- Payment Modal -->
-    <div id="paymentModal" class="modal-overlay fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-[100] opacity-0 pointer-events-none">
-        <div class="modal-content bg-cream text-black rounded-lg shadow-2xl p-6 md:p-8 w-full max-w-md text-center transform scale-95">
-            <h3 class="text-2xl font-bold font-serif mb-2" id="modalProductName">Product Name</h3>
-            <p class="text-3xl font-bold text-rust mb-6" id="modalProductPrice">₹0</p>
-            
-            <!-- This container will hold either the QR code or the dynamic link button -->
-            <div id="payment-container">
-                <p id="qr-text" class="text-gray-700 mb-4">Scan the QR code to pay.</p>
-                <div id="qrCodeContainer" class="w-48 h-48 mx-auto mb-4 rounded-md bg-white p-2 shadow-inner flex items-center justify-center"></div>
-                <a id="dynamicUpiLink" href="#" class="hidden bg-coral text-white font-bold py-3 px-8 rounded-full hover:bg-rust transition-colors duration-300 inline-block">Pay with UPI App</a>
-            </div>
-            
-            <div class="bg-white rounded-lg p-3 flex items-center justify-between shadow-inner mt-4">
-                <input id="upiIdInput" type="text" readonly value="saruptiwari2004-4@oksbi" class="bg-transparent text-gray-800 text-sm md:text-base w-full outline-none">
-                <button id="copyUpiBtn" class="bg-rust text-white text-sm font-bold py-2 px-4 rounded-md hover:bg-coral transition-colors">Copy</button>
-            </div>
-            <p id="copyFeedback" class="text-green-600 text-sm mt-2 h-4"></p>
-            
-            <p class="text-xs text-gray-600 mt-6">
-                <strong>Important:</strong> After payment, please send a screenshot of the transaction to our contact email or WhatsApp to confirm your order.
-            </p>
-            
-            <button id="closeModalBtn" class="absolute top-4 right-4 text-gray-500 hover:text-black">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
-        </div>
-    </div>
-
-
     <script>
         AOS.init({ duration: 800, once: true, offset: 50 });
 
@@ -456,95 +426,6 @@
             
             window.location.href = mailtoLink;
         });
-
-
-        // --- Payment Modal Logic ---
-        const paymentModal = document.getElementById('paymentModal');
-        const closeModalBtn = document.getElementById('closeModalBtn');
-        const buyNowBtns = document.querySelectorAll('.buy-now-btn');
-        const modalProductName = document.getElementById('modalProductName');
-        const modalProductPrice = document.getElementById('modalProductPrice');
-        const qrCodeContainer = document.getElementById('qrCodeContainer');
-        const dynamicUpiLink = document.getElementById('dynamicUpiLink');
-        const qrText = document.getElementById('qr-text');
-        const upiIdInput = document.getElementById('upiIdInput');
-        const copyUpiBtn = document.getElementById('copyUpiBtn');
-        const copyFeedback = document.getElementById('copyFeedback');
-        
-        const upiId = 'saruptiwari2004-4@oksbi';
-        const payeeName = 'Artevia Studio';
-        let qrCodeInstance = null; // To hold the QRCode object
-
-        buyNowBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const productName = btn.dataset.productName;
-                const price = btn.dataset.price;
-                
-                modalProductName.textContent = productName;
-                modalProductPrice.textContent = `₹ ${price}`;
-                
-                // UPI Intent String
-                const upiString = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(payeeName)}&am=${price}&tn=${encodeURIComponent('Payment for ' + productName)}`;
-
-                // Clear previous QR code
-                qrCodeContainer.innerHTML = '';
-
-                // Device Detection
-                const isAndroid = /android/i.test(navigator.userAgent);
-
-                if (isAndroid) {
-                    // Show dynamic link for Android
-                    qrCodeContainer.classList.add('hidden');
-                    qrText.classList.add('hidden');
-                    dynamicUpiLink.href = upiString;
-                    dynamicUpiLink.classList.remove('hidden');
-                } else {
-                    // Show QR code for iOS and Desktops
-                    qrCodeContainer.classList.remove('hidden');
-                    qrText.classList.remove('hidden');
-                    dynamicUpiLink.classList.add('hidden');
-                    
-                    // Generate new QR code
-                    qrCodeInstance = new QRCode(qrCodeContainer, {
-                        text: upiString,
-                        width: 176,
-                        height: 176,
-                        colorDark : "#000000",
-                        colorLight : "#ffffff",
-                        correctLevel : QRCode.CorrectLevel.H
-                    });
-                }
-
-                // Show Modal
-                paymentModal.classList.remove('opacity-0', 'pointer-events-none');
-                paymentModal.querySelector('.modal-content').classList.remove('scale-95');
-            });
-        });
-
-        function closeModal() {
-            paymentModal.classList.add('opacity-0', 'pointer-events-none');
-            paymentModal.querySelector('.modal-content').classList.add('scale-95');
-            copyFeedback.textContent = '';
-        }
-
-        closeModalBtn.addEventListener('click', closeModal);
-        paymentModal.addEventListener('click', (e) => {
-            if (e.target === paymentModal) closeModal();
-        });
-
-        copyUpiBtn.addEventListener('click', () => {
-            upiIdInput.select();
-            upiIdInput.setSelectionRange(0, 99999);
-            try {
-                document.execCommand('copy');
-                copyFeedback.textContent = 'UPI ID Copied!';
-                setTimeout(() => { copyFeedback.textContent = ''; }, 2000);
-            } catch (err) {
-                copyFeedback.textContent = 'Failed to copy!';
-            }
-            window.getSelection().removeAllRanges();
-        });
-
     </script>
 </body>
 </html>
