@@ -108,15 +108,7 @@
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const scriptURL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE'; // <-- IMPORTANT: REPLACE THIS URL
-
-            // FIX: Check if the URL is still a placeholder
-            if (scriptURL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
-                formFeedback.textContent = 'Form is not configured. Please follow the setup guide.';
-                formFeedback.style.color = 'red';
-                console.error('ERROR: Google Apps Script URL has not been replaced in dine.html. Please follow the setup_guide.md to deploy your script and add the correct URL.');
-                return; // Stop the function from proceeding
-            }
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbxk1aAJG81lg2BsLHhsh4-xMFqzsb4G6tZhAHPsS2aWSP8K6gEVdAtvFkEIW8YL17F_kA/exec';
 
             // Show loading state
             submitButton.disabled = true;
@@ -131,11 +123,15 @@
                         formFeedback.style.color = 'green';
                         form.reset();
                     } else {
-                        throw new Error('Network response was not ok.');
+                        // This will handle errors from the Apps Script itself, like validation errors
+                        response.json().then(data => {
+                            formFeedback.textContent = data.error || 'Oops! Something went wrong.';
+                            formFeedback.style.color = 'red';
+                        });
                     }
                 })
                 .catch(error => {
-                    formFeedback.textContent = 'Oops! Something went wrong. Please try again.';
+                    formFeedback.textContent = 'Oops! Something went wrong. Please check your connection and try again.';
                     formFeedback.style.color = 'red';
                     console.error('Error!', error.message);
                 })
