@@ -13,7 +13,7 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #F5F1E8; /* Cream White */
+            background-color: #F5E8; /* Cream White */
             color: #000000;
         }
         h1, h2, h3, .font-serif {
@@ -108,7 +108,7 @@
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbwfiQFCh__4qf2Y1nXXbT0QKl6UCNv2XraC9MT44vcChWepldGvJIKnZCTDmDRmE1Qqzw/exec';
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbxk1aAJG81lg2BsLHhsh4-xMFqzsb4G6tZhAHPsS2aWSP8K6gEVdAtvFkEIW8YL17F_kA/exec';
 
             // Show loading state
             submitButton.disabled = true;
@@ -116,21 +116,15 @@
 
             const formData = new FormData(form);
 
-            fetch(scriptURL, { method: 'POST', body: formData })
-                .then(response => {
-                    if (response.ok) {
-                        formFeedback.textContent = 'Thank you! You\'re on the list. We\'ll be in touch soon!';
-                        formFeedback.style.color = 'green';
-                        form.reset();
-                    } else {
-                        // This will handle errors from the Apps Script itself, like validation errors
-                        response.json().then(data => {
-                            formFeedback.textContent = data.error || 'Oops! Something went wrong.';
-                            formFeedback.style.color = 'red';
-                        });
-                    }
+            fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: formData })
+                .then(() => {
+                    // In 'no-cors' mode, we can't read the response, so we assume success.
+                    formFeedback.textContent = 'Thank you! You\'re on the list. We\'ll be in touch soon!';
+                    formFeedback.style.color = 'green';
+                    form.reset();
                 })
                 .catch(error => {
+                    // This catch block will now likely only trigger on true network failures.
                     formFeedback.textContent = 'Oops! Something went wrong. Please check your connection and try again.';
                     formFeedback.style.color = 'red';
                     console.error('Error!', error.message);
