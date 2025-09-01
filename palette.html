@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artevia Palette | Café & Kitchen - Opening Soon</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F5F1E8; /* Cream White */
+            color: #000000;
+        }
+        h1, h2, h3, .font-serif {
+            font-family: 'Lora', serif;
+        }
+        .bg-rust { background-color: #B9472C; }
+        .text-rust { color: #B9472C; }
+        .bg-coral { background-color: #FF7043; }
+        .text-coral { color: #FF7043; }
+        .border-rust { border-color: #B9472C; }
+        .hover-bg-rust:hover { background-color: #a03d25; }
+
+        .hero-bg {
+            background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://raw.githubusercontent.com/Sarup098/artevia/main/IMG_8306.JPG');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <main>
+        <!-- Hero Section -->
+        <section id="hero" class="min-h-screen flex flex-col items-center justify-center text-center p-6 hero-bg text-white">
+            <div data-aos="fade-up">
+                <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/Artevia_Palette_Logo.png" alt="Artevia Palette Logo" class="w-full max-w-md mx-auto mb-8">
+                <div class="bg-yellow-400 text-black font-bold text-4xl md:text-6xl py-3 px-6 rounded-lg inline-block shadow-lg">
+                    OPENING SOON
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="py-20 md:py-24 bg-cream text-black">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl md:text-4xl font-serif font-bold text-rust mb-6" data-aos="fade-up">A Taste of Creativity</h2>
+                <p class="max-w-3xl mx-auto text-lg text-gray-800" data-aos="fade-up" data-aos-delay="100">
+                    Welcome to Artevia Palette, where culinary art meets creative expression. Nestled in the heart of Sikkim, our café is an extension of Artevia Studio's vision—a place to savor delicious local and continental flavors, connect with fellow creators, and find inspiration in every corner.
+                </p>
+            </div>
+        </section>
+
+        <!-- Pre-launch Offer Form Section -->
+        <section id="signup" class="py-20 md:py-24 bg-gray-100">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-serif font-bold text-black mb-4" data-aos="fade-up">Be the First to Know!</h2>
+                    <p class="max-w-2xl mx-auto text-lg text-gray-700" data-aos="fade-up" data-aos-delay="100">
+                        Sign up now for an exclusive invitation to our grand opening and receive a special discount of <strong class="text-rust">up to 90% off!</strong> Don't miss out on being part of our story from day one.
+                    </p>
+                </div>
+
+                <div class="max-w-lg mx-auto bg-white p-8 rounded-xl shadow-lg" data-aos="fade-up" data-aos-delay="200">
+                    <form id="pre-launch-form">
+                        <div class="mb-6">
+                            <label for="name" class="block text-gray-800 mb-2 font-semibold">Full Name</label>
+                            <input type="text" id="name" name="name" class="w-full bg-gray-50 border border-gray-300 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-rust transition-all" required placeholder="Your Name">
+                        </div>
+                        <div class="mb-8">
+                            <label for="contact" class="block text-gray-800 mb-2 font-semibold">Contact (Phone or Email)</label>
+                            <input type="text" id="contact" name="contact" class="w-full bg-gray-50 border border-gray-300 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-rust transition-all" required placeholder="Your Phone or Email">
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" id="submit-button" class="bg-rust text-white font-bold py-4 px-12 rounded-full text-lg hover-bg-rust transition-colors duration-300 w-full">
+                                Get My Invite!
+                            </button>
+                        </div>
+                    </form>
+                    <div id="form-feedback" class="text-center mt-4 font-semibold"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black text-white">
+        <div class="container mx-auto px-6 py-8 text-center">
+            <a href="https://www.arteviastudio.in/" class="inline-block">
+                <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/main%20logo.png" alt="Artevia Studio Logo" class="h-12 w-auto mx-auto mb-4">
+            </a>
+            <p class="text-sm text-gray-400">&copy; 2025 Artevia Studio. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        AOS.init({ duration: 800, once: true, offset: 50 });
+
+        const form = document.getElementById('pre-launch-form');
+        const submitButton = document.getElementById('submit-button');
+        const formFeedback = document.getElementById('form-feedback');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const scriptURL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE'; // <-- IMPORTANT: REPLACE THIS URL
+
+            // FIX: Check if the URL is still a placeholder
+            if (scriptURL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+                formFeedback.textContent = 'Form is not configured. Please follow the setup guide.';
+                formFeedback.style.color = 'red';
+                console.error('ERROR: Google Apps Script URL has not been replaced in dine.html. Please follow the setup_guide.md to deploy your script and add the correct URL.');
+                return; // Stop the function from proceeding
+            }
+
+            // Show loading state
+            submitButton.disabled = true;
+            submitButton.textContent = 'Submitting...';
+
+            const formData = new FormData(form);
+
+            fetch(scriptURL, { method: 'POST', body: formData })
+                .then(response => {
+                    if (response.ok) {
+                        formFeedback.textContent = 'Thank you! You\'re on the list. We\'ll be in touch soon!';
+                        formFeedback.style.color = 'green';
+                        form.reset();
+                    } else {
+                        throw new Error('Network response was not ok.');
+                    }
+                })
+                .catch(error => {
+                    formFeedback.textContent = 'Oops! Something went wrong. Please try again.';
+                    formFeedback.style.color = 'red';
+                    console.error('Error!', error.message);
+                })
+                .finally(() => {
+                    // Restore button state
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Get My Invite!';
+                });
+        });
+    </script>
+</body>
+</html>
+
