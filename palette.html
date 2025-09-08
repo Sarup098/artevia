@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,117 +7,148 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #F5E8; /* Cream White */
-            color: #000000;
+            background-color: #000000;
+            color: #FFFFFF;
         }
-        h1, h2, h3, .font-serif {
+        .font-serif {
             font-family: 'Lora', serif;
         }
         .bg-rust { background-color: #B9472C; }
         .text-rust { color: #B9472C; }
-        .bg-coral { background-color: #FF7043; }
-        .text-coral { color: #FF7043; }
-        .border-rust { border-color: #B9472C; }
         .hover-bg-rust:hover { background-color: #a03d25; }
 
         .hero-bg {
-            background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://raw.githubusercontent.com/Sarup098/artevia/main/IMG_8306.JPG');
+            background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url('https://raw.githubusercontent.com/Sarup098/artevia/main/IMG_8306.JPG');
             background-size: cover;
             background-position: center;
+        }
+
+        /* Shimmer Animation */
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+        .animate-shimmer {
+            background: linear-gradient(90deg, #FBBF24, #FDE68A, #FBBF24);
+            background-size: 200% auto;
+            color: #000;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 4s linear infinite;
         }
     </style>
 </head>
 <body class="antialiased">
 
     <main>
-        <!-- Hero Section -->
-        <section id="hero" class="min-h-screen flex flex-col items-center justify-center text-center p-6 hero-bg text-white">
-            <div data-aos="fade-up">
-                <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/Artevia_Palette_Logo.png" alt="Artevia Palette Logo" class="w-full max-w-md mx-auto mb-8">
-                <div class="bg-yellow-400 text-black font-bold text-4xl md:text-6xl py-3 px-6 rounded-lg inline-block shadow-lg">
-                    OPENING SOON
-                </div>
-            </div>
-        </section>
+        <!-- Single Screen Hero Section -->
+        <section id="hero" class="min-h-screen flex flex-col items-center text-center p-4 hero-bg">
+            <div class="flex flex-col justify-between h-full w-full max-w-md mx-auto py-4">
 
-        <!-- About Section -->
-        <section id="about" class="py-20 md:py-24 bg-cream text-black">
-            <div class="container mx-auto px-6 text-center">
-                <h2 class="text-3xl md:text-4xl font-serif font-bold text-rust mb-6" data-aos="fade-up">A Taste of Creativity</h2>
-                <p class="max-w-3xl mx-auto text-lg text-gray-800" data-aos="fade-up" data-aos-delay="100">
-                    Welcome to Artevia Palette, where culinary art meets creative expression. Nestled in the heart of Sikkim, our café is an extension of Artevia Studio's vision—a place to savor delicious local and continental flavors, connect with fellow creators, and find inspiration in every corner.
-                </p>
-            </div>
-        </section>
-
-        <!-- Pre-launch Offer Form Section -->
-        <section id="signup" class="py-20 md:py-24 bg-gray-100">
-            <div class="container mx-auto px-6">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl md:text-4xl font-serif font-bold text-black mb-4" data-aos="fade-up">Be the First to Know!</h2>
-                    <p class="max-w-2xl mx-auto text-lg text-gray-700" data-aos="fade-up" data-aos-delay="100">
-                        Sign up now for an exclusive invitation to our grand opening and receive a special discount of <strong class="text-rust">up to 90% off!</strong> Don't miss out on being part of our story from day one.
-                    </p>
+                <!-- Top: Logo & Title -->
+                <div class="flex-shrink-0">
+                    <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/Artevia_Palette_Logo.png" alt="Artevia Palette Logo" class="w-full max-w-xs mx-auto">
+                    <h1 class="text-5xl md:text-7xl font-extrabold tracking-tighter mt-4">
+                        <span class="animate-shimmer">OPENING SOON</span>
+                    </h1>
+                    <p class="text-yellow-400 font-semibold mt-2">Right near SMIT!</p>
                 </div>
 
-                <div class="max-w-lg mx-auto bg-white p-8 rounded-xl shadow-lg" data-aos="fade-up" data-aos-delay="200">
-                    <form id="pre-launch-form">
-                        <div class="mb-6">
-                            <label for="name" class="block text-gray-800 mb-2 font-semibold">Full Name</label>
-                            <input type="text" id="name" name="name" class="w-full bg-gray-50 border border-gray-300 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-rust transition-all" required placeholder="Your Name">
+                <!-- Middle: Features Grid -->
+                <div class="grid grid-cols-2 gap-4 my-4 text-left">
+                    <!-- Feature 1 -->
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-6 h-6 text-yellow-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12.378 1.602a.75.75 0 00-.756 0L3 6.632l9 5.25 9-5.25-8.622-5.03zM21.75 7.93l-9 5.25v9l8.628-5.032a.75.75 0 00.372-.648V7.93zM2.25 7.93v8.54a.75.75 0 00.372.648L11.25 22.17v-9l-9-5.25z"/></svg>
+                        <div>
+                            <h3 class="font-bold text-sm">Professional Chef</h3>
+                            <p class="text-gray-300 text-xs">Unmatched taste, student prices.</p>
                         </div>
-                        <div class="mb-8">
-                            <label for="contact" class="block text-gray-800 mb-2 font-semibold">Contact (Phone or Email)</label>
-                            <input type="text" id="contact" name="contact" class="w-full bg-gray-50 border border-gray-300 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-rust transition-all" required placeholder="Your Phone or Email">
+                    </div>
+                    <!-- Feature 2 -->
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-6 h-6 text-yellow-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.657 7.343A8 8 0 0117.657 18.657z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.879 16.121A3 3 0 1014.12 11.88l-4.242 4.242z"></path></svg>
+                        <div>
+                            <h3 class="font-bold text-sm">Biryani Saturdays</h3>
+                            <p class="text-gray-300 text-xs">Free for all PG residents!</p>
                         </div>
-                        <div class="text-center">
-                            <button type="submit" id="submit-button" class="bg-rust text-white font-bold py-4 px-12 rounded-full text-lg hover-bg-rust transition-colors duration-300 w-full">
-                                Get My Invite!
+                    </div>
+                    <!-- Feature 3 -->
+                    <div class="flex items-center space-x-2">
+                         <svg class="w-6 h-6 text-yellow-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        <div>
+                            <h3 class="font-bold text-sm">Student PG Service</h3>
+                            <p class="text-gray-300 text-xs">Starts this October.</p>
+                        </div>
+                    </div>
+                    <!-- Feature 4 -->
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-6 h-6 text-yellow-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <div>
+                            <h3 class="font-bold text-sm">Fully Air-Conditioned</h3>
+                            <p class="text-gray-300 text-xs">Chill vibes guaranteed.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom: Form Section -->
+                <div class="flex-shrink-0">
+                     <div class="bg-black/50 backdrop-blur-sm p-6 rounded-xl shadow-lg">
+                        <div id="form-intro">
+                            <button id="open-form-btn" class="bg-rust text-white font-bold py-4 px-12 rounded-full text-lg hover-bg-rust transition-all duration-300 w-full transform hover:scale-105">
+                                Get Your Invite & 90% Off!
                             </button>
                         </div>
-                    </form>
-                    <div id="form-feedback" class="text-center mt-4 font-semibold"></div>
+                        <form id="pre-launch-form" class="hidden transition-all duration-500">
+                            <div class="mb-4">
+                                <label for="name" class="sr-only">Full Name</label>
+                                <input type="text" id="name" name="name" class="w-full bg-gray-800/50 text-white border border-gray-600 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-rust transition-all" required placeholder="Your Full Name">
+                            </div>
+                            <div class="mb-4">
+                                <label for="phone" class="sr-only">Phone Number</label>
+                                <input type="tel" id="phone" name="phone" class="w-full bg-gray-800/50 text-white border border-gray-600 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-rust transition-all" required placeholder="Your Phone Number">
+                            </div>
+                            <div class="text-center">
+                                <button type="submit" id="submit-button" class="bg-rust text-white font-bold py-3 px-12 rounded-full text-base hover-bg-rust transition-colors duration-300 w-full">
+                                    Submit
+                                </button>
+                            </div>
+                        </form>
+                        <div id="form-feedback" class="text-center mt-3 font-semibold text-sm"></div>
+                    </div>
                 </div>
+
             </div>
         </section>
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-black text-white">
-        <div class="container mx-auto px-6 py-8 text-center">
-            <a href="https://www.arteviastudio.in/" class="inline-block">
-                <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/main%20logo.png" alt="Artevia Studio Logo" class="h-12 w-auto mx-auto mb-4">
-            </a>
-            <p class="text-sm text-gray-400">&copy; 2025 Artevia Studio. All Rights Reserved.</p>
-        </div>
-    </footer>
-
     <script>
-        AOS.init({ duration: 800, once: true, offset: 50 });
-
+        const openFormBtn = document.getElementById('open-form-btn');
+        const formIntro = document.getElementById('form-intro');
         const form = document.getElementById('pre-launch-form');
         const submitButton = document.getElementById('submit-button');
         const formFeedback = document.getElementById('form-feedback');
+
+        openFormBtn.addEventListener('click', () => {
+            formIntro.classList.add('hidden');
+            form.classList.remove('hidden');
+        });
 
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             
             const scriptURL = 'https://script.google.com/macros/s/AKfycbzX-GJftVnvZqIfZ8j-5fCu9gwjpMZ56VL-FmzQedfQeh4Baf1fWui_KD4aD6Z77ldr/exec';
             
-            // Show loading state
             submitButton.disabled = true;
             submitButton.textContent = 'Submitting...';
 
             const formData = new FormData(form);
             const plainFormData = Object.fromEntries(formData.entries());
 		
-            // The Google Apps Script needs the data in a specific format to work with doPost
             const formDataUrlEncoded = new URLSearchParams(plainFormData);
 
             fetch(scriptURL, {
@@ -128,30 +159,29 @@
                 },
             })
             .then(response => {
-                // The new script sends back a JSON response, which we can read.
                 if (response.ok) return response.json();
                 throw new Error(`Network response was not ok: ${response.statusText}`);
             })
             .then(data => {
                 if(data.result === 'success'){
-                    formFeedback.textContent = 'Thank you! You\'re on the list. We\'ll be in touch soon!';
-                    formFeedback.style.color = 'green';
+                    formFeedback.textContent = 'Your special discount code will be sent in your WhatsApp!';
+                    formFeedback.style.color = '#10B981';
                     form.reset();
+                    form.classList.add('hidden');
+                    formIntro.classList.remove('hidden');
                 } else {
-                    // Handle errors returned from the script
                     formFeedback.textContent = data.error || 'Oops! Something went wrong.';
-                    formFeedback.style.color = 'red';
+                    formFeedback.style.color = '#EF4444';
                 }
             })
             .catch(error => {
                 formFeedback.textContent = 'Oops! Something went wrong. Please check your connection and try again.';
-                formFeedback.style.color = 'red';
+                formFeedback.style.color = '#EF4444';
                 console.error('Error!', error.message);
             })
             .finally(() => {
-                // Restore button state
                 submitButton.disabled = false;
-                submitButton.textContent = 'Get My Invite!';
+                submitButton.textContent = 'Submit';
             });
         });
     </script>
