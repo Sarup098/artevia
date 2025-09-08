@@ -41,6 +41,21 @@
             -webkit-text-fill-color: transparent;
             animation: shimmer 4s linear infinite;
         }
+
+        /* More prominent CTA Pulse Animation */
+        @keyframes cta-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 15px rgba(255, 112, 67, 0.6);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 30px rgba(255, 112, 67, 1);
+            }
+        }
+        .animate-cta-pulse {
+            animation: cta-pulse 2s infinite ease-in-out;
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -60,38 +75,30 @@
                 </div>
 
                 <!-- Middle: Features Grid -->
-                <div class="grid grid-cols-2 gap-y-6 gap-x-4 my-4 text-left">
+                <div class="grid grid-cols-2 gap-y-6 gap-x-4 my-4">
                     <!-- Feature 1 -->
-                    <div class="flex items-center space-x-3">
-                        <svg class="w-8 h-8 text-yellow-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12.378 1.602a.75.75 0 00-.756 0L3 6.632l9 5.25 9-5.25-8.622-5.03zM21.75 7.93l-9 5.25v9l8.628-5.032a.75.75 0 00.372-.648V7.93zM2.25 7.93v8.54a.75.75 0 00.372.648L11.25 22.17v-9l-9-5.25z"/></svg>
-                        <div>
-                            <h3 class="font-bold text-base">Professional Chef</h3>
-                            <p class="text-gray-300 text-sm">Unmatched taste, student prices.</p>
-                        </div>
+                    <div class="text-center">
+                        <svg class="w-10 h-10 text-yellow-400 mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12.378 1.602a.75.75 0 00-.756 0L3 6.632l9 5.25 9-5.25-8.622-5.03zM21.75 7.93l-9 5.25v9l8.628-5.032a.75.75 0 00.372-.648V7.93zM2.25 7.93v8.54a.75.75 0 00.372.648L11.25 22.17v-9l-9-5.25z"/></svg>
+                        <h3 class="font-bold text-base">Professional Chef</h3>
+                        <p class="text-gray-300 text-sm">Unmatched taste, student prices.</p>
                     </div>
                     <!-- Feature 2 -->
-                    <div class="flex items-center space-x-3">
-                        <svg class="w-8 h-8 text-yellow-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.657 7.343A8 8 0 0117.657 18.657z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.879 16.121A3 3 0 1014.12 11.88l-4.242 4.242z"></path></svg>
-                        <div>
-                            <h3 class="font-bold text-base">Biryani Saturdays</h3>
-                            <p class="text-gray-300 text-sm">Free for all PG residents!</p>
-                        </div>
+                    <div class="text-center">
+                        <svg class="w-10 h-10 text-yellow-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.657 7.343A8 8 0 0117.657 18.657z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.879 16.121A3 3 0 1014.12 11.88l-4.242 4.242z"></path></svg>
+                        <h3 class="font-bold text-base">Biryani Saturdays</h3>
+                        <p class="text-gray-300 text-sm">Free for all PG residents!</p>
                     </div>
                     <!-- Feature 3 -->
-                    <div class="flex items-center space-x-3">
-                         <svg class="w-8 h-8 text-yellow-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                        <div>
-                            <h3 class="font-bold text-base">Student PG Service</h3>
-                            <p class="text-gray-300 text-sm">Starts this October.</p>
-                        </div>
+                    <div class="text-center">
+                         <svg class="w-10 h-10 text-yellow-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        <h3 class="font-bold text-base">Student PG Service</h3>
+                        <p class="text-gray-300 text-sm">Starts this October.</p>
                     </div>
                     <!-- Feature 4 -->
-                    <div class="flex items-center space-x-3">
-                        <svg class="w-8 h-8 text-yellow-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <div>
-                            <h3 class="font-bold text-base">Fully Air-Conditioned</h3>
-                            <p class="text-gray-300 text-sm">Chill vibes guaranteed.</p>
-                        </div>
+                    <div class="text-center">
+                        <svg class="w-10 h-10 text-yellow-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <h3 class="font-bold text-base">Fully Air-Conditioned</h3>
+                        <p class="text-gray-300 text-sm">Chill vibes guaranteed.</p>
                     </div>
                 </div>
 
@@ -99,7 +106,7 @@
                 <div class="flex-shrink-0">
                     <div id="form-container" class="transition-all duration-300 rounded-xl">
                         <div id="form-intro">
-                            <button id="open-form-btn" class="bg-rust text-white font-bold py-4 px-8 rounded-full text-lg hover-bg-rust transition-all duration-300 w-full transform hover:scale-105">
+                            <button id="open-form-btn" class="bg-rust text-white font-bold py-4 px-8 rounded-full text-lg hover-bg-rust transition-all duration-300 w-full transform animate-cta-pulse">
                                 Get Your Invite & Special Discount!
                             </button>
                         </div>
