@@ -42,7 +42,7 @@
             animation: shimmer 4s linear infinite;
         }
 
-        /* More prominent CTA Pulse Animation */
+        /* CTA Pulse Animation */
         @keyframes cta-pulse {
             0%, 100% {
                 transform: scale(1);
@@ -76,7 +76,7 @@
 
                 <!-- Middle: Features Grid -->
                 <div class="grid grid-cols-2 gap-y-6 gap-x-4 my-4">
-                    <!-- Feature 1 -->
+                     <!-- Feature 1 -->
                     <div class="text-center">
                         <svg class="w-10 h-10 text-yellow-400 mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12.378 1.602a.75.75 0 00-.756 0L3 6.632l9 5.25 9-5.25-8.622-5.03zM21.75 7.93l-9 5.25v9l8.628-5.032a.75.75 0 00.372-.648V7.93zM2.25 7.93v8.54a.75.75 0 00.372.648L11.25 22.17v-9l-9-5.25z"/></svg>
                         <h3 class="font-bold text-base">Professional Chef</h3>
@@ -133,7 +133,28 @@
         </section>
     </main>
 
-    <script>
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCVnRmh3kRwnc9Feq3XBLfwuHS0gv8J36A",
+            authDomain: "palette-9bee8.firebaseapp.com",
+            projectId: "palette-9bee8",
+            storageBucket: "palette-9bee8.appspot.com",
+            messagingSenderId: "140431314373",
+            appId: "1:140431314373:web:636fd2de7bdbae30598fac",
+            measurementId: "G-PS1YJ5MDTF"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // --- Form Logic ---
         const openFormBtn = document.getElementById('open-form-btn');
         const formIntro = document.getElementById('form-intro');
         const formContainer = document.getElementById('form-container');
@@ -149,70 +170,52 @@
             form.classList.remove('hidden');
         });
 
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
-            formFeedback.textContent = ''; // Clear previous messages
+            formFeedback.textContent = '';
 
-            // --- Client-Side Validation ---
             const nameValue = nameInput.value.trim();
             const phoneValue = phoneInput.value.trim();
             const phoneRegex = /^\d{10}$/;
 
             if (nameValue === "") {
                 formFeedback.textContent = 'Please enter your name.';
-                formFeedback.style.color = '#FBBF24'; // Yellow for warning
+                formFeedback.style.color = '#FBBF24';
                 return;
             }
 
             if (!phoneRegex.test(phoneValue)) {
                 formFeedback.textContent = 'Please enter a valid 10-digit phone number.';
-                formFeedback.style.color = '#FBBF24'; // Yellow for warning
+                formFeedback.style.color = '#FBBF24';
                 return;
             }
-            
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbyjZFLWXJB63qL23HZzoMrvD-tWyvHcxP-_XUIGDbu077LYCfNl6s_2YdvrXVDG-T3W/exec';
             
             submitButton.disabled = true;
             submitButton.textContent = 'Submitting...';
 
-            const formData = new FormData(form);
-            const plainFormData = Object.fromEntries(formData.entries());
-		
-            const formDataUrlEncoded = new URLSearchParams(plainFormData);
+            try {
+                // Add a new document with a generated ID to the "signups" collection.
+                const docRef = await addDoc(collection(db, "signups"), {
+                    name: nameValue,
+                    phone: phoneValue,
+                    timestamp: serverTimestamp() // Adds the server-side timestamp
+                });
 
-            fetch(scriptURL, {
-                method: 'POST',
-                body: formDataUrlEncoded,
-                headers: {
-                    "Content-Type": "application/x-www.form-urlencoded",
-                },
-            })
-            .then(response => {
-                if (response.ok) return response.json();
-                throw new Error(`Network response was not ok: ${response.statusText}`);
-            })
-            .then(data => {
-                if(data.result === 'success'){
-                    formFeedback.textContent = 'Your special discount code will be sent in your WhatsApp!';
-                    formFeedback.style.color = '#10B981';
-                    form.reset();
-                    form.classList.add('hidden');
-                    formContainer.classList.remove('bg-black/50', 'backdrop-blur-sm', 'p-6');
-                    formIntro.classList.remove('hidden');
-                } else {
-                    formFeedback.textContent = data.error || 'Oops! Something went wrong.';
-                    formFeedback.style.color = '#EF4444';
-                }
-            })
-            .catch(error => {
-                formFeedback.textContent = 'Oops! Something went wrong. Please check your connection and try again.';
+                formFeedback.textContent = 'Your special discount code will be sent in your WhatsApp!';
+                formFeedback.style.color = '#10B981';
+                form.reset();
+                form.classList.add('hidden');
+                formContainer.classList.remove('bg-black/50', 'backdrop-blur-sm', 'p-6');
+                formIntro.classList.remove('hidden');
+
+            } catch (error) {
+                formFeedback.textContent = 'Oops! Something went wrong. Please try again.';
                 formFeedback.style.color = '#EF4444';
-                console.error('Error!', error.message);
-            })
-            .finally(() => {
+                console.error("Error adding document: ", error);
+            } finally {
                 submitButton.disabled = false;
                 submitButton.textContent = 'Submit';
-            });
+            }
         });
     </script>
 </body>
