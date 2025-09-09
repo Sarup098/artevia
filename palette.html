@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Artevia Palette | Café & Kitchen - Opening Soon</title>
+    <title>Artevia Palette | Café & Kitchen</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -60,11 +60,10 @@
 </head>
 <body class="antialiased">
 
-    <main>
-        <!-- Single Screen Hero Section -->
+    <!-- Main Public Content -->
+    <main id="main-content">
         <section id="hero" class="min-h-screen flex flex-col items-center text-center p-4 hero-bg">
             <div class="flex flex-col justify-between h-full w-full max-w-md mx-auto py-4">
-
                 <!-- Top: Logo & Title -->
                 <div class="flex-shrink-0">
                     <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/Artevia_Palette_Logo.png" alt="Artevia Palette Logo" class="w-full max-w-xs mx-auto">
@@ -73,35 +72,29 @@
                     </h1>
                     <p class="text-yellow-400 font-semibold mt-2">Right near SMIT (at the old Ace Mart location)!</p>
                 </div>
-
                 <!-- Middle: Features Grid -->
                 <div class="grid grid-cols-2 gap-y-6 gap-x-4 my-4">
-                    <!-- Feature 1 -->
                     <div class="text-center">
                         <svg class="w-10 h-10 text-yellow-400 mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12.378 1.602a.75.75 0 00-.756 0L3 6.632l9 5.25 9-5.25-8.622-5.03zM21.75 7.93l-9 5.25v9l8.628-5.032a.75.75 0 00.372-.648V7.93zM2.25 7.93v8.54a.75.75 0 00.372.648L11.25 22.17v-9l-9-5.25z"/></svg>
                         <h3 class="font-bold text-base">Professional Chef</h3>
                         <p class="text-gray-300 text-sm">Unmatched taste, student prices.</p>
                     </div>
-                    <!-- Feature 2 -->
                     <div class="text-center">
                         <svg class="w-10 h-10 text-yellow-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.657 7.343A8 8 0 0117.657 18.657z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.879 16.121A3 3 0 1014.12 11.88l-4.242 4.242z"></path></svg>
                         <h3 class="font-bold text-base">Biryani Saturdays</h3>
                         <p class="text-gray-300 text-sm">Included with monthly food plans!</p>
                     </div>
-                    <!-- Feature 3 -->
                     <div class="text-center">
                          <svg class="w-10 h-10 text-yellow-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                         <h3 class="font-bold text-base">Monthly Food Plans</h3>
                         <p class="text-gray-300 text-sm">Perfect for students.</p>
                     </div>
-                    <!-- Feature 4 -->
                     <div class="text-center">
                         <svg class="w-10 h-10 text-yellow-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                         <h3 class="font-bold text-base">Fully Air-Conditioned</h3>
                         <p class="text-gray-300 text-sm">Chill vibes guaranteed.</p>
                     </div>
                 </div>
-
                 <!-- Bottom: Form Section -->
                 <div class="flex-shrink-0">
                     <div id="form-container" class="transition-all duration-300 rounded-xl">
@@ -128,26 +121,74 @@
                         <div id="form-feedback" class="text-center mt-3 font-semibold text-sm h-5"></div>
                     </div>
                 </div>
-
+                <footer class="text-white py-4 flex-shrink-0">
+                    <a href="https://www.arteviastudio.in/" class="inline-block mb-2">
+                        <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/main%20logo.png" alt="Artevia Studio Logo" class="h-8 w-auto mx-auto">
+                    </a>
+                    <p class="text-xs text-gray-400">&copy; 2025 Artevia Studio. All Rights Reserved.</p>
+                    <div class="mt-2">
+                        <a href="#admin" class="text-xs text-gray-600 hover:text-gray-400 transition-colors">Admin Login</a>
+                    </div>
+                </footer>
             </div>
-             <!-- Footer with Admin Link -->
-            <footer class="text-white py-4">
-                <a href="https://www.arteviastudio.in/" class="inline-block mb-2">
-                    <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/main%20logo.png" alt="Artevia Studio Logo" class="h-8 w-auto mx-auto">
-                </a>
-                <p class="text-xs text-gray-400">&copy; 2025 Artevia Studio. All Rights Reserved.</p>
-                <div class="mt-2">
-                    <a href="admin.html" class="text-xs text-gray-600 hover:text-gray-400 transition-colors">Admin Login</a>
-                </div>
-            </footer>
         </section>
     </main>
+
+    <!-- Admin Section (Hidden by default) -->
+    <div id="admin-section" class="hidden bg-gray-100 min-h-screen">
+        <!-- Login Modal -->
+        <div id="login-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-sm">
+                <div class="bg-gray-800 rounded-lg p-4 mb-6">
+                    <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/Artevia_Palette_Logo.png" alt="Artevia Palette Logo" class="w-48 mx-auto">
+                </div>
+                <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Admin Login</h2>
+                <form id="login-form">
+                    <div class="mb-4 relative">
+                        <label for="password" class="sr-only">Password</label>
+                        <input type="password" id="password" class="w-full px-4 py-3 border text-gray-900 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B9472C]" placeholder="Enter Password" required>
+                        <button type="button" id="toggle-password" class="absolute inset-y-0 right-0 flex items-center pr-3">
+                            <svg id="eye-open" class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                            <svg id="eye-closed" class="h-5 w-5 text-gray-400 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 .527-1.666 1.405-3.159 2.53-4.39M19.542 12c-.527 1.666-1.405 3.159-2.53 4.39m-1.398-1.398a3 3 0 11-4.242-4.242M3 3l18 18" /></svg>
+                        </button>
+                    </div>
+                    <button type="submit" class="w-full bg-[#B9472C] text-white font-bold py-3 rounded-lg hover:bg-[#a03d25] transition-colors">Login</button>
+                </form>
+                <p id="login-error" class="text-red-500 text-center text-sm mt-4"></p>
+            </div>
+        </div>
+
+        <!-- Dashboard Content (Initially Hidden) -->
+        <div id="dashboard" class="hidden container mx-auto p-6">
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800">Pre-launch Sign-ups</h1>
+                <button id="logout-btn" class="bg-gray-700 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600">Logout</button>
+            </div>
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone Number</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Coupon Code</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sign-up Date</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                        </tr>
+                    </thead>
+                    <tbody id="signups-table-body" class="bg-white divide-y divide-gray-200">
+                        <!-- Data will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+        // --- Firebase Config ---
         const firebaseConfig = {
             apiKey: "AIzaSyCVnRmh3kRwnc9Feq3XBLfwuHS0gv8J36A",
             authDomain: "palette-9bee8.firebaseapp.com",
@@ -161,6 +202,8 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // --- PUBLIC PAGE ELEMENTS ---
+        const mainContent = document.getElementById('main-content');
         const openFormBtn = document.getElementById('open-form-btn');
         const formIntro = document.getElementById('form-intro');
         const formContainer = document.getElementById('form-container');
@@ -170,6 +213,30 @@
         const nameInput = document.getElementById('name');
         const phoneInput = document.getElementById('phone');
 
+        // --- ADMIN PAGE ELEMENTS ---
+        const adminSection = document.getElementById('admin-section');
+        const loginModal = document.getElementById('login-modal');
+        const loginForm = document.getElementById('login-form');
+        const passwordInput = document.getElementById('password');
+        const loginError = document.getElementById('login-error');
+        const dashboard = document.getElementById('dashboard');
+        const tableBody = document.getElementById('signups-table-body');
+        const logoutBtn = document.getElementById('logout-btn');
+        const togglePasswordBtn = document.getElementById('toggle-password');
+        const eyeOpen = document.getElementById('eye-open');
+        const eyeClosed = document.getElementById('eye-closed');
+
+        // --- HELPER FUNCTIONS ---
+        function generateCouponCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let coupon = 'PALETTE-';
+            for (let i = 0; i < 6; i++) {
+                coupon += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return coupon;
+        }
+        
+        // --- PUBLIC PAGE LOGIC ---
         openFormBtn.addEventListener('click', () => {
             formIntro.classList.add('hidden');
             formContainer.classList.add('bg-black/50', 'backdrop-blur-sm', 'p-6');
@@ -189,7 +256,6 @@
                 formFeedback.style.color = '#FBBF24';
                 return;
             }
-
             if (!phoneRegex.test(phoneValue)) {
                 formFeedback.textContent = 'Please enter a valid 10-digit phone number.';
                 formFeedback.style.color = '#FBBF24';
@@ -198,20 +264,25 @@
             
             submitButton.disabled = true;
             submitButton.textContent = 'Submitting...';
+            
+            const couponCode = generateCouponCode();
 
             try {
-                const docRef = await addDoc(collection(db, "signups"), {
+                await addDoc(collection(db, "signups"), {
                     name: nameValue,
                     phone: phoneValue,
+                    couponCode: couponCode,
                     timestamp: serverTimestamp()
                 });
-
-                formFeedback.textContent = 'Your special discount code will be sent in your WhatsApp!';
+                formFeedback.innerHTML = `Success! Your 10% discount code is <strong class="text-yellow-400">${couponCode}</strong>. Save it!`;
                 formFeedback.style.color = '#10B981';
                 form.reset();
-                form.classList.add('hidden');
-                formContainer.classList.remove('bg-black/50', 'backdrop-blur-sm', 'p-6');
-                formIntro.classList.remove('hidden');
+                setTimeout(() => {
+                    form.classList.add('hidden');
+                    formContainer.classList.remove('bg-black/50', 'backdrop-blur-sm', 'p-6');
+                    formIntro.classList.remove('hidden');
+                    formFeedback.textContent = '';
+                }, 4000);
 
             } catch (error) {
                 formFeedback.textContent = 'Oops! Something went wrong. Please try again.';
@@ -222,6 +293,94 @@
                 submitButton.textContent = 'Submit';
             }
         });
+
+        // --- ADMIN LOGIC ---
+        togglePasswordBtn.addEventListener('click', () => {
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+            eyeOpen.classList.toggle('hidden', !isPassword);
+            eyeClosed.classList.toggle('hidden', isPassword);
+        });
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (passwordInput.value === 'sarup@2004') {
+                sessionStorage.setItem('isAdminAuthenticated', 'true');
+                showDashboard();
+            } else {
+                loginError.textContent = 'Incorrect password.';
+                passwordInput.value = '';
+            }
+        });
+
+        logoutBtn.addEventListener('click', () => {
+             sessionStorage.removeItem('isAdminAuthenticated');
+             window.location.hash = '';
+             window.location.reload();
+        });
+
+        async function fetchSignups() {
+            try {
+                const q = query(collection(db, 'signups'), orderBy('timestamp', 'desc'));
+                const querySnapshot = await getDocs(q);
+                tableBody.innerHTML = ''; 
+
+                if (querySnapshot.empty) {
+                    tableBody.innerHTML = '<tr><td colspan="5" class="text-center p-6 text-gray-500">No sign-ups yet.</td></tr>';
+                    return;
+                }
+                querySnapshot.forEach(doc => {
+                    const data = doc.data();
+                    const date = data.timestamp ? data.timestamp.toDate().toLocaleString('en-IN') : 'N/A';
+                    const whatsappMessage = encodeURIComponent(`Hello ${data.name}! This is Sarup from Artevia Palette. Thanks for signing up for our pre-launch offer! We're excited to see you soon.`);
+                    const whatsappLink = `https://wa.me/91${data.phone}?text=${whatsappMessage}`;
+                    
+                    tableBody.innerHTML += `<tr>
+                        <td class="px-6 py-4 text-sm font-medium text-gray-900">${data.name}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">${data.phone}</td>
+                        <td class="px-6 py-4 text-sm text-gray-700 font-mono">${data.couponCode || 'N/A'}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">${date}</td>
+                        <td class="px-6 py-4 text-sm">
+                            <a href="${whatsappLink}" target="_blank" class="inline-flex items-center gap-x-2 bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-full text-xs">
+                                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 4.315 1.731 6.086l.003.004l-1.241 4.515 4.591-1.205z"/></svg>
+                                Chat
+                            </a>
+                        </td>
+                    </tr>`;
+                });
+            } catch (error) {
+                console.error("Error fetching documents: ", error);
+                tableBody.innerHTML = '<tr><td colspan="5" class="text-center p-6 text-red-500">Failed to load data.</td></tr>';
+            }
+        }
+
+        function showDashboard() {
+            mainContent.classList.add('hidden');
+            adminSection.classList.remove('hidden');
+            loginModal.classList.add('hidden');
+            dashboard.classList.remove('hidden');
+            fetchSignups();
+        }
+
+        // --- INITIAL PAGE LOAD LOGIC ---
+        function checkAdminRoute() {
+            if (window.location.hash === '#admin') {
+                mainContent.classList.add('hidden');
+                adminSection.classList.remove('hidden');
+                if (sessionStorage.getItem('isAdminAuthenticated') === 'true') {
+                    showDashboard();
+                } else {
+                    loginModal.classList.remove('hidden');
+                }
+            } else {
+                mainContent.classList.remove('hidden');
+                adminSection.classList.add('hidden');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', checkAdminRoute);
+        window.addEventListener('hashchange', checkAdminRoute);
+
     </script>
 </body>
 </html>
