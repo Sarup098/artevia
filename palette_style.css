@@ -1,0 +1,60 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #000000;
+    color: #FFFFFF;
+}
+.font-serif {
+    font-family: 'Lora', serif;
+}
+.bg-rust { background-color: #B9472C; }
+.text-rust { color: #B9472C; }
+.hover-bg-rust:hover { background-color: #a03d25; }
+
+.hero-bg {
+    background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url('https://raw.githubusercontent.com/Sarup098/artevia/main/IMG_8306.JPG');
+    background-size: cover;
+    background-position: center;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+}
+.animate-shimmer {
+    background: linear-gradient(90deg, #FBBF24, #FDE68A, #FBBF24);
+    background-size: 200% auto;
+    color: #000;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 4s linear infinite;
+}
+
+@keyframes cta-pulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 15px rgba(255, 112, 67, 0.6);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 30px rgba(255, 112, 67, 1);
+    }
+}
+.animate-cta-pulse {
+    animation: cta-pulse 2s infinite ease-in-out;
+}
+
+.toggle-checkbox:checked { right: 0; border-color: #10B981; }
+.toggle-checkbox:checked + .toggle-label { background-color: #10B981; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    vertical-align: text-bottom;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spin .75s linear infinite;
+}
