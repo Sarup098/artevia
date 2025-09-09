@@ -282,7 +282,7 @@
                     couponCode: couponCode,
                     timestamp: serverTimestamp()
                 });
-                formFeedback.innerHTML = `Success! Your 10% discount code is <strong class="text-yellow-400">${couponCode}</strong>. Save it!`;
+                formFeedback.innerHTML = `Success! Your code for 10% OFF on your first order above ₹399 is <strong class="text-yellow-400">${couponCode}</strong>. Save it!`;
                 formFeedback.style.color = '#10B981';
                 form.reset();
                 setTimeout(() => {
@@ -290,7 +290,7 @@
                     formContainer.classList.remove('bg-black/50', 'backdrop-blur-sm', 'p-6');
                     formIntro.classList.remove('hidden');
                     formFeedback.textContent = '';
-                }, 4000);
+                }, 5000);
 
             } catch (error) {
                 formFeedback.textContent = 'Oops! Something went wrong. Please try again.';
@@ -319,6 +319,8 @@
                 adminName = 'Sarup';
             } else if (enteredPassword === 'sekhar@2002') {
                 adminName = 'Sekhar';
+            } else if (enteredPassword === 'anukriti') {
+                adminName = 'Anukriti';
             }
 
             if (adminName) {
