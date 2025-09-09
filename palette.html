@@ -76,7 +76,7 @@
 
                 <!-- Middle: Features Grid -->
                 <div class="grid grid-cols-2 gap-y-6 gap-x-4 my-4">
-                     <!-- Feature 1 -->
+                    <!-- Feature 1 -->
                     <div class="text-center">
                         <svg class="w-10 h-10 text-yellow-400 mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12.378 1.602a.75.75 0 00-.756 0L3 6.632l9 5.25 9-5.25-8.622-5.03zM21.75 7.93l-9 5.25v9l8.628-5.032a.75.75 0 00.372-.648V7.93zM2.25 7.93v8.54a.75.75 0 00.372.648L11.25 22.17v-9l-9-5.25z"/></svg>
                         <h3 class="font-bold text-base">Professional Chef</h3>
@@ -130,16 +130,24 @@
                 </div>
 
             </div>
+             <!-- Footer with Admin Link -->
+            <footer class="text-white py-4">
+                <a href="https://www.arteviastudio.in/" class="inline-block mb-2">
+                    <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/main%20logo.png" alt="Artevia Studio Logo" class="h-8 w-auto mx-auto">
+                </a>
+                <p class="text-xs text-gray-400">&copy; 2025 Artevia Studio. All Rights Reserved.</p>
+                <div class="mt-2">
+                    <a href="admin.html" class="text-xs text-gray-600 hover:text-gray-400 transition-colors">Admin Login</a>
+                </div>
+            </footer>
         </section>
     </main>
 
     <!-- Firebase SDK -->
     <script type="module">
-        // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // Your web app's Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCVnRmh3kRwnc9Feq3XBLfwuHS0gv8J36A",
             authDomain: "palette-9bee8.firebaseapp.com",
@@ -150,11 +158,9 @@
             measurementId: "G-PS1YJ5MDTF"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // --- Form Logic ---
         const openFormBtn = document.getElementById('open-form-btn');
         const formIntro = document.getElementById('form-intro');
         const formContainer = document.getElementById('form-container');
@@ -194,11 +200,10 @@
             submitButton.textContent = 'Submitting...';
 
             try {
-                // Add a new document with a generated ID to the "signups" collection.
                 const docRef = await addDoc(collection(db, "signups"), {
                     name: nameValue,
                     phone: phoneValue,
-                    timestamp: serverTimestamp() // Adds the server-side timestamp
+                    timestamp: serverTimestamp()
                 });
 
                 formFeedback.textContent = 'Your special discount code will be sent in your WhatsApp!';
