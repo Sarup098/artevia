@@ -56,6 +56,14 @@
         .animate-cta-pulse {
             animation: cta-pulse 2s infinite ease-in-out;
         }
+        /* Admin Toggle Switch */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #10B981;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #10B981;
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -71,7 +79,7 @@
                         <span class="animate-shimmer">OPENING SOON</span>
                     </h1>
                     <p class="text-yellow-400 font-semibold mt-2">Right near SMIT!</p>
-                    <div class="mt-4">
+                     <div class="mt-4">
                         <a href="https://maps.app.goo.gl/ZWvWZJ8yW4UJcMhh6" target="_blank" class="inline-flex items-center gap-x-2 bg-white/20 text-white font-semibold py-2 px-4 rounded-full text-sm hover:bg-white/30 transition-colors">
                             <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M9.69 18.933l.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 00.281-.14c.186-.1.4-.22.653-.364.253-.145.546-.317.84-.504a25.058 25.058 0 002.323-1.666c.33-.245.636-.518.91-.806.275-.288.516-.61.722-.957.207-.347.375-.724.504-1.12.13-.395.228-.816.29-1.258.062-.442.093-.9.093-1.365 0-.885-.156-1.742-.468-2.56-.312-.818-.78-1.583-1.383-2.285a6.457 6.457 0 00-2.285-1.383c-.818-.312-1.675-.468-2.56-.468s-1.742.156-2.56.468a6.457 6.457 0 00-2.285 1.383c-.603.702-1.07 1.467-1.383 2.285-.312.818-.468 1.675-.468 2.56 0 .465.031.923.093 1.365.128.396.275.773.504 1.12.206.347.447.67.722.957.273.288.58.561.91.806a25.058 25.058 0 003.163 2.17c.294.187.587.36.84.504.253.143.467.263.653.364.093.05.183.1.281.14l.018.008.006.003zM10 8a2 2 0 100 4 2 2 0 000-4z" clip-rule="evenodd" />
@@ -126,7 +134,7 @@
                                 </button>
                             </div>
                         </form>
-                        <div id="form-feedback" class="text-center mt-3 font-semibold text-sm h-5"></div>
+                        <div id="form-feedback" class="text-center mt-3 font-semibold text-sm h-12 flex flex-col items-center justify-center"></div>
                     </div>
                 </div>
                 <footer class="text-white py-4 flex-shrink-0">
@@ -175,8 +183,7 @@
             
             <!-- Summary Cards -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <!-- Total Signups Card -->
-                <div class="bg-white p-4 rounded-lg shadow-md flex items-center">
+                 <div class="bg-white p-4 rounded-lg shadow-md flex items-center">
                     <div class="bg-blue-100 p-3 rounded-full">
                         <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a3.002 3.002 0 013.286-1.857m0 0a3 3 0 013.286 1.857m0 0l-1.832.832M12 12c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3z"></path></svg>
                     </div>
@@ -185,7 +192,6 @@
                         <p class="text-sm text-gray-500">Total Sign-ups</p>
                     </div>
                 </div>
-                <!-- Unique Contacts Card -->
                 <div class="bg-white p-4 rounded-lg shadow-md flex items-center">
                     <div class="bg-green-100 p-3 rounded-full">
                         <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21v-2a6 6 0 00-12 0v2"></path></svg>
@@ -195,7 +201,6 @@
                         <p class="text-sm text-gray-500">Unique Contacts</p>
                     </div>
                 </div>
-                <!-- Signups Today Card -->
                 <div class="bg-white p-4 rounded-lg shadow-md flex items-center">
                     <div class="bg-yellow-100 p-3 rounded-full">
                         <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -208,25 +213,22 @@
             </div>
 
             <!-- Mobile Card View -->
-            <div id="signups-cards-container" class="md:hidden space-y-4">
-                <!-- Mobile cards will be inserted here -->
-            </div>
+            <div id="signups-cards-container" class="md:hidden space-y-4"></div>
 
             <!-- Desktop Table View -->
             <div class="hidden md:block bg-white rounded-lg shadow-md overflow-hidden">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone Number</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Coupon Code</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sign-up Date</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Coupon</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
                         </tr>
                     </thead>
-                    <tbody id="signups-table-body" class="bg-white divide-y divide-gray-200">
-                        <!-- Desktop table rows will be inserted here -->
-                    </tbody>
+                    <tbody id="signups-table-body" class="bg-white divide-y divide-gray-200"></tbody>
                 </table>
             </div>
         </div>
@@ -235,9 +237,8 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, addDoc, serverTimestamp, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, getDocs, query, where, orderBy, onSnapshot, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // --- Firebase Config ---
         const firebaseConfig = {
             apiKey: "AIzaSyCVnRmh3kRwnc9Feq3XBLfwuHS0gv8J36A",
             authDomain: "palette-9bee8.firebaseapp.com",
@@ -251,7 +252,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // --- PUBLIC PAGE ELEMENTS ---
         const mainContent = document.getElementById('main-content');
         const openFormBtn = document.getElementById('open-form-btn');
         const formIntro = document.getElementById('form-intro');
@@ -261,8 +261,6 @@
         const formFeedback = document.getElementById('form-feedback');
         const nameInput = document.getElementById('name');
         const phoneInput = document.getElementById('phone');
-
-        // --- ADMIN PAGE ELEMENTS ---
         const adminSection = document.getElementById('admin-section');
         const loginModal = document.getElementById('login-modal');
         const loginForm = document.getElementById('login-form');
@@ -279,7 +277,8 @@
         const uniqueContactsEl = document.getElementById('unique-contacts');
         const signupsTodayEl = document.getElementById('signups-today');
 
-        // --- HELPER FUNCTIONS ---
+        let unsubscribe = null;
+
         function generateCouponCode() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let coupon = 'PALETTE-';
@@ -288,8 +287,63 @@
             }
             return coupon;
         }
+
+        async function generateCouponImage(couponCode, name) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1080;
+            canvas.height = 1080;
+            const ctx = canvas.getContext('2d');
+            const bg = new Image();
+            bg.crossOrigin = "anonymous";
+            bg.src = 'https://raw.githubusercontent.com/Sarup098/artevia/main/IMG_8306.JPG';
+            const logo = new Image();
+            logo.crossOrigin = "anonymous";
+            logo.src = 'https://raw.githubusercontent.com/Sarup098/artevia/main/Artevia_Palette_Logo.png';
+            await Promise.all([
+                new Promise(resolve => bg.onload = resolve),
+                new Promise(resolve => logo.onload = resolve)
+            ]);
+            
+            const canvasAspect = canvas.width / canvas.height;
+            const imgAspect = bg.width / bg.height;
+            let newWidth, newHeight, newX, newY;
+            if (imgAspect > canvasAspect) {
+                newHeight = canvas.height;
+                newWidth = bg.width * (newHeight / bg.height);
+                newX = (canvas.width - newWidth) / 2;
+                newY = 0;
+            } else {
+                newWidth = canvas.width;
+                newHeight = bg.height * (newWidth / bg.width);
+                newY = (canvas.height - newHeight) / 2;
+                newX = 0;
+            }
+            ctx.drawImage(bg, newX, newY, newWidth, newHeight);
+
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(logo, (canvas.width - 600) / 2, 100, 600, 200);
+            ctx.font = 'bold 120px Lora, serif';
+            ctx.fillStyle = '#FBBF24';
+            ctx.textAlign = 'center';
+            ctx.fillText('10% OFF', canvas.width / 2, 450);
+            ctx.font = '40px Inter, sans-serif';
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillText('On your first order above ₹399', canvas.width / 2, 520);
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(140, 600, 800, 200);
+            ctx.font = 'bold 80px Inter, sans-serif';
+            ctx.fillStyle = '#000000';
+            ctx.fillText(couponCode, canvas.width / 2, 730);
+            ctx.font = '30px Inter, sans-serif';
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillText(`This coupon is exclusively for ${name}`, canvas.width / 2, 880);
+            const link = document.createElement('a');
+            link.download = `ArteviaPalette-Coupon-${couponCode}.jpg`;
+            link.href = canvas.toDataURL('image/jpeg', 0.9);
+            link.click();
+        }
         
-        // --- PUBLIC PAGE LOGIC ---
         openFormBtn.addEventListener('click', () => {
             formIntro.classList.add('hidden');
             formContainer.classList.add('bg-black/50', 'backdrop-blur-sm', 'p-6');
@@ -299,55 +353,66 @@
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
             formFeedback.textContent = '';
-
             const nameValue = nameInput.value.trim();
             const phoneValue = phoneInput.value.trim();
-            const phoneRegex = /^\d{10}$/;
-
             if (nameValue === "") {
                 formFeedback.textContent = 'Please enter your name.';
                 formFeedback.style.color = '#FBBF24';
                 return;
             }
-            if (!phoneRegex.test(phoneValue)) {
+            if (!/^\d{10}$/.test(phoneValue)) {
                 formFeedback.textContent = 'Please enter a valid 10-digit phone number.';
                 formFeedback.style.color = '#FBBF24';
                 return;
             }
-            
             submitButton.disabled = true;
-            submitButton.textContent = 'Submitting...';
-            
-            const couponCode = generateCouponCode();
-
+            submitButton.textContent = 'Checking...';
             try {
-                await addDoc(collection(db, "signups"), {
-                    name: nameValue,
-                    phone: phoneValue,
-                    couponCode: couponCode,
-                    timestamp: serverTimestamp()
-                });
-                formFeedback.innerHTML = `Success! Your code for 10% OFF on your first order above ₹399 is <strong class="text-yellow-400">${couponCode}</strong>. Save it!`;
+                const q = query(collection(db, "signups"), where("phone", "==", phoneValue));
+                const querySnapshot = await getDocs(q);
+                let couponCode;
+                let isNewUser = true;
+                if (!querySnapshot.empty) {
+                    isNewUser = false;
+                    couponCode = querySnapshot.docs[0].data().couponCode;
+                } else {
+                    couponCode = generateCouponCode();
+                }
+                if (isNewUser) {
+                    submitButton.textContent = 'Saving...';
+                    await addDoc(collection(db, "signups"), {
+                        name: nameValue,
+                        phone: phoneValue,
+                        couponCode: couponCode,
+                        used: false,
+                        timestamp: serverTimestamp()
+                    });
+                }
+                formFeedback.innerHTML = `Success! Your code for 10% OFF on your first order above ₹399 is <strong class="text-yellow-400">${couponCode}</strong>.`;
                 formFeedback.style.color = '#10B981';
+                const downloadButton = document.createElement('button');
+                downloadButton.textContent = 'Download Coupon';
+                downloadButton.className = 'bg-yellow-500 text-black font-bold py-2 px-4 rounded-full text-xs mt-2 hover:bg-yellow-400';
+                downloadButton.onclick = () => generateCouponImage(couponCode, nameValue);
+                formFeedback.appendChild(document.createElement('br'));
+                formFeedback.appendChild(downloadButton);
                 form.reset();
                 setTimeout(() => {
                     form.classList.add('hidden');
                     formContainer.classList.remove('bg-black/50', 'backdrop-blur-sm', 'p-6');
                     formIntro.classList.remove('hidden');
-                    formFeedback.textContent = '';
-                }, 5000);
-
+                    formFeedback.innerHTML = '';
+                }, 8000);
             } catch (error) {
                 formFeedback.textContent = 'Oops! Something went wrong. Please try again.';
                 formFeedback.style.color = '#EF4444';
-                console.error("Error adding document: ", error);
+                console.error("Error: ", error);
             } finally {
                 submitButton.disabled = false;
                 submitButton.textContent = 'Submit';
             }
         });
 
-        // --- ADMIN LOGIC ---
         togglePasswordBtn.addEventListener('click', () => {
             const isPassword = passwordInput.type === 'password';
             passwordInput.type = isPassword ? 'text' : 'password';
@@ -359,15 +424,9 @@
             e.preventDefault();
             const enteredPassword = passwordInput.value;
             let adminName = null;
-
-            if (enteredPassword === 'sarup@2004') {
-                adminName = 'Sarup';
-            } else if (enteredPassword === 'sekhar@2002') {
-                adminName = 'Sekhar';
-            } else if (enteredPassword === 'anukriti') {
-                adminName = 'Anukriti';
-            }
-
+            if (enteredPassword === 'sarup@2004') adminName = 'Sarup';
+            else if (enteredPassword === 'sekhar@2002') adminName = 'Sekhar';
+            else if (enteredPassword === 'anukriti') adminName = 'Anukriti';
             if (adminName) {
                 sessionStorage.setItem('isAdminAuthenticated', 'true');
                 sessionStorage.setItem('adminName', adminName);
@@ -379,130 +438,114 @@
         });
 
         logoutBtn.addEventListener('click', () => {
-             sessionStorage.removeItem('isAdminAuthenticated');
-             sessionStorage.removeItem('adminName');
+             sessionStorage.clear();
+             if (unsubscribe) unsubscribe();
              window.location.hash = '';
              window.location.reload();
         });
 
-        async function fetchSignups() {
-            try {
-                const q = query(collection(db, 'signups'), orderBy('timestamp', 'desc'));
-                const querySnapshot = await getDocs(q);
-                tableBody.innerHTML = ''; 
-                cardsContainer.innerHTML = '';
-                
+        function setupRealtimeListener() {
+            const q = query(collection(db, 'signups'), orderBy('timestamp', 'desc'));
+            unsubscribe = onSnapshot(q, (querySnapshot) => {
+                const groupedSignups = new Map();
                 let signupsToday = 0;
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
-
                 totalSignupsEl.textContent = querySnapshot.size;
-
-                const groupedSignups = new Map();
-
                 querySnapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (data.timestamp && data.timestamp.toDate() >= today) {
-                        signupsToday++;
-                    }
-                    const phone = data.phone;
-                    if (phone) {
-                        if (!groupedSignups.has(phone)) {
-                            groupedSignups.set(phone, []);
-                        }
-                        groupedSignups.get(phone).push(data);
+                    const data = { id: doc.id, ...doc.data() };
+                    if (data.timestamp && data.timestamp.toDate() >= today) signupsToday++;
+                    if (data.phone) {
+                        if (!groupedSignups.has(data.phone)) groupedSignups.set(data.phone, []);
+                        groupedSignups.get(data.phone).push(data);
                     }
                 });
-
                 uniqueContactsEl.textContent = groupedSignups.size;
                 signupsTodayEl.textContent = signupsToday;
+                renderDashboard(groupedSignups);
+            });
+        }
+        
+        function renderDashboard(groupedSignups) {
+            tableBody.innerHTML = ''; 
+            cardsContainer.innerHTML = '';
+            if (groupedSignups.size === 0) {
+                const emptyMessage = '<tr><td colspan="6" class="text-center p-6 text-gray-500">No sign-ups yet.</td></tr>';
+                tableBody.innerHTML = emptyMessage;
+                cardsContainer.innerHTML = `<p class="text-center p-6 text-gray-500">No sign-ups yet.</p>`;
+                return;
+            }
+            const adminName = sessionStorage.getItem('adminName') || 'The Team';
+            groupedSignups.forEach((entries, phone) => {
+                const primaryEntry = entries[0]; 
+                const date = primaryEntry.timestamp ? primaryEntry.timestamp.toDate().toLocaleString('en-IN') : 'N/A';
+                const whatsappMessage = encodeURIComponent(`Hello ${primaryEntry.name}! This is ${adminName} from Artevia Palette. Thanks for signing up! Your discount code is ${primaryEntry.couponCode}. We're excited to see you soon.`);
+                const whatsappLink = `https://wa.me/91${primaryEntry.phone}?text=${whatsappMessage}`;
+                const uniqueNames = new Set(entries.map(e => e.name.trim().toLowerCase()));
+                const isExpandable = entries.length > 1 && uniqueNames.size > 1;
 
-                if (groupedSignups.size === 0) {
-                    const emptyMessage = '<tr><td colspan="5" class="text-center p-6 text-gray-500">No sign-ups yet.</td></tr>';
-                    tableBody.innerHTML = emptyMessage;
-                    cardsContainer.innerHTML = `<p class="text-center p-6 text-gray-500">No sign-ups yet.</p>`;
-                    return;
-                }
-                const adminName = sessionStorage.getItem('adminName') || 'The Team';
-
-                groupedSignups.forEach((entries, phone) => {
-                    const primaryEntry = entries[0]; 
-                    const date = primaryEntry.timestamp ? primaryEntry.timestamp.toDate().toLocaleString('en-IN') : 'N/A';
-                    const whatsappMessage = encodeURIComponent(`Hello ${primaryEntry.name}! This is ${adminName} from Artevia Palette. Thanks for signing up! Your discount code is ${primaryEntry.couponCode}. We're excited to see you soon.`);
-                    const whatsappLink = `https://wa.me/91${primaryEntry.phone}?text=${whatsappMessage}`;
-                    
-                    const uniqueNames = new Set(entries.map(e => e.name.trim().toLowerCase()));
-                    const isExpandable = entries.length > 1 && uniqueNames.size > 1;
-
-                    // Create Table Row for Desktop
-                    let tableHtml = `<tr ${isExpandable ? `class="cursor-pointer" data-toggle-id="desktop-${phone}"` : ''}>
-                        <td class="px-6 py-4 text-sm font-medium text-gray-900">${primaryEntry.name} ${isExpandable ? `<span class="ml-2 bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded-full">+ ${entries.length - 1} more</span>` : ''}</td>
-                        <td class="px-6 py-4 text-sm text-gray-500">${primaryEntry.phone}</td>
-                        <td class="px-6 py-4 text-sm text-gray-700 font-mono">${primaryEntry.couponCode || 'N/A'}</td>
-                        <td class="px-6 py-4 text-sm text-gray-500">${date}</td>
-                        <td class="px-6 py-4 text-sm">
-                            <a href="${whatsappLink}" target="_blank" class="inline-flex items-center gap-x-2 bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-full text-xs">
-                                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 4.315 1.731 6.086l.003.004l-1.241 4.515 4.591-1.205z"/></svg>
-                                Chat
-                            </a>
-                        </td>
-                    </tr>`;
-                    
-                    if (isExpandable) {
-                        for (let i = 1; i < entries.length; i++) {
-                            const entry = entries[i];
-                            tableHtml += `<tr class="hidden bg-gray-50" data-details-for="desktop-${phone}">
-                                <td class="pl-12 py-3 text-sm text-gray-700">${entry.name}</td>
-                                <td></td>
-                                <td class="px-6 py-3 text-sm text-gray-700 font-mono">${entry.couponCode}</td>
-                                <td class="px-6 py-3 text-sm text-gray-500">${entry.timestamp.toDate().toLocaleString('en-IN')}</td>
-                                <td></td>
-                            </tr>`;
-                        }
-                    }
-                    tableBody.innerHTML += tableHtml;
-
-
-                    // Create Card for Mobile
-                    let cardHtml = `<div class="bg-white p-4 rounded-lg shadow-md">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="font-bold text-gray-900">${primaryEntry.name}</p>
-                                <p class="text-sm text-gray-500">${primaryEntry.phone}</p>
-                            </div>
-                            <a href="${whatsappLink}" target="_blank" class="inline-flex items-center gap-x-1 bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-2 rounded-full text-xs">
-                                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 4.315 1.731 6.086l.003.004l-1.241 4.515 4.591-1.205z"/></svg>
-                                Chat
-                            </a>
+                let tableHtml = `<tr ${isExpandable ? `class="cursor-pointer" data-toggle-id="desktop-${phone}"` : ''}>
+                    <td class="px-6 py-4 text-sm font-medium text-gray-900">${primaryEntry.name} ${isExpandable ? `<span class="ml-2 bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded-full">+ ${entries.length - 1} more</span>` : ''}</td>
+                    <td class="px-6 py-4 text-sm text-gray-500">${primaryEntry.phone}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700 font-mono">${primaryEntry.couponCode || 'N/A'}</td>
+                    <td class="px-6 py-4 text-sm text-gray-500">${date}</td>
+                    <td class="px-6 py-4 text-sm">
+                        <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                            <input type="checkbox" name="toggle" id="toggle-${primaryEntry.id}" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" ${primaryEntry.used ? 'checked' : ''} data-doc-id="${primaryEntry.id}"/>
+                            <label for="toggle-${primaryEntry.id}" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
                         </div>
-                        <div class="mt-3 pt-3 border-t border-gray-200">
+                    </td>
+                    <td class="px-6 py-4 text-sm">
+                        <a href="${whatsappLink}" target="_blank" class="inline-flex items-center gap-x-2 bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-full text-xs">Chat</a>
+                    </td>
+                </tr>`;
+                if (isExpandable) {
+                    for (let i = 1; i < entries.length; i++) {
+                        const entry = entries[i];
+                        tableHtml += `<tr class="hidden bg-gray-50" data-details-for="desktop-${phone}">
+                            <td class="pl-12 py-3 text-sm text-gray-700">${entry.name}</td><td></td>
+                            <td class="px-6 py-3 text-sm text-gray-700 font-mono">${entry.couponCode}</td>
+                            <td class="px-6 py-3 text-sm text-gray-500">${entry.timestamp.toDate().toLocaleString('en-IN')}</td>
+                            <td class="px-6 py-3 text-center"><input type="checkbox" class="toggle-checkbox-sub" ${entry.used ? 'checked' : ''} data-doc-id="${entry.id}"></td><td></td>
+                        </tr>`;
+                    }
+                }
+                tableBody.innerHTML += tableHtml;
+
+                let cardHtml = `<div class="bg-white p-4 rounded-lg shadow-md">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="font-bold text-gray-900">${primaryEntry.name}</p>
+                            <p class="text-sm text-gray-500">${primaryEntry.phone}</p>
+                        </div>
+                        <a href="${whatsappLink}" target="_blank" class="inline-flex items-center gap-x-1 bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-2 rounded-full text-xs">Chat</a>
+                    </div>
+                    <div class="mt-3 pt-3 border-t border-gray-200 flex justify-between items-center">
+                        <div>
                             <p class="text-xs text-gray-500">Coupon: <span class="font-mono text-gray-700">${primaryEntry.couponCode || 'N/A'}</span></p>
                             <p class="text-xs text-gray-500">Date: <span class="text-gray-700">${date}</span></p>
+                        </div>
+                        <div class="relative inline-block w-10 align-middle select-none">
+                             <input type="checkbox" name="toggle-mobile" id="toggle-mobile-${primaryEntry.id}" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" ${primaryEntry.used ? 'checked' : ''} data-doc-id="${primaryEntry.id}"/>
+                            <label for="toggle-mobile-${primaryEntry.id}" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                        </div>
+                    </div>`;
+                if (isExpandable) {
+                    let subEntriesHtml = `<div class="hidden mt-3 pt-3 border-t border-gray-200 space-y-2" data-details-for="mobile-${phone}">`;
+                    for (let i = 1; i < entries.length; i++) {
+                        const entry = entries[i];
+                        subEntriesHtml += `<div class="text-xs flex justify-between">
+                            <p class="text-gray-800 font-semibold">${entry.name}</p>
+                            <p class="text-gray-500">Coupon: <span class="font-mono">${entry.couponCode}</span></p>
                         </div>`;
-                    
-                    if (isExpandable) {
-                        let subEntriesHtml = `<div class="hidden mt-3 pt-3 border-t border-gray-200 space-y-2" data-details-for="mobile-${phone}">`;
-                        for (let i = 1; i < entries.length; i++) {
-                            const entry = entries[i];
-                            subEntriesHtml += `<div class="text-xs">
-                                <p class="text-gray-800 font-semibold">${entry.name}</p>
-                                <p class="text-gray-500">Coupon: <span class="font-mono">${entry.couponCode}</span></p>
-                            </div>`;
-                        }
-                        subEntriesHtml += `</div>`;
-                        cardHtml += subEntriesHtml;
-                        cardHtml += `<button class="text-xs text-blue-600 font-semibold mt-2" data-toggle-id="mobile-${phone}">View ${entries.length - 1} more</button>`;
                     }
-                    cardHtml += `</div>`;
-                    cardsContainer.innerHTML += cardHtml;
-                });
-
-            } catch (error) {
-                console.error("Error fetching documents: ", error);
-                const errorMessage = '<tr><td colspan="5" class="text-center p-6 text-red-500">Failed to load data.</td></tr>';
-                tableBody.innerHTML = errorMessage;
-                cardsContainer.innerHTML = `<p class="text-center p-6 text-red-500">Failed to load data.</p>`;
-            }
+                    subEntriesHtml += `</div>`;
+                    cardHtml += subEntriesHtml;
+                    cardHtml += `<button class="text-xs text-blue-600 font-semibold mt-2" data-toggle-id="mobile-${phone}">View ${entries.length - 1} more</button>`;
+                }
+                cardHtml += `</div>`;
+                cardsContainer.innerHTML += cardHtml;
+            });
         }
 
         function showDashboard() {
@@ -510,16 +553,28 @@
             adminSection.classList.remove('hidden');
             loginModal.classList.add('hidden');
             dashboard.classList.remove('hidden');
-            fetchSignups();
+            setupRealtimeListener();
         }
 
-        // --- EVENT LISTENERS ---
+        dashboard.addEventListener('change', async (e) => {
+            if (e.target.matches('.toggle-checkbox, .toggle-checkbox-sub')) {
+                const docId = e.target.dataset.docId;
+                const isUsed = e.target.checked;
+                const docRef = doc(db, 'signups', docId);
+                try {
+                    await updateDoc(docRef, { used: isUsed });
+                } catch (error) {
+                    console.error("Error updating document: ", error);
+                    e.target.checked = !isUsed;
+                }
+            }
+        });
+
         tableBody.addEventListener('click', (e) => {
             const headerRow = e.target.closest('tr[data-toggle-id]');
             if (headerRow) {
                 const toggleId = headerRow.dataset.toggleId;
-                const detailRows = document.querySelectorAll(`tr[data-details-for="${toggleId}"]`);
-                detailRows.forEach(row => row.classList.toggle('hidden'));
+                document.querySelectorAll(`tr[data-details-for="${toggleId}"]`).forEach(row => row.classList.toggle('hidden'));
             }
         });
 
@@ -529,12 +584,10 @@
                 const toggleId = toggleButton.dataset.toggleId;
                 const detailsDiv = document.querySelector(`div[data-details-for="${toggleId}"]`);
                 detailsDiv.classList.toggle('hidden');
-                const isHidden = detailsDiv.classList.contains('hidden');
-                toggleButton.textContent = isHidden ? `View ${detailsDiv.children.length} more` : 'Hide details';
+                toggleButton.textContent = detailsDiv.classList.contains('hidden') ? `View ${detailsDiv.children.length} more` : 'Hide details';
             }
         });
 
-        // --- INITIAL PAGE LOAD LOGIC ---
         function checkAdminRoute() {
             if (window.location.hash === '#admin') {
                 mainContent.classList.add('hidden');
@@ -552,9 +605,7 @@
 
         window.addEventListener('DOMContentLoaded', checkAdminRoute);
         window.addEventListener('hashchange', checkAdminRoute);
-
     </script>
 </body>
 </html>
-
 
