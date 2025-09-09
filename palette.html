@@ -165,6 +165,40 @@
                 <button id="logout-btn" class="bg-gray-700 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600 self-start md:self-center">Logout</button>
             </div>
             
+            <!-- NEW: Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <!-- Total Signups Card -->
+                <div class="bg-white p-4 rounded-lg shadow-md flex items-center">
+                    <div class="bg-blue-100 p-3 rounded-full">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a3.002 3.002 0 013.286-1.857m0 0a3 3 0 013.286 1.857m0 0l-1.832.832M12 12c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3z"></path></svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-3xl font-bold text-gray-900" id="total-signups">0</p>
+                        <p class="text-sm text-gray-500">Total Sign-ups</p>
+                    </div>
+                </div>
+                <!-- Unique Contacts Card -->
+                <div class="bg-white p-4 rounded-lg shadow-md flex items-center">
+                    <div class="bg-green-100 p-3 rounded-full">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21v-2a6 6 0 00-12 0v2"></path></svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-3xl font-bold text-gray-900" id="unique-contacts">0</p>
+                        <p class="text-sm text-gray-500">Unique Contacts</p>
+                    </div>
+                </div>
+                <!-- Signups Today Card -->
+                <div class="bg-white p-4 rounded-lg shadow-md flex items-center">
+                    <div class="bg-yellow-100 p-3 rounded-full">
+                        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-3xl font-bold text-gray-900" id="signups-today">0</p>
+                        <p class="text-sm text-gray-500">Sign-ups Today</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Mobile Card View -->
             <div id="signups-cards-container" class="md:hidden space-y-4">
                 <!-- Mobile cards will be inserted here -->
@@ -233,6 +267,9 @@
         const togglePasswordBtn = document.getElementById('toggle-password');
         const eyeOpen = document.getElementById('eye-open');
         const eyeClosed = document.getElementById('eye-closed');
+        const totalSignupsEl = document.getElementById('total-signups');
+        const uniqueContactsEl = document.getElementById('unique-contacts');
+        const signupsTodayEl = document.getElementById('signups-today');
 
         // --- HELPER FUNCTIONS ---
         function generateCouponCode() {
@@ -346,8 +383,33 @@
                 const querySnapshot = await getDocs(q);
                 tableBody.innerHTML = ''; 
                 cardsContainer.innerHTML = '';
+                
+                let signupsToday = 0;
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
 
-                if (querySnapshot.empty) {
+                totalSignupsEl.textContent = querySnapshot.size;
+
+                const groupedSignups = new Map();
+
+                querySnapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.timestamp && data.timestamp.toDate() >= today) {
+                        signupsToday++;
+                    }
+                    const phone = data.phone;
+                    if (phone) {
+                        if (!groupedSignups.has(phone)) {
+                            groupedSignups.set(phone, []);
+                        }
+                        groupedSignups.get(phone).push(data);
+                    }
+                });
+
+                uniqueContactsEl.textContent = groupedSignups.size;
+                signupsTodayEl.textContent = signupsToday;
+
+                if (groupedSignups.size === 0) {
                     const emptyMessage = '<tr><td colspan="5" class="text-center p-6 text-gray-500">No sign-ups yet.</td></tr>';
                     tableBody.innerHTML = emptyMessage;
                     cardsContainer.innerHTML = `<p class="text-center p-6 text-gray-500">No sign-ups yet.</p>`;
@@ -355,17 +417,20 @@
                 }
                 const adminName = sessionStorage.getItem('adminName') || 'The Team';
 
-                querySnapshot.forEach(doc => {
-                    const data = doc.data();
-                    const date = data.timestamp ? data.timestamp.toDate().toLocaleString('en-IN') : 'N/A';
-                    const whatsappMessage = encodeURIComponent(`Hello ${data.name}! This is ${adminName} from Artevia Palette. Thanks for signing up! Your discount code is ${data.couponCode}. We're excited to see you soon.`);
-                    const whatsappLink = `https://wa.me/91${data.phone}?text=${whatsappMessage}`;
+                groupedSignups.forEach((entries, phone) => {
+                    const primaryEntry = entries[0]; 
+                    const date = primaryEntry.timestamp ? primaryEntry.timestamp.toDate().toLocaleString('en-IN') : 'N/A';
+                    const whatsappMessage = encodeURIComponent(`Hello ${primaryEntry.name}! This is ${adminName} from Artevia Palette. Thanks for signing up! Your discount code is ${primaryEntry.couponCode}. We're excited to see you soon.`);
+                    const whatsappLink = `https://wa.me/91${primaryEntry.phone}?text=${whatsappMessage}`;
                     
+                    const uniqueNames = new Set(entries.map(e => e.name.trim().toLowerCase()));
+                    const isExpandable = entries.length > 1 && uniqueNames.size > 1;
+
                     // Create Table Row for Desktop
-                    tableBody.innerHTML += `<tr>
-                        <td class="px-6 py-4 text-sm font-medium text-gray-900">${data.name}</td>
-                        <td class="px-6 py-4 text-sm text-gray-500">${data.phone}</td>
-                        <td class="px-6 py-4 text-sm text-gray-700 font-mono">${data.couponCode || 'N/A'}</td>
+                    let tableHtml = `<tr ${isExpandable ? `class="cursor-pointer" data-toggle-id="desktop-${phone}"` : ''}>
+                        <td class="px-6 py-4 text-sm font-medium text-gray-900">${primaryEntry.name} ${isExpandable ? `<span class="ml-2 bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded-full">+ ${entries.length - 1} more</span>` : ''}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">${primaryEntry.phone}</td>
+                        <td class="px-6 py-4 text-sm text-gray-700 font-mono">${primaryEntry.couponCode || 'N/A'}</td>
                         <td class="px-6 py-4 text-sm text-gray-500">${date}</td>
                         <td class="px-6 py-4 text-sm">
                             <a href="${whatsappLink}" target="_blank" class="inline-flex items-center gap-x-2 bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-full text-xs">
@@ -374,27 +439,56 @@
                             </a>
                         </td>
                     </tr>`;
+                    
+                    if (isExpandable) {
+                        for (let i = 1; i < entries.length; i++) {
+                            const entry = entries[i];
+                            tableHtml += `<tr class="hidden bg-gray-50" data-details-for="desktop-${phone}">
+                                <td class="pl-12 py-3 text-sm text-gray-700">${entry.name}</td>
+                                <td></td>
+                                <td class="px-6 py-3 text-sm text-gray-700 font-mono">${entry.couponCode}</td>
+                                <td class="px-6 py-3 text-sm text-gray-500">${entry.timestamp.toDate().toLocaleString('en-IN')}</td>
+                                <td></td>
+                            </tr>`;
+                        }
+                    }
+                    tableBody.innerHTML += tableHtml;
+
 
                     // Create Card for Mobile
-                    cardsContainer.innerHTML += `
-                        <div class="bg-white p-4 rounded-lg shadow-md">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <p class="font-bold text-gray-900">${data.name}</p>
-                                    <p class="text-sm text-gray-500">${data.phone}</p>
-                                </div>
-                                <a href="${whatsappLink}" target="_blank" class="inline-flex items-center gap-x-1 bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-2 rounded-full text-xs">
-                                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 4.315 1.731 6.086l.003.004l-1.241 4.515 4.591-1.205z"/></svg>
-                                    Chat
-                                </a>
+                    let cardHtml = `<div class="bg-white p-4 rounded-lg shadow-md">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-bold text-gray-900">${primaryEntry.name}</p>
+                                <p class="text-sm text-gray-500">${primaryEntry.phone}</p>
                             </div>
-                            <div class="mt-3 pt-3 border-t border-gray-200">
-                                <p class="text-xs text-gray-500">Coupon: <span class="font-mono text-gray-700">${data.couponCode || 'N/A'}</span></p>
-                                <p class="text-xs text-gray-500">Date: <span class="text-gray-700">${date}</span></p>
-                            </div>
+                            <a href="${whatsappLink}" target="_blank" class="inline-flex items-center gap-x-1 bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-2 rounded-full text-xs">
+                                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 4.315 1.731 6.086l.003.004l-1.241 4.515 4.591-1.205z"/></svg>
+                                Chat
+                            </a>
                         </div>
-                    `;
+                        <div class="mt-3 pt-3 border-t border-gray-200">
+                            <p class="text-xs text-gray-500">Coupon: <span class="font-mono text-gray-700">${primaryEntry.couponCode || 'N/A'}</span></p>
+                            <p class="text-xs text-gray-500">Date: <span class="text-gray-700">${date}</span></p>
+                        </div>`;
+                    
+                    if (isExpandable) {
+                        let subEntriesHtml = `<div class="hidden mt-3 pt-3 border-t border-gray-200 space-y-2" data-details-for="mobile-${phone}">`;
+                        for (let i = 1; i < entries.length; i++) {
+                            const entry = entries[i];
+                            subEntriesHtml += `<div class="text-xs">
+                                <p class="text-gray-800 font-semibold">${entry.name}</p>
+                                <p class="text-gray-500">Coupon: <span class="font-mono">${entry.couponCode}</span></p>
+                            </div>`;
+                        }
+                        subEntriesHtml += `</div>`;
+                        cardHtml += subEntriesHtml;
+                        cardHtml += `<button class="text-xs text-blue-600 font-semibold mt-2" data-toggle-id="mobile-${phone}">View ${entries.length - 1} more</button>`;
+                    }
+                    cardHtml += `</div>`;
+                    cardsContainer.innerHTML += cardHtml;
                 });
+
             } catch (error) {
                 console.error("Error fetching documents: ", error);
                 const errorMessage = '<tr><td colspan="5" class="text-center p-6 text-red-500">Failed to load data.</td></tr>';
@@ -410,6 +504,27 @@
             dashboard.classList.remove('hidden');
             fetchSignups();
         }
+
+        // --- EVENT LISTENERS ---
+        tableBody.addEventListener('click', (e) => {
+            const headerRow = e.target.closest('tr[data-toggle-id]');
+            if (headerRow) {
+                const toggleId = headerRow.dataset.toggleId;
+                const detailRows = document.querySelectorAll(`tr[data-details-for="${toggleId}"]`);
+                detailRows.forEach(row => row.classList.toggle('hidden'));
+            }
+        });
+
+        cardsContainer.addEventListener('click', (e) => {
+            const toggleButton = e.target.closest('button[data-toggle-id]');
+            if (toggleButton) {
+                const toggleId = toggleButton.dataset.toggleId;
+                const detailsDiv = document.querySelector(`div[data-details-for="${toggleId}"]`);
+                detailsDiv.classList.toggle('hidden');
+                const isHidden = detailsDiv.classList.contains('hidden');
+                toggleButton.textContent = isHidden ? `View ${detailsDiv.children.length} more` : 'Hide details';
+            }
+        });
 
         // --- INITIAL PAGE LOAD LOGIC ---
         function checkAdminRoute() {
