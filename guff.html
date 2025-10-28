@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guff | Real People, Real Stories from Sikkim</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: #F5F1E8; /* Cream White */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+        h1, h2, h3, .font-serif {
+            font-family: 'Lora', serif;
+        }
+        .bg-rust { background-color: #B9472C; }
+        .bg-cream { background-color: #F5F1E8; }
+        .bg-coral { background-color: #FF7043; }
+        .text-rust { color: #B9472C; }
+        .text-cream { color: #F5F1E8; }
+        .text-coral { color: #FF7043; }
+        .hover-bg-coral:hover { background-color: #e65a31; } /* Darker Coral */
+        .hover-bg-rust:hover { background-color: #a03d25; }
+
+        .sikkim-pattern {
+            background-image: url('https://raw.githubusercontent.com/Sarup098/artevia/main/pattern.png');
+            background-size: 300px;
+            background-position: center;
+            background-repeat: repeat;
+        }
+        /* Animated Background Pattern Overlay */
+        @keyframes subtle-glow-move {
+            0%, 100% { opacity: 0.03; transform: translate(0, 0) scale(1); }
+            50% { opacity: 0.06; transform: translate(15px, 8px) scale(1.05); } /* Slightly more movement */
+            100% { opacity: 0.03; transform: translate(0, 0) scale(1); }
+        }
+        /* More Visible Light Leak Animation */
+        @keyframes light-leak-enhanced {
+             0% { background-position: -600px 0, -600px 0; opacity: 0.2; } /* Start further off-screen */
+             50% { opacity: 0.5; } /* Brighter peak opacity */
+             100% { background-position: 600px 0, 600px 0; opacity: 0.2; } /* End further off-screen */
+        }
+
+         .pattern-overlay-dark::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: url('https://raw.githubusercontent.com/Sarup098/artevia/main/pattern.png');
+            background-size: 400px;
+            background-position: center;
+            background-repeat: repeat;
+            opacity: 0.03;
+            z-index: 0;
+            animation: subtle-glow-move 20s infinite ease-in-out; /* Slower, smoother movement */
+        }
+         #intro.pattern-overlay-dark::after {
+             content: "";
+             position: absolute;
+             inset: 0;
+             background:
+                 radial-gradient(ellipse at top left, rgba(255, 215, 0, 0.3) 0%, transparent 60%), /* Brighter Gold */
+                 radial-gradient(ellipse at bottom right, rgba(255, 112, 67, 0.3) 0%, transparent 60%); /* Brighter Coral */
+             background-size: 500px 500px, 500px 500px; /* Larger leaks */
+             background-repeat: no-repeat;
+             mix-blend-mode: screen;
+             animation: light-leak-enhanced 12s infinite alternate ease-in-out; /* Faster drift */
+             z-index: 1;
+         }
+
+        #intro.pattern-overlay-dark, #cta-section.pattern-overlay-dark, #instagram-cta.pattern-overlay-dark {
+            position: relative;
+            overflow: hidden; /* Contain pseudo-elements */
+        }
+        #intro > *, #cta-section > *, #instagram-cta > * {
+            position: relative;
+            z-index: 2; /* Content above pattern and light leaks */
+        }
+
+        .cta-button {
+             transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
+        }
+        .cta-button:hover {
+             transform: translateY(-2px);
+             box-shadow: 0 6px 12px rgba(185, 71, 44, 0.3);
+        }
+        /* Modal Styles */
+        .modal-overlay {
+            transition: opacity 0.3s ease;
+        }
+        .modal-content {
+            transition: transform 0.3s ease;
+        }
+
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Simple Header - Guff Focused -->
+    <header class="bg-black py-4 sticky top-0 z-50 shadow-md">
+        <div class="container mx-auto px-6 flex justify-center items-center gap-x-4"> <!-- Centered Logo & Text -->
+             <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/guff.PNG" alt="Guff Logo" class="h-16 w-auto">
+             <span class="text-xl font-semibold text-cream">Guff Podcast</span>
+        </div>
+    </header>
+
+    <main>
+        <!-- Intro Section -->
+        <section id="intro" class="py-20 md:py-32 bg-gray-900 pattern-overlay-dark">
+            <div class="container mx-auto px-6 text-center">
+                 <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/guff.PNG" alt="Guff Logo" class="w-56 md:w-80 mx-auto mb-8" data-aos="fade-up">
+                <h1 class="text-3xl md:text-4xl font-serif font-bold text-cream mb-6 leading-snug" data-aos="fade-up" data-aos-delay="100">
+                    Real people. Real stories.<br>Honest conversation from the hills of Sikkim and nearby.
+                </h1>
+                <p class="max-w-2xl mx-auto text-lg text-cream/80 mb-10" data-aos="fade-up" data-aos-delay="200">
+                   <strong>Guff Podcast</strong> delves into the authentic experiences, ideas, and voices shaping our region. Join us for insightful discussions that connect and inspire.
+                </p>
+                 <a href="#episodes" class="cta-button bg-coral text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-rust transition-colors duration-300" data-aos="fade-up" data-aos-delay="300">Listen Now</a>
+            </div>
+        </section>
+
+        <!-- Featured Episodes Section -->
+        <section id="episodes" class="py-20 md:py-32 bg-black">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-serif font-bold text-cream mb-4" data-aos="fade-up">Featured Episodes</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
+                    <!-- Episode 1: Jagatguru -->
+                    <div data-aos="fade-up">
+                        <div class="aspect-video rounded-lg overflow-hidden shadow-2xl mb-4">
+                            <iframe class="w-full h-full" src="https://www.youtube.com/embed/GPyQPVfw5o0" title="Podcast with Jagatguru" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                        </div>
+                        <h3 class="text-xl font-bold text-cream mb-2">Conversation with Jagatguru</h3>
+                        <p class="text-cream/70 text-sm">An insightful discussion with one of India's most prominent spiritual leaders.</p>
+                    </div>
+
+                    <!-- Episode 2: ISRO Scientist -->
+                    <div data-aos="fade-up" data-aos-delay="100">
+                         <div class="aspect-video rounded-lg overflow-hidden shadow-2xl mb-4">
+                            <iframe class="w-full h-full" src="https://www.youtube.com/embed/Rc85cgpukqw" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="Podcast with ISRO Scientist"></iframe>
+                        </div>
+                        <h3 class="text-xl font-bold text-cream mb-2">Chat with Dinesh Dhungel</h3>
+                        <p class="text-cream/70 text-sm">Exploring the journey of an ISRO engineer and entrepreneur from Sikkim.</p>
+                    </div>
+
+                     <!-- Episode 3: NEW -->
+                    <div data-aos="fade-up" data-aos-delay="200">
+                        <div class="aspect-video rounded-lg overflow-hidden shadow-2xl mb-4">
+                            <iframe class="w-full h-full" src="https://www.youtube.com/embed/C-SBgzqRqbY" title="Exploring Sikkim's Music Scene" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                        </div>
+                        <h3 class="text-xl font-bold text-cream mb-2">Exploring Sikkim's Music Scene</h3>
+                        <p class="text-cream/70 text-sm">A conversation about the vibrant local music and its artists.</p>
+                    </div>
+
+                     <!-- Episode 4: NEW -->
+                    <div data-aos="fade-up" data-aos-delay="300">
+                         <div class="aspect-video rounded-lg overflow-hidden shadow-2xl mb-4">
+                             <iframe class="w-full h-full" src="https://www.youtube.com/embed/oX6iYwqNlzA" title="The Future of Tourism in the Hills" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                        </div>
+                        <h3 class="text-xl font-bold text-cream mb-2">The Future of Tourism in the Hills</h3>
+                        <p class="text-cream/70 text-sm">Discussing sustainable travel and community impact.</p>
+                    </div>
+                </div>
+                <div class="text-center mt-16" data-aos="fade-up">
+                     <a href="https://www.youtube.com/@Arteviastudio/videos" target="_blank" class="cta-button bg-rust text-cream font-bold py-3 px-8 rounded-full text-lg hover:bg-coral transition-colors duration-300">View All Episodes</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action Section -->
+        <section id="cta-section" class="py-20 bg-gray-900 pattern-overlay-dark">
+            <div class="container mx-auto px-6 text-center">
+                 <h2 class="text-3xl font-serif font-bold text-cream mb-4" data-aos="fade-up">Get Involved</h2>
+                 <p class="text-lg text-cream/80 mb-8 max-w-xl mx-auto" data-aos="fade-up" data-aos-delay="100">Have a story to share or want to support our conversations?</p>
+                 <!-- Flex container for buttons -->
+                 <div class="flex flex-col sm:flex-row justify-center items-start sm:items-center gap-6">
+                    <!-- Get Featured Container -->
+                    <div class="flex flex-col items-center" data-aos="fade-up" data-aos-delay="200">
+                        <button id="open-feature-modal-btn" class="cta-button bg-coral text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-rust transition-colors duration-300">Get Featured in Guff</button>
+                        <p class="text-xs text-gray-500 mt-2">Talk to our team</p>
+                    </div>
+                    <!-- Sponsor Container -->
+                    <div class="flex flex-col items-center" data-aos="fade-up" data-aos-delay="300">
+                        <a href="https://pages.razorpay.com/pl_RYithli6b10Fxt/view" target="_blank" class="cta-button bg-rust text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-coral transition-colors duration-300">
+                            Sponsor Guff
+                        </a>
+                        <p class="text-xs text-gray-500 mt-2">Powered by Razorpay</p>
+                    </div>
+                 </div>
+            </div>
+        </section>
+
+
+         <!-- Instagram CTA Section -->
+        <section id="instagram-cta" class="py-20 bg-black pattern-overlay-dark">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl font-serif font-bold text-cream mb-4" data-aos="fade-up">Join the Conversation</h2>
+                <p class="text-lg text-cream/80 mb-8" data-aos="fade-up" data-aos-delay="100">Follow Guff on Instagram for behind-the-scenes content, updates, and more.</p>
+                <a href="https://www.instagram.com/guff.podcasts?igsh=cmVld2xuODc0dHJt&utm_source=qr" target="_blank" class="cta-button inline-flex items-center gap-x-3 bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 text-white font-bold py-3 px-8 rounded-full text-lg hover:opacity-90 transition-opacity duration-300" data-aos="fade-up" data-aos-delay="200">
+                    Follow @guff.podcasts
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-950 text-cream/60 py-6">
+        <div class="container mx-auto px-6 text-center text-xs">
+             <a href="index.html" class="inline-block mb-2 opacity-70 hover:opacity-100 transition-opacity">
+                <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/main%20logo.png" alt="Artevia Studio Logo" class="h-6 w-auto mx-auto">
+             </a>
+            <p>Guff is a podcast by Artevia Studio.</p>
+            <p class="mt-1">&copy; 2025 Artevia Studio. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Get Featured Modal -->
+    <div id="feature-modal" class="modal-overlay fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-[100] opacity-0 pointer-events-none">
+        <div class="modal-content bg-cream text-black rounded-lg shadow-2xl p-6 md:p-8 w-full max-w-sm transform scale-95">
+            <h3 class="text-xl font-bold font-serif mb-4 text-center">Get Featured in Guff</h3>
+            <p class="text-sm text-gray-700 mb-6 text-center">Please enter your name below so we know who we're chatting with!</p>
+            
+            <div class="mb-4">
+                <label for="guest-name" class="block text-gray-800 text-sm font-semibold mb-2">Your Name</label>
+                <input type="text" id="guest-name" class="w-full bg-white border border-gray-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-rust" placeholder="Enter your name">
+            </div>
+            
+            <button id="submit-feature-request" class="w-full bg-rust text-white font-bold py-3 rounded-lg hover:bg-coral transition-colors duration-300">Chat Now on WhatsApp</button>
+            <p id="modal-error" class="text-red-500 text-xs text-center mt-2 h-4"></p>
+
+            <button id="close-modal-btn" class="absolute top-3 right-3 text-gray-500 hover:text-black">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- We don't need the Razorpay script if we use a direct link -->
+    <script>
+        AOS.init({ duration: 800, once: true, offset: 50 });
+
+        // --- Modal Logic ---
+        const featureModal = document.getElementById('feature-modal');
+        const openModalBtn = document.getElementById('open-feature-modal-btn');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const submitFeatureRequestBtn = document.getElementById('submit-feature-request');
+        const guestNameInput = document.getElementById('guest-name');
+        const modalError = document.getElementById('modal-error');
+        const guffContactNumber = "919907488075"; // Your WhatsApp number
+
+        openModalBtn.addEventListener('click', () => {
+             modalError.textContent = ''; 
+             guestNameInput.value = ''; 
+             featureModal.classList.remove('opacity-0', 'pointer-events-none');
+             featureModal.querySelector('.modal-content').classList.remove('scale-95');
+        });
+
+        function closeModal() {
+             featureModal.classList.add('opacity-0', 'pointer-events-none');
+             featureModal.querySelector('.modal-content').classList.add('scale-95');
+        }
+
+        closeModalBtn.addEventListener('click', closeModal);
+        featureModal.addEventListener('click', (e) => {
+             if (e.target === featureModal) closeModal();
+        });
+
+        submitFeatureRequestBtn.addEventListener('click', () => {
+            const guestName = guestNameInput.value.trim();
+            if (!guestName) {
+                modalError.textContent = 'Please enter your name.';
+                return;
+            }
+            modalError.textContent = ''; 
+
+            const message = encodeURIComponent(`Hello Guff Team! This is ${guestName}. I find the podcast very interesting and would love to learn more about the process of getting featured. Thank you!`);
+            const whatsappLink = `https://wa.me/${guffContactNumber}?text=${message}`;
+            
+            window.open(whatsappLink, '_blank'); 
+            closeModal(); 
+        });
+
+    </script>
+</body>
+</html>
+
