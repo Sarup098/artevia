@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guff | Real People, Real Stories from Sikkim</title>
+    <title>Guff Podcasts | Real People, Real Stories from Sikkim</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -98,15 +98,25 @@
             transition: transform 0.3s ease;
         }
 
+        /* Guff Logo Glow Animation (Even Subtler) */
+        @keyframes logo-glow-subtle {
+             0%, 100% { filter: drop-shadow(0 0 15px rgba(255, 112, 67, 0.15)) drop-shadow(0 0 20px rgba(255, 215, 0, 0.07)); } /* Lowered opacity */
+             50% { filter: drop-shadow(0 0 20px rgba(255, 112, 67, 0.25)) drop-shadow(0 0 25px rgba(255, 215, 0, 0.12)); } /* Lowered opacity */
+        }
+        .guff-logo-glow {
+            animation: logo-glow-subtle 4s infinite ease-in-out;
+        }
+
     </style>
 </head>
 <body class="antialiased">
 
-    <!-- Simple Header - Guff Focused -->
+    <!-- Header - Guff Focused -->
     <header class="bg-black py-4 sticky top-0 z-50 shadow-md">
-        <div class="container mx-auto px-6 flex justify-center items-center gap-x-4"> <!-- Centered Logo & Text -->
-             <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/guff.PNG" alt="Guff Logo" class="h-16 w-auto">
-             <span class="text-xl font-semibold text-cream">Guff Podcast</span>
+        <!-- Flex container: Left-aligned on mobile, centered on medium screens and up -->
+        <div class="container mx-auto px-6 flex justify-start md:justify-center items-center gap-x-4">
+             <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/guff.PNG" alt="Guff Logo" class="h-12 md:h-16 w-auto"> <!-- Smaller on mobile -->
+             <span class="text-lg md:text-xl font-semibold text-cream">Guff Podcasts</span>
         </div>
     </header>
 
@@ -114,12 +124,12 @@
         <!-- Intro Section -->
         <section id="intro" class="py-20 md:py-32 bg-gray-900 pattern-overlay-dark">
             <div class="container mx-auto px-6 text-center">
-                 <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/guff.PNG" alt="Guff Logo" class="w-56 md:w-80 mx-auto mb-8" data-aos="fade-up">
+                 <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/guff.PNG" alt="Guff Logo" class="w-56 md:w-80 mx-auto mb-8 guff-logo-glow" data-aos="fade-up">
                 <h1 class="text-3xl md:text-4xl font-serif font-bold text-cream mb-6 leading-snug" data-aos="fade-up" data-aos-delay="100">
                     Real people. Real stories.<br>Honest conversation from the hills of Sikkim and nearby.
                 </h1>
                 <p class="max-w-2xl mx-auto text-lg text-cream/80 mb-10" data-aos="fade-up" data-aos-delay="200">
-                   <strong>Guff Podcast</strong> delves into the authentic experiences, ideas, and voices shaping our region. Join us for insightful discussions that connect and inspire.
+                   The <strong>Guff Podcasts</strong> brand delves into the authentic experiences, ideas, and voices shaping our region. Join us for insightful discussions that connect and inspire.
                 </p>
                  <a href="#episodes" class="cta-button bg-coral text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-rust transition-colors duration-300" data-aos="fade-up" data-aos-delay="300">Listen Now</a>
             </div>
@@ -150,22 +160,22 @@
                         <p class="text-cream/70 text-sm">Exploring the journey of an ISRO engineer and entrepreneur from Sikkim.</p>
                     </div>
 
-                     <!-- Episode 3: NEW -->
+                     <!-- Episode 3: Sonia Pradhan -->
                     <div data-aos="fade-up" data-aos-delay="200">
                         <div class="aspect-video rounded-lg overflow-hidden shadow-2xl mb-4">
-                            <iframe class="w-full h-full" src="https://www.youtube.com/embed/C-SBgzqRqbY" title="Exploring Sikkim's Music Scene" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                            <iframe class="w-full h-full" src="https://www.youtube.com/embed/C-SBgzqRqbY" title="Chat with Miss Sonia Pradhan (Miss Universe Sikkim)" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                         </div>
-                        <h3 class="text-xl font-bold text-cream mb-2">Exploring Sikkim's Music Scene</h3>
-                        <p class="text-cream/70 text-sm">A conversation about the vibrant local music and its artists.</p>
+                        <h3 class="text-xl font-bold text-cream mb-2">Chat with Miss Sonia Pradhan</h3>
+                        <p class="text-cream/70 text-sm">Insights from Miss Universe Sikkim on her journey and aspirations.</p>
                     </div>
 
-                     <!-- Episode 4: NEW -->
+                     <!-- Episode 4: Sanjay Budhathoki -->
                     <div data-aos="fade-up" data-aos-delay="300">
                          <div class="aspect-video rounded-lg overflow-hidden shadow-2xl mb-4">
-                             <iframe class="w-full h-full" src="https://www.youtube.com/embed/oX6iYwqNlzA" title="The Future of Tourism in the Hills" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                             <iframe class="w-full h-full" src="https://www.youtube.com/embed/oX6iYwqNlzA" title="Chat with Sanjay Budhathoki (International Athlete)" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                         </div>
-                        <h3 class="text-xl font-bold text-cream mb-2">The Future of Tourism in the Hills</h3>
-                        <p class="text-cream/70 text-sm">Discussing sustainable travel and community impact.</p>
+                        <h3 class="text-xl font-bold text-cream mb-2">Chat with Sanjay Budhathoki</h3>
+                        <p class="text-cream/70 text-sm">The story of an international athlete from Sikkim giving back to the community.</p>
                     </div>
                 </div>
                 <div class="text-center mt-16" data-aos="fade-up">
@@ -180,15 +190,15 @@
                  <h2 class="text-3xl font-serif font-bold text-cream mb-4" data-aos="fade-up">Get Involved</h2>
                  <p class="text-lg text-cream/80 mb-8 max-w-xl mx-auto" data-aos="fade-up" data-aos-delay="100">Have a story to share or want to support our conversations?</p>
                  <!-- Flex container for buttons -->
-                 <div class="flex flex-col sm:flex-row justify-center items-start sm:items-center gap-6">
+                 <div class="flex flex-col sm:flex-row justify-center items-center sm:items-start gap-6">
                     <!-- Get Featured Container -->
                     <div class="flex flex-col items-center" data-aos="fade-up" data-aos-delay="200">
-                        <button id="open-feature-modal-btn" class="cta-button bg-coral text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-rust transition-colors duration-300">Get Featured in Guff</button>
+                        <button id="open-feature-modal-btn" class="cta-button bg-coral text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-rust transition-colors duration-300 w-full sm:w-auto">Get Featured in Guff</button>
                         <p class="text-xs text-gray-500 mt-2">Talk to our team</p>
                     </div>
                     <!-- Sponsor Container -->
                     <div class="flex flex-col items-center" data-aos="fade-up" data-aos-delay="300">
-                        <a href="https://pages.razorpay.com/pl_RYithli6b10Fxt/view" target="_blank" class="cta-button bg-rust text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-coral transition-colors duration-300">
+                        <a href="https://pages.razorpay.com/pl_RYithli6b10Fxt/view" target="_blank" class="cta-button bg-rust text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-coral transition-colors duration-300 w-full sm:w-auto">
                             Sponsor Guff
                         </a>
                         <p class="text-xs text-gray-500 mt-2">Powered by Razorpay</p>
@@ -217,7 +227,7 @@
              <a href="index.html" class="inline-block mb-2 opacity-70 hover:opacity-100 transition-opacity">
                 <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/main%20logo.png" alt="Artevia Studio Logo" class="h-6 w-auto mx-auto">
              </a>
-            <p>Guff is a podcast by Artevia Studio.</p>
+            <p>Guff Podcasts is a brand by Artevia Studio.</p>
             <p class="mt-1">&copy; 2025 Artevia Studio. All Rights Reserved.</p>
         </div>
     </footer>
