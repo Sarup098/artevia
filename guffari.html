@@ -13,7 +13,7 @@
             font-family: 'Inter', sans-serif;
             background-color: #000000;
             color: #FFFFFF;
-            overflow-x: hidden;
+            overflow: hidden;
         }
         h1, h2, h3, .font-serif {
             font-family: 'Lora', serif;
@@ -23,17 +23,41 @@
         .bg-coral { background-color: #FF7043; }
         .text-coral { color: #FF7043; }
         
+        /* NEW: Keyframe for liquid borders */
+        @keyframes liquid-border {
+            0%, 100% { border-color: rgba(255, 255, 255, 0.1); } /* 10% opacity */
+            50% { border-color: rgba(255, 255, 255, 0.3); } /* 30% opacity */
+        }
+        
+        /* NEW: Base glass element class */
+        .glass-element {
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Start at 10% */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            animation: liquid-border 3s infinite ease-in-out;
+        }
+        
+        /* Glassmorphism Chat Bubbles */
         .chat-bubble-user {
-            background-color: #B9472C;
-            color: #F5F1E8;
+            background-color: rgba(255, 255, 255, 0.15); /* White glass */
+            color: #FFFFFF;
         }
         .chat-bubble-ai {
-            background-color: #e5e7eb;
-            color: #1f2937;
+            background-color: rgba(255, 255, 255, 0.15); /* White glass */
+            color: #FFFFFF;
         }
-        /* Make the AI's markdown formatting look good */
+        /* Ensure markdown elements inside AI bubbles are also white */
+        .chat-bubble-ai p, .chat-bubble-ai h3, .chat-bubble-ai ul, .chat-bubble-ai ol, .chat-bubble-ai strong {
+            color: #FFFFFF !important;
+        }
+        
         .prose-pre-bg-inherit pre {
-            background-color: inherit !important;
+            background-color: rgba(255,255,255,0.08) !important;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            margin-top: 0.75rem;
+            margin-bottom: 0.75rem;
+            overflow-x: auto;
         }
         .chat-bubble-ai p { margin-bottom: 0.5rem; }
         .chat-bubble-ai h3 { font-size: 1.1rem; font-weight: 700; margin-top: 1rem; margin-bottom: 0.25rem; }
@@ -52,9 +76,9 @@
         
         /* Animated Background Pattern Overlay */
         @keyframes subtle-glow-move {
-            0%, 100% { opacity: 0.03; transform: translate(0, 0) scale(1); }
-            50% { opacity: 0.06; transform: translate(15px, 8px) scale(1.05); }
-            100% { opacity: 0.03; transform: translate(0, 0) scale(1); }
+            0%, 100% { opacity: 0.05; transform: translate(0, 0) scale(1); } /* Brighter */
+            50% { opacity: 0.08; transform: translate(15px, 8px) scale(1.05); } /* Brighter */
+            100% { opacity: 0.05; transform: translate(0, 0) scale(1); } /* Brighter */
         }
         /* Light Leak Animation */
         @keyframes light-leak-enhanced {
@@ -71,7 +95,7 @@
             background-size: 400px;
             background-position: center;
             background-repeat: repeat;
-            opacity: 0.03;
+            opacity: 0.05; /* Brighter */
             z-index: 0;
             animation: subtle-glow-move 20s infinite ease-in-out;
         }
@@ -92,6 +116,8 @@
         .chat-container-wrapper {
             position: relative;
             overflow: hidden; /* Contain pseudo-elements */
+            background-color: rgba(0,0,0,0.5); /* Semi-transparent overlay for chat area */
+            border-radius: 1rem; /* Rounded corners */
         }
         .chat-content {
             position: relative;
@@ -120,7 +146,7 @@
     <div class="container mx-auto max-w-2xl h-[calc(100vh-80px)] flex flex-col p-4 chat-container-wrapper pattern-overlay-dark rounded-lg">
         <div class="chat-content w-full h-full flex flex-col">
             <div class="text-center py-4">
-                <h1 class="text-3xl font-serif font-bold text-white text-center h-10">
+                <h1 class="text-3xl font-serif font-bold text-white text-center h-10 flex items-center justify-center">
                     <span id="typing-text"></span><span class="blinking-cursor">|</span>
                 </h1>
                 <p class="text-gray-300 text-center">your AI podcast assistant by Artevia Studio</p>
@@ -128,26 +154,22 @@
 
             <!-- Chat Messages Window -->
             <div id="chat-window" class="flex-1 overflow-y-auto p-4 bg-gray-900/50 rounded-lg space-y-4 my-4">
-                <!-- Initial AI Message -->
-                <div class="flex justify-start">
-                    <div class="chat-bubble-ai rounded-lg py-2 px-4 max-w-lg">
-                        <p class="text-sm">Hi! I’m Guffari, your Artevia Studio AI assistant for question framing. Ready to cook up some great questions? 😉 First things first, who's our guest? (Please give me their full name.)</p>
-                    </div>
-                </div>
-                <!-- Messages will be appended here -->
+                <!-- Initial AI Message will be typed here by JS -->
             </div>
 
             <!-- Chat Input Form -->
-            <form id="chat-form" class="py-4">
-                <div class="flex items-center bg-gray-900 rounded-full p-2">
-                    <input type="text" id="chat-input" class="flex-1 bg-transparent text-white border-none focus:ring-0 placeholder-gray-500" placeholder="Type your response..." autocomplete="off">
-                    <button type="submit" class="bg-rust text-white rounded-full p-3 hover:bg-coral transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform rotate-90" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009.175 17V4.909l4.428 6.327a1 1 0 001.788-1.243l-7-10z" />
-                        </svg>
-                    </button>
-                </div>
-            </form>
+            <div id="form-wrapper" class="py-2">
+                <form id="chat-form">
+                    <!-- Glassmorphism effect -->
+                    <div class="flex items-center glass-element bg-white/15 rounded-full p-2"> <!-- White glass input bar -->
+                        <input type="text" id="chat-input" class="flex-1 bg-transparent text-white border-none focus:ring-0 focus:outline-none placeholder-gray-400" placeholder="Type your response..." autocomplete="off">
+                        <!-- Red Glass Button -->
+                        <button type="submit" class="glass-element bg-rust/50 text-white rounded-full p-3 hover:bg-rust/70 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z"></path></svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -155,7 +177,7 @@
         const chatWindow = document.getElementById('chat-window');
         const chatForm = document.getElementById('chat-form');
         const chatInput = document.getElementById('chat-input');
-        const typingText = document.getElementById('typing-text');
+        const typingTextElement = document.getElementById('typing-text');
         const chatHistory = [];
         
         // This is the "brain" for your chatbot, exactly as you designed it.
@@ -228,9 +250,10 @@
         > “Would you like me to simplify, localize, or format these questions for direct podcast notes?”`;
 
         // Add the initial AI message to the history
+        const firstAIMessage = "Hi! I’m Guffari, your Artevia Studio AI assistant for question framing. Ready to cook up some great questions? 😉 First things first, who's our guest? (Please give me their full name.)";
         chatHistory.push({
             role: "model",
-            parts: [{ text: "Hi! I’m Guffari, your Artevia Studio AI assistant for question framing. Ready to cook up some great questions? 😉 First things first, who's our guest? (Please give me their full name.)" }]
+            parts: [{ text: firstAIMessage }]
         });
 
         // Function to display messages (for user)
@@ -239,7 +262,7 @@
             messageElement.classList.add('flex', sender === 'user' ? 'justify-end' : 'justify-start');
             
             messageElement.innerHTML = `
-                <div class="rounded-lg py-2 px-4 max-w-lg ${sender === 'user' ? 'chat-bubble-user' : 'chat-bubble-ai prose prose-pre-bg-inherit'}">
+                <div class="rounded-lg py-2 px-4 max-w-lg glass-element ${sender === 'user' ? 'chat-bubble-user' : 'chat-bubble-ai prose prose-pre-bg-inherit'}">
                     <p class="text-sm">${message}</p>
                 </div>
             `;
@@ -248,15 +271,14 @@
             return messageElement;
         }
 
-        // --- NEW: Real-time typing for AI ---
+        // --- Real-time typing for AI ---
         function displayAITypingResponse(message) {
             const messageElement = document.createElement('div');
             messageElement.classList.add('flex', 'justify-start');
             
             const bubble = document.createElement('div');
-            bubble.classList.add('rounded-lg', 'py-2', 'px-4', 'max-w-lg', 'chat-bubble-ai', 'prose', 'prose-pre-bg-inherit');
+            bubble.classList.add('rounded-lg', 'py-2', 'px-4', 'max-w-lg', 'chat-bubble-ai', 'prose', 'prose-pre-bg-inherit', 'glass-element');
             
-            // Create a paragraph that will be typed into
             const p = document.createElement('p');
             p.classList.add('text-sm');
             bubble.appendChild(p);
@@ -265,7 +287,7 @@
             chatWindow.scrollTop = chatWindow.scrollHeight;
 
             let i = 0;
-            const typingSpeed = 20; // Faster typing
+            const typingSpeed = 20; 
             
             function typeChar() {
                 if (i < message.length) {
@@ -274,15 +296,12 @@
                     chatWindow.scrollTop = chatWindow.scrollHeight;
                     setTimeout(typeChar, typingSpeed);
                 } else {
-                    // Typing finished, now parse the markdown
-                    // This replaces the plain text with rich HTML
                     bubble.innerHTML = marked.parse(message, { breaks: true, gfm: true });
                     chatWindow.scrollTop = chatWindow.scrollHeight;
                 }
             }
-            typeChar(); // Start typing
+            typeChar();
         }
-
 
         // Function to show "Thinking..."
         let thinkingInterval = null;
@@ -292,8 +311,8 @@
             thinkingElement.id = 'thinking-bubble';
             
             thinkingElement.innerHTML = `
-                <div class="rounded-lg py-2 px-4 max-w-xs chat-bubble-ai">
-                    <p class="text-sm" id="thinking-text">Guffari is thinking...</p>
+                <div class="rounded-lg py-2 px-4 max-w-xs chat-bubble-ai glass-element">
+                    <p class="text-sm" id="thinking-text"></p>
                 </div>
             `;
             chatWindow.appendChild(thinkingElement);
@@ -307,8 +326,8 @@
             thinkingInterval = setInterval(() => {
                 thinkingState = (thinkingState + 1) % thinkingMessages.length;
                 thinkingTextEl.textContent = thinkingMessages[thinkingState];
-            }, 2000);
-
+            }, 1500); 
+            
             return thinkingElement;
         }
 
@@ -339,8 +358,7 @@
 
             const thinkingBubble = showThinking();
 
-            const apiKey = ""; // API key is handled by the environment
-            // *** FIX: Reverted to Gemini Flash model ***
+            const apiKey = "AIzaSyBhjpqaK7MEKzshaVP115KOY97TDd1_hrs"; // YOUR KEY
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
             const payload = {
@@ -358,7 +376,6 @@
             };
             
             try {
-                // Exponential backoff
                 let response;
                 let retries = 5;
                 let delay = 1000;
@@ -395,7 +412,6 @@
                 const aiResponse = aiResponsePart.text;
                 chatHistory.push({ role: "model", parts: [{ text: aiResponse }] });
                 
-                // Use the new typing function
                 displayAITypingResponse(aiResponse);
 
             } catch (error) {
@@ -405,40 +421,46 @@
             }
         });
         
-        // --- NEW Typing Animation Logic ---
+        // --- NEW Title Typing Animation Logic ---
         function typingAnimation() {
             const sequences = [
                 // English sequence
-                "G", "Gu", "Guf", "Guff", "Guffa", "Guffar", "Guffari", "Guffari.", "Guffari..", "Guffari...",
+                "G", "Gu", "Guf", "Guff", "Guffa", "Guffar", "Guffari",
+                "Guffari.", "Guffari..", "Guffari...",
                 "Guffari...", // Hold
-                "Guffari..", "Guffari.", "Guffari", "Guffar", "Guffa", "Guff", "Guf", "Gu", "G",
-                "G", // Hold
+                "Guffari...", // Hold
+                "Guffari..", "Guffari.", "Guffari",
+                "Guffar", "Guffa", "Guff", "Guf", "Gu", "G",
+                "", // Hold Empty
                 // Nepali sequence
-                "ग", "गफ", "गफा", "गफार", "गफारी", "गफारी.", "गफारी..", "गफारी...",
+                "ग", "गफ", "गफा", "गफार", "गफारी",
+                "गफारी.", "गफारी..", "गफारी...",
                 "गफारी...", // Hold
-                "गफारी..", "गफारी.", "गफारी", "गफार", "गफा", "गफ", "ग",
-                "ग" // Hold
+                "गफारी...", // Hold
+                "गफारी..", "गफारी.", "गफारी",
+                "गफार", "गफा", "गफ", "ग",
+                "" // Hold Empty
             ];
             let frameIndex = 0;
-            const typeSpeed = 120;
-            const deleteSpeed = 100;
+            const typeSpeed = 100;
+            const deleteSpeed = 80;
             const pauseEnd = 2500; // 2.5 seconds pause
-            const pauseMid = 200; // Short pause before switching
+            const pauseMid = 200;
 
             function type() {
                 let currentFrame = sequences[frameIndex];
-                typingText.textContent = currentFrame;
+                typingTextElement.textContent = currentFrame;
 
                 let timeout;
                 
                 if (currentFrame.endsWith('...')) {
-                    timeout = pauseEnd; // Long pause on "..."
+                    timeout = pauseEnd;
                 } else if (frameIndex < sequences.length - 1 && sequences[frameIndex+1].length < currentFrame.length) {
-                    timeout = deleteSpeed; // Deleting
-                } else if (currentFrame.length === 1 && (frameIndex === sequences.length - 1 || sequences[frameIndex+1].length > 1)) {
-                     timeout = pauseMid; // Pause before starting new language
+                    timeout = deleteSpeed;
+                } else if(currentFrame.length === 0) {
+                    timeout = pauseMid;
                 } else {
-                    timeout = typeSpeed; // Typing
+                    timeout = typeSpeed;
                 }
 
                 frameIndex = (frameIndex + 1) % sequences.length;
@@ -447,8 +469,17 @@
             
             setTimeout(type, 500); // Initial start
         }
-
-        typingAnimation();
+        
+        // --- Start first message animation on load ---
+        window.addEventListener('DOMContentLoaded', () => {
+            // Start typing the first message
+            setTimeout(() => {
+                displayAITypingResponse(firstAIMessage);
+            }, 1000); // 1-second delay for effect
+            
+            // Start title animation
+            typingAnimation();
+        });
 
     </script>
 </body>
