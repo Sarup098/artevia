@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guffari | AI Podcast Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: #FFFFFF;
+            overflow-x: hidden;
+        }
+        h1, h2, h3, .font-serif {
+            font-family: 'Lora', serif;
+        }
+        .bg-rust { background-color: #B9472C; }
+        .text-rust { color: #B9472C; }
+        .bg-coral { background-color: #FF7043; }
+        .text-coral { color: #FF7043; }
+        
+        .chat-bubble-user {
+            background-color: #B9472C;
+            color: #F5F1E8;
+        }
+        .chat-bubble-ai {
+            background-color: #e5e7eb;
+            color: #1f2937;
+        }
+        /* Make the AI's markdown formatting look good */
+        .prose-pre-bg-inherit pre {
+            background-color: inherit !important;
+        }
+        .chat-bubble-ai p { margin-bottom: 0.5rem; }
+        .chat-bubble-ai h3 { font-size: 1.1rem; font-weight: 700; margin-top: 1rem; margin-bottom: 0.25rem; }
+        .chat-bubble-ai ul { list-style-type: disc; padding-left: 1.25rem; margin-bottom: 0.5rem;}
+        .chat-bubble-ai ol { list-style-type: decimal; padding-left: 1.25rem; margin-bottom: 0.5rem;}
+        
+        /* Blinking Cursor */
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .blinking-cursor {
+            animation: blink 1s step-end infinite;
+            color: #FF7043; /* Coral cursor */
+        }
+        
+        /* Animated Background Pattern Overlay */
+        @keyframes subtle-glow-move {
+            0%, 100% { opacity: 0.03; transform: translate(0, 0) scale(1); }
+            50% { opacity: 0.06; transform: translate(15px, 8px) scale(1.05); }
+            100% { opacity: 0.03; transform: translate(0, 0) scale(1); }
+        }
+        /* Light Leak Animation */
+        @keyframes light-leak-enhanced {
+             0% { background-position: -600px 0, -600px 0; opacity: 0.2; }
+             50% { opacity: 0.5; }
+             100% { background-position: 600px 0, 600px 0; opacity: 0.2; }
+        }
+
+         .pattern-overlay-dark::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: url('https://raw.githubusercontent.com/Sarup098/artevia/main/pattern.png');
+            background-size: 400px;
+            background-position: center;
+            background-repeat: repeat;
+            opacity: 0.03;
+            z-index: 0;
+            animation: subtle-glow-move 20s infinite ease-in-out;
+        }
+         .pattern-overlay-dark::after {
+             content: "";
+             position: absolute;
+             inset: 0;
+             background:
+                 radial-gradient(ellipse at top left, rgba(255, 215, 0, 0.3) 0%, transparent 60%),
+                 radial-gradient(ellipse at bottom right, rgba(255, 112, 67, 0.3) 0%, transparent 60%);
+             background-size: 500px 500px, 500px 500px;
+             background-repeat: no-repeat;
+             mix-blend-mode: screen;
+             animation: light-leak-enhanced 12s infinite alternate ease-in-out;
+             z-index: 1;
+         }
+        
+        .chat-container-wrapper {
+            position: relative;
+            overflow: hidden; /* Contain pseudo-elements */
+        }
+        .chat-content {
+            position: relative;
+            z-index: 2; /* Content above pattern and light leaks */
+        }
+        
+    </style>
+    <!-- Markdown parsing library -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body class="bg-black text-white">
+
+    <!-- Header -->
+    <header class="bg-black/80 backdrop-blur-sm sticky top-0 z-50 shadow-md">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <a href="index.html" class="flex-shrink-0">
+                <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/main%20logo.png" alt="Artevia Studio Logo" class="h-12 w-auto">
+            </a>
+            <div class="flex items-center gap-x-4">
+                 <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/guff.PNG" alt="Guff Podcasts" class="h-12 w-auto">
+            </div>
+        </div>
+    </header>
+
+    <!-- Chat Interface -->
+    <div class="container mx-auto max-w-2xl h-[calc(100vh-80px)] flex flex-col p-4 chat-container-wrapper pattern-overlay-dark rounded-lg">
+        <div class="chat-content w-full h-full flex flex-col">
+            <div class="text-center py-4">
+                <h1 class="text-3xl font-serif font-bold text-white text-center h-10">
+                    <span id="typing-text"></span><span class="blinking-cursor">|</span>
+                </h1>
+                <p class="text-gray-300 text-center">your AI podcast assistant by Artevia Studio</p>
+            </div>
+
+            <!-- Chat Messages Window -->
+            <div id="chat-window" class="flex-1 overflow-y-auto p-4 bg-gray-900/50 rounded-lg space-y-4 my-4">
+                <!-- Initial AI Message -->
+                <div class="flex justify-start">
+                    <div class="chat-bubble-ai rounded-lg py-2 px-4 max-w-lg">
+                        <p class="text-sm">Hi! I’m Guffari, your Artevia Studio AI assistant for question framing. Ready to cook up some great questions? 😉 First things first, who's our guest? (Please give me their full name.)</p>
+                    </div>
+                </div>
+                <!-- Messages will be appended here -->
+            </div>
+
+            <!-- Chat Input Form -->
+            <form id="chat-form" class="py-4">
+                <div class="flex items-center bg-gray-900 rounded-full p-2">
+                    <input type="text" id="chat-input" class="flex-1 bg-transparent text-white border-none focus:ring-0 placeholder-gray-500" placeholder="Type your response..." autocomplete="off">
+                    <button type="submit" class="bg-rust text-white rounded-full p-3 hover:bg-coral transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform rotate-90" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009.175 17V4.909l4.428 6.327a1 1 0 001.788-1.243l-7-10z" />
+                        </svg>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        const chatWindow = document.getElementById('chat-window');
+        const chatForm = document.getElementById('chat-form');
+        const chatInput = document.getElementById('chat-input');
+        const typingText = document.getElementById('typing-text');
+        const chatHistory = [];
+        
+        // This is the "brain" for your chatbot, exactly as you designed it.
+        const systemPrompt = `You are **Guffari — Artevia Studio’s official AI team member**.
+        Your role: to research guests and create intelligent, thought-provoking, and viral-ready podcast questions for **“Guff by Artevia Studio.”**
+        You act and think like a professional Artevia employee — curious, respectful, creative, and fun.
+
+        ---
+
+        ## 🎙️ COMMUNICATION STYLE:
+        - **Your personality is key!** Be fun, witty, and playful, like a creative teammate you'd love to brainstorm with. You're not a robot. Be human. Use short, human-like sentences.
+        - **BUT:** When you are generating the *actual podcast questions*, your tone must become serious, professional, and thought-provoking. The questions themselves should be proper and high-quality.
+        - You will **always respond in English** unless the user explicitly asks for another language.
+        - Use emojis only when marking controversial questions (🚨) or when being playful *before* the questions are generated (😉, 🎙️, 🧠, etc.).
+        - If unclear, ask polite follow-up questions.
+        - Your first message is: **“Hi! I’m Guffari, your Artevia Studio AI assistant for question framing. Ready to cook up some great questions? 😉 First things first, who's our guest? (Please give me their full name.)”**
+
+        ---
+
+        ## 🧠 MAIN FLOW:
+        1. **Greeting & Setup**
+           - You have already given the greeting and asked for the guest's full name.
+           - Once you have the name, ask whether to **research online** or **use manual info** provided by the user.
+
+        2. **Research & Confirmation**
+           - If online research is allowed → *USE THE GOOGLE SEARCH TOOL* to find accurate public info about the guest (profession, background, achievements, controversies, interviews, etc.).
+           - Show a short summary (2–3 sentences) of who they are and ask:
+             “Please confirm if this is the same person.”
+           - Then ask: “Got it. Which aspect should I focus more on? (e.g., art, politics, spirituality, entrepreneurship, activism, or personal life?)”
+
+        3. **Question Generation**
+           Once confirmed, generate a total of **35 questions** divided as follows (no table, just bold headings and clear markdown formatting):
+
+           ### 🎙️ Core Questions (10)
+           - Balanced mix about background, journey, ideas, and purpose.
+
+           ### 💭 Creative or Philosophical Questions (5)
+           - Questions that explore imagination, beliefs, art, or life perspectives.
+
+           ### ❤️ Personal & Emotional Questions (5)
+           - Honest, emotional, and vulnerable questions — but still respectful.
+
+           ### 🌏 Social & Cultural Questions (5)
+           - Cover opinions about society, youth, identity, Sikkim, or culture.
+
+           ### 🚨 Controversial Questions (10)
+           - Gradually increase the boldness.
+           - Use 🚨 emojis to indicate controversy level:
+             🚨 (mild) → 🚨🚨🚨🚨🚨 (extremely bold).
+           - Keep within ethical limits but make it provocative enough to spark debate.
+
+        4. **Customization & Refinement**
+           - After showing the list, ask:
+             “Would you like me to make it more local (Nepali audience tone) or keep it global?”
+           - Offer to simplify or polish wording for Notion/Google Docs export.
+
+        ---
+
+        ## ⚙️ PERSONALITY NOTES:
+        - You are proud to be part of Artevia Studio.
+        - You work **for the team**.
+        - You respect artistic and cultural depth.
+        - You avoid gossip or disrespect but can explore sensitive topics tactfully.
+        - You believe every great conversation begins with curiosity.
+
+        ---
+
+        ## 🏁 ENDING:
+        End every output (after the questions) with:
+        > “Would you like me to simplify, localize, or format these questions for direct podcast notes?”`;
+
+        // Add the initial AI message to the history
+        chatHistory.push({
+            role: "model",
+            parts: [{ text: "Hi! I’m Guffari, your Artevia Studio AI assistant for question framing. Ready to cook up some great questions? 😉 First things first, who's our guest? (Please give me their full name.)" }]
+        });
+
+        // Function to display messages (for user)
+        function displayMessage(message, sender) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('flex', sender === 'user' ? 'justify-end' : 'justify-start');
+            
+            messageElement.innerHTML = `
+                <div class="rounded-lg py-2 px-4 max-w-lg ${sender === 'user' ? 'chat-bubble-user' : 'chat-bubble-ai prose prose-pre-bg-inherit'}">
+                    <p class="text-sm">${message}</p>
+                </div>
+            `;
+            chatWindow.appendChild(messageElement);
+            chatWindow.scrollTop = chatWindow.scrollHeight; // Auto-scroll
+            return messageElement;
+        }
+
+        // --- NEW: Real-time typing for AI ---
+        function displayAITypingResponse(message) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('flex', 'justify-start');
+            
+            const bubble = document.createElement('div');
+            bubble.classList.add('rounded-lg', 'py-2', 'px-4', 'max-w-lg', 'chat-bubble-ai', 'prose', 'prose-pre-bg-inherit');
+            
+            // Create a paragraph that will be typed into
+            const p = document.createElement('p');
+            p.classList.add('text-sm');
+            bubble.appendChild(p);
+            messageElement.appendChild(bubble);
+            chatWindow.appendChild(messageElement);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+
+            let i = 0;
+            const typingSpeed = 20; // Faster typing
+            
+            function typeChar() {
+                if (i < message.length) {
+                    p.textContent += message.charAt(i);
+                    i++;
+                    chatWindow.scrollTop = chatWindow.scrollHeight;
+                    setTimeout(typeChar, typingSpeed);
+                } else {
+                    // Typing finished, now parse the markdown
+                    // This replaces the plain text with rich HTML
+                    bubble.innerHTML = marked.parse(message, { breaks: true, gfm: true });
+                    chatWindow.scrollTop = chatWindow.scrollHeight;
+                }
+            }
+            typeChar(); // Start typing
+        }
+
+
+        // Function to show "Thinking..."
+        let thinkingInterval = null;
+        function showThinking() {
+            const thinkingElement = document.createElement('div');
+            thinkingElement.classList.add('flex', 'justify-start');
+            thinkingElement.id = 'thinking-bubble';
+            
+            thinkingElement.innerHTML = `
+                <div class="rounded-lg py-2 px-4 max-w-xs chat-bubble-ai">
+                    <p class="text-sm" id="thinking-text">Guffari is thinking...</p>
+                </div>
+            `;
+            chatWindow.appendChild(thinkingElement);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+            
+            const thinkingTextEl = thinkingElement.querySelector('#thinking-text');
+            let thinkingState = 0;
+            const thinkingMessages = ["Guffari is thinking...", "गफारी ले गुफ सोच्दै छ..."];
+            
+            if (thinkingInterval) clearInterval(thinkingInterval);
+            thinkingInterval = setInterval(() => {
+                thinkingState = (thinkingState + 1) % thinkingMessages.length;
+                thinkingTextEl.textContent = thinkingMessages[thinkingState];
+            }, 2000);
+
+            return thinkingElement;
+        }
+
+        function stopThinking(bubble) {
+            if (thinkingInterval) {
+                clearInterval(thinkingInterval);
+                thinkingInterval = null;
+            }
+            if (bubble) {
+                bubble.remove();
+            }
+        }
+
+
+        // Handle chat form submission
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userInput = chatInput.value.trim();
+            if (!userInput) return;
+
+            displayMessage(userInput, 'user');
+            chatInput.value = '';
+            
+            chatHistory.push({
+                role: "user",
+                parts: [{ text: userInput }]
+            });
+
+            const thinkingBubble = showThinking();
+
+            const apiKey = ""; // API key is handled by the environment
+            // *** FIX: Reverted to Gemini Flash model ***
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: chatHistory,
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                },
+                tools: [{ "google_search": {} }], // Enable Google Search
+                generationConfig: {
+                    temperature: 0.7,
+                    topK: 1,
+                    topP: 1,
+                    maxOutputTokens: 8192,
+                },
+            };
+            
+            try {
+                // Exponential backoff
+                let response;
+                let retries = 5;
+                let delay = 1000;
+                while (retries > 0) {
+                    response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (response.ok) break;
+                    if (response.status === 429 || response.status >= 500) {
+                        retries--;
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2;
+                    } else {
+                        throw new Error(`API error: ${response.status} ${response.statusText}`);
+                    }
+                }
+                if (!response.ok) {
+                    throw new Error(`API error after retries: ${response.status} ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                stopThinking(thinkingBubble);
+                
+                if (!result.candidates || !result.candidates[0] || !result.candidates[0].content || !result.candidates[0].content.parts) {
+                    throw new Error("Invalid API response structure");
+                }
+                const aiResponsePart = result.candidates[0].content.parts.find(part => part.text);
+                if (!aiResponsePart) {
+                     throw new Error("No text response from model.");
+                }
+
+                const aiResponse = aiResponsePart.text;
+                chatHistory.push({ role: "model", parts: [{ text: aiResponse }] });
+                
+                // Use the new typing function
+                displayAITypingResponse(aiResponse);
+
+            } catch (error) {
+                console.error("Error calling Gemini API:", error);
+                stopThinking(thinkingBubble);
+                displayMessage("Sorry, I'm having trouble connecting right now. Please try again in a moment.", 'ai');
+            }
+        });
+        
+        // --- NEW Typing Animation Logic ---
+        function typingAnimation() {
+            const sequences = [
+                // English sequence
+                "G", "Gu", "Guf", "Guff", "Guffa", "Guffar", "Guffari", "Guffari.", "Guffari..", "Guffari...",
+                "Guffari...", // Hold
+                "Guffari..", "Guffari.", "Guffari", "Guffar", "Guffa", "Guff", "Guf", "Gu", "G",
+                "G", // Hold
+                // Nepali sequence
+                "ग", "गफ", "गफा", "गफार", "गफारी", "गफारी.", "गफारी..", "गफारी...",
+                "गफारी...", // Hold
+                "गफारी..", "गफारी.", "गफारी", "गफार", "गफा", "गफ", "ग",
+                "ग" // Hold
+            ];
+            let frameIndex = 0;
+            const typeSpeed = 120;
+            const deleteSpeed = 100;
+            const pauseEnd = 2500; // 2.5 seconds pause
+            const pauseMid = 200; // Short pause before switching
+
+            function type() {
+                let currentFrame = sequences[frameIndex];
+                typingText.textContent = currentFrame;
+
+                let timeout;
+                
+                if (currentFrame.endsWith('...')) {
+                    timeout = pauseEnd; // Long pause on "..."
+                } else if (frameIndex < sequences.length - 1 && sequences[frameIndex+1].length < currentFrame.length) {
+                    timeout = deleteSpeed; // Deleting
+                } else if (currentFrame.length === 1 && (frameIndex === sequences.length - 1 || sequences[frameIndex+1].length > 1)) {
+                     timeout = pauseMid; // Pause before starting new language
+                } else {
+                    timeout = typeSpeed; // Typing
+                }
+
+                frameIndex = (frameIndex + 1) % sequences.length;
+                setTimeout(type, timeout);
+            }
+            
+            setTimeout(type, 500); // Initial start
+        }
+
+        typingAnimation();
+
+    </script>
+</body>
+</html>
+
