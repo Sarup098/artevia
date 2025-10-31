@@ -75,6 +75,16 @@
         .guff-logo-glow {
             animation: logo-glow-subtle 4s infinite ease-in-out;
         }
+
+        /* Blinking Cursor */
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .blinking-cursor {
+            animation: blink 1s step-end infinite;
+            color: #FF7043; /* Coral cursor */
+        }
     </style>
 </head>
 <body class="pattern-overlay-dark min-h-screen">
@@ -102,11 +112,16 @@
         -->
         <section id="guest-display-section" class="hidden my-8"> <!-- Added margin -->
             <div class="bg-gray-900/70 backdrop-blur-md border border-white/20 rounded-lg shadow-xl p-8 md:p-12">
+                
+                <h1 class="text-3xl font-serif font-bold text-white text-center mb-6 h-10 flex items-center justify-center">
+                    <span id="guest-title-text"></span><span class="blinking-cursor">|</span>
+                </h1>
+                
                 <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/guff.PNG" alt="Guff Logo" class="w-48 mx-auto mb-6 guff-logo-glow">
                 
-                <h1 class="text-3xl font-serif font-bold text-center text-white mb-6">
+                <h2 class="text-3xl font-serif font-bold text-center text-white mb-6">
                     To: <span id="guest-name-display" class="text-coral">Guest Name</span>
-                </h1>
+                </h2>
                 
                 <p class="text-lg text-gray-200 leading-relaxed text-center mb-8">
                     We are incredibly excited and honored to host you for an honest conversation on Guff Podcasts. Your voice and your story are important to us, and we truly cannot wait to share this platform with you.
@@ -136,6 +151,23 @@
                     </div>
                 </div>
 
+                <!-- WhatsApp Contact Section -->
+                <div class="mt-10 pt-6 border-t border-white/10 text-center">
+                    <h3 class="text-lg font-semibold text-gray-200 mb-4">Have questions? Chat with the team.</h3>
+                    <div class="flex flex-col sm:flex-row justify-center gap-4">
+                        <!-- Chat with Sarup -->
+                        <a id="chat-sarup-btn" href="#" target="_blank" class="inline-flex items-center justify-center gap-x-2 bg-green-500 text-white font-bold py-2 px-5 rounded-full hover:bg-green-600 transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 4.315 1.731 6.086l.003.004l-1.241 4.515 4.591-1.205z"/></svg>
+                            Chat with Sarup
+                        </a>
+                        <!-- Chat with Karan -->
+                        <a id="chat-karan-btn" href="#" target="_blank" class="inline-flex items-center justify-center gap-x-2 bg-green-500 text-white font-bold py-2 px-5 rounded-full hover:bg-green-600 transition-colors">
+                           <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 4.315 1.731 6.086l.003.004l-1.241 4.515 4.591-1.205z"/></svg>
+                            Chat with Karan
+                        </a>
+                    </div>
+                </div>
+
                  <p class="text-center text-lg text-gray-200 mt-10">
                     See you soon!
                 </p>
@@ -147,8 +179,8 @@
         -->
         <section id="admin-form-section" class="hidden my-8"> <!-- Added margin -->
             <div class="bg-gray-900/70 backdrop-blur-md border border-white/20 rounded-lg shadow-xl p-8 md:p-12">
-                <h1 class="text-3xl font-serif font-bold text-center text-white mb-6">
-                    Guff Invitation Generator
+                <h1 class="text-3xl font-serif font-bold text-white text-center mb-6 h-10 flex items-center justify-center">
+                    <span id="admin-title-text"></span><span class="blinking-cursor">|</span>
                 </h1>
                 <form id="generate-link-form" class="space-y-6">
                     <div>
@@ -194,47 +226,116 @@
         const generatedLinkOutput = document.getElementById('generated-link-output');
         const copyLinkBtn = document.getElementById('copy-link-btn');
         const copyFeedback = document.getElementById('copy-feedback');
+        const chatSarupBtn = document.getElementById('chat-sarup-btn');
+        const chatKaranBtn = document.getElementById('chat-karan-btn');
 
-        // Function to safely decode Base64
-        function safeAtob(base64) {
+        // --- NEW: Robust Base64 Encoding/Decoding for Unicode ---
+        function safeEncode(str) {
             try {
-                // btoa and atob are the standard functions for Base64 encoding/decoding
-                return atob(base64);
+                return btoa(encodeURIComponent(str));
+            } catch (e) {
+                console.error("Failed to encode string:", e);
+                return null;
+            }
+        }
+        function safeDecode(base64) {
+            try {
+                return decodeURIComponent(atob(base64));
             } catch (e) {
                 console.error("Failed to decode Base64 string:", e);
                 return null;
             }
         }
 
+        // --- NEW: Title Typing Animation Logic ---
+        function typingAnimation(element) {
+            if (!element) return; // Don't run if element doesn't exist
+
+            const sequences = [
+                // English sequence
+                "G", "Gu", "Guf", "Guff",
+                "Guff.", "Guff..", "Guff...",
+                "Guff...", // Hold
+                "Guff...", // Hold
+                "Guff..", "Guff.", "Guff",
+                "Guf", "Gu", "G",
+                "", // Hold Empty
+                // Nepali sequence
+                "ग", "गफ",
+                "गफ.", "गफ..", "गफ...",
+                "गफ...", // Hold
+                "गफ...", // Hold
+                "गफ..", "गफ.", "गफ",
+                "ग",
+                "" // Hold Empty
+            ];
+            let frameIndex = 0;
+            const typeSpeed = 100;
+            const deleteSpeed = 80;
+            const pauseEnd = 2500; // 2.5 seconds pause
+            const pauseMid = 200;
+
+            function type() {
+                let currentFrame = sequences[frameIndex];
+                element.textContent = currentFrame;
+
+                let timeout;
+                
+                if (currentFrame.endsWith('...')) {
+                    timeout = pauseEnd;
+                } else if (frameIndex < sequences.length - 1 && sequences[frameIndex+1].length < currentFrame.length) {
+                    timeout = deleteSpeed;
+                } else if(currentFrame.length === 0) {
+                    timeout = pauseMid;
+                } else {
+                    timeout = typeSpeed;
+                }
+
+                frameIndex = (frameIndex + 1) % sequences.length;
+                setTimeout(type, timeout);
+            }
+            
+            setTimeout(type, 500); // Initial start
+        }
+
         // Check the URL on page load
         window.addEventListener('DOMContentLoaded', () => {
-            const hash = window.location.hash.substring(1); // Get the hash string (e.g., "eyJuYW1lIjoi...")
+            const hash = window.location.hash.substring(1); 
+            const adminTitle = document.getElementById('admin-title-text');
+            const guestTitle = document.getElementById('guest-title-text');
 
             if (hash) {
                 // We are in GUEST VIEW
                 try {
-                    const jsonString = safeAtob(hash);
+                    const jsonString = safeDecode(hash); 
                     const data = JSON.parse(jsonString);
 
                     if (data.n && data.v && data.t) {
                         document.getElementById('guest-name-display').textContent = data.n;
                         document.getElementById('venue-display').textContent = data.v;
                         document.getElementById('time-display').textContent = data.t;
-                        document.getElementById('question-display').textContent = data.q || "We're looking forward to our conversation!"; // Fallback for question
+                        document.getElementById('question-display').textContent = data.q || "We're looking forward to our conversation!"; // Fallback
+                        
+                        // Set WhatsApp links
+                        const whatsappMessage = encodeURIComponent(`Hello! This is ${data.n}. I have a question about my upcoming Guff Podcast recording.`);
+                        chatSarupBtn.href = `https://wa.me/919907488075?text=${whatsappMessage}`;
+                        chatKaranBtn.href = `https://wa.me/917029991661?text=${whatsappMessage}`; 
                         
                         guestDisplay.classList.remove('hidden');
+                        typingAnimation(guestTitle); // Animate the guest title
                     } else {
-                        // Hash data is incomplete, show admin form
                         adminForm.classList.remove('hidden');
+                        typingAnimation(adminTitle); // Animate the admin title
                     }
                 } catch (e) {
-                    // Invalid hash, just show the admin form
                     console.error("Invalid data in URL hash:", e);
                     adminForm.classList.remove('hidden');
+                    typingAnimation(adminTitle); // Animate the admin title
                 }
             } else {
                 // We are in ADMIN VIEW
                 adminForm.classList.remove('hidden');
+                typingAnimation(adminTitle); // Animate the admin title
             }
         });
 
@@ -247,7 +348,6 @@
             const time = document.getElementById('time-input').value;
             const question = document.getElementById('question-input').value;
 
-            // Create a compact data object
             const data = {
                 n: name,
                 v: venue,
@@ -255,17 +355,17 @@
                 q: question
             };
 
-            // Convert object to JSON string, then to Base64
             const jsonString = JSON.stringify(data);
-            const base64String = btoa(jsonString); // btoa = Binary-to-ASCII
+            const base64String = safeEncode(jsonString); // Use new safe function
 
-            // Get the clean base URL (without any old parameters or hash)
+            if (!base64String) {
+                alert("Error generating link. Could not encode data.");
+                return;
+            }
+
             const baseLink = window.location.href.split('#')[0].split('?')[0];
-
-            // Build the new URL with the hash
             const finalLink = baseLink + '#' + base64String;
 
-            // Display the new link
             generatedLinkOutput.value = finalLink;
             linkOutputSection.classList.remove('hidden');
             copyFeedback.textContent = '';
@@ -275,7 +375,6 @@
         copyLinkBtn.addEventListener('click', () => {
             generatedLinkOutput.select();
             try {
-                // Use document.execCommand('copy') for broader compatibility
                 var successful = document.execCommand('copy');
                 var msg = successful ? 'Copied to clipboard!' : 'Failed to copy.';
                 copyFeedback.textContent = msg;
