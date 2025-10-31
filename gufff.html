@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guff Podcasts | Guest Invitation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: #F5F1E8;
+            overflow-x: hidden;
+        }
+        h1, h2, h3, .font-serif {
+            font-family: 'Lora', serif;
+        }
+        .bg-rust { background-color: #B9472C; }
+        .text-rust { color: #B9472C; }
+        .bg-coral { background-color: #FF7043; }
+        .text-coral { color: #FF7043; }
+        
+        /* Animated Background Pattern Overlay */
+        @keyframes subtle-glow-move {
+            0%, 100% { opacity: 0.03; transform: translate(0, 0) scale(1); }
+            50% { opacity: 0.06; transform: translate(15px, 8px) scale(1.05); }
+            100% { opacity: 0.03; transform: translate(0, 0) scale(1); }
+        }
+        @keyframes light-leak-enhanced {
+             0% { background-position: -600px 0, -600px 0; opacity: 0.2; }
+             50% { opacity: 0.5; }
+             100% { background-position: 600px 0, 600px 0; opacity: 0.2; }
+        }
+         .pattern-overlay-dark {
+            position: relative;
+         }
+         .pattern-overlay-dark::before {
+            content: "";
+            position: fixed; /* Make background fixed */
+            inset: 0;
+            background-image: url('https://raw.githubusercontent.com/Sarup098/artevia/main/pattern.png');
+            background-size: 400px;
+            background-position: center;
+            background-repeat: repeat;
+            opacity: 0.05; /* Brighter */
+            z-index: -1;
+            animation: subtle-glow-move 20s infinite ease-in-out;
+        }
+         .pattern-overlay-dark::after {
+             content: "";
+             position: fixed; /* Make background fixed */
+             inset: 0;
+             background:
+                 radial-gradient(ellipse at top left, rgba(255, 215, 0, 0.3) 0%, transparent 60%),
+                 radial-gradient(ellipse at bottom right, rgba(255, 112, 67, 0.3) 0%, transparent 60%);
+             background-size: 500px 500px, 500px 500px;
+             background-repeat: no-repeat;
+             mix-blend-mode: screen;
+             animation: light-leak-enhanced 12s infinite alternate ease-in-out;
+             z-index: -1;
+         }
+         .content-z {
+            position: relative;
+            z-index: 2; /* Content stays on top */
+         }
+         
+         /* Guff Logo Glow Animation */
+        @keyframes logo-glow-subtle {
+             0%, 100% { filter: drop-shadow(0 0 15px rgba(255, 112, 67, 0.15)) drop-shadow(0 0 20px rgba(255, 215, 0, 0.07)); }
+             50% { filter: drop-shadow(0 0 20px rgba(255, 112, 67, 0.25)) drop-shadow(0 0 25px rgba(255, 215, 0, 0.12)); }
+        }
+        .guff-logo-glow {
+            animation: logo-glow-subtle 4s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="pattern-overlay-dark min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-black/80 backdrop-blur-sm sticky top-0 z-50 shadow-md">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <a href="index.html" class="flex-shrink-0">
+                <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/main%20logo.png" alt="Artevia Studio Logo" class="h-12 w-auto">
+            </a>
+            <div class="flex items-center gap-x-4">
+                 <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/guff.PNG" alt="Guff Podcasts" class="h-12 w-auto">
+            </div>
+        </div>
+    </header>
+
+    <!-- 
+      DYNAMIC CONTENT AREA 
+      This one file shows one of two sections based on the URL hash.
+    -->
+    <div class="container mx-auto max-w-2xl p-6 content-z">
+
+        <!-- 
+          SECTION 1: GUEST MEMENTO (Visible only if URL has a hash) 
+        -->
+        <section id="guest-display-section" class="hidden my-8"> <!-- Added margin -->
+            <div class="bg-gray-900/70 backdrop-blur-md border border-white/20 rounded-lg shadow-xl p-8 md:p-12">
+                <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/guff.PNG" alt="Guff Logo" class="w-48 mx-auto mb-6 guff-logo-glow">
+                
+                <h1 class="text-3xl font-serif font-bold text-center text-white mb-6">
+                    To: <span id="guest-name-display" class="text-coral">Guest Name</span>
+                </h1>
+                
+                <p class="text-lg text-gray-200 leading-relaxed text-center mb-8">
+                    We are incredibly excited and honored to host you for an honest conversation on Guff Podcasts. Your voice and your story are important to us, and we truly cannot wait to share this platform with you.
+                </p>
+                
+                <div class="bg-black/30 border border-white/10 rounded-lg p-6 space-y-4 mb-8">
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Event</h3>
+                        <p class="text-lg text-white font-medium">Guff Podcast Recording</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Time & Date</h3>
+                            <p class="text-lg text-white font-medium" id="time-display"></p>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Venue</h3>
+                            <p class="text-lg text-white font-medium" id="venue-display"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h2 class="text-2xl font-serif font-bold text-white mb-4">A Thought to Get Us Started...</h2>
+                    <div class="border-l-4 border-rust pl-4">
+                        <p class="text-xl text-gray-200 italic leading-relaxed" id="question-display"></p>
+                    </div>
+                </div>
+
+                 <p class="text-center text-lg text-gray-200 mt-10">
+                    See you soon!
+                </p>
+            </div>
+        </section>
+
+        <!-- 
+          SECTION 2: ADMIN FORM (Visible by default) 
+        -->
+        <section id="admin-form-section" class="hidden my-8"> <!-- Added margin -->
+            <div class="bg-gray-900/70 backdrop-blur-md border border-white/20 rounded-lg shadow-xl p-8 md:p-12">
+                <h1 class="text-3xl font-serif font-bold text-center text-white mb-6">
+                    Guff Invitation Generator
+                </h1>
+                <form id="generate-link-form" class="space-y-6">
+                    <div>
+                        <label for="guest-name-input" class="block text-sm font-medium text-gray-300">Guest's Full Name</label>
+                        <input type="text" id="guest-name-input" class="mt-1 block w-full bg-gray-800 border border-gray-700 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-coral" required>
+                    </div>
+                     <div>
+                        <label for="venue-input" class="block text-sm font-medium text-gray-300">Venue</label>
+                        <input type="text" id="venue-input" class="mt-1 block w-full bg-gray-800 border border-gray-700 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-coral" required>
+                    </div>
+                     <div>
+                        <label for="time-input" class="block text-sm font-medium text-gray-300">Time & Date</label>
+                        <input type="text" id="time-input" class="mt-1 block w-full bg-gray-800 border border-gray-700 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-coral" placeholder="e.g., Sunday, Oct 26th @ 4:00 PM" required>
+                    </div>
+                     <div>
+                        <label for="question-input" class="block text-sm font-medium text-gray-300">Tentative Question(s)</label>
+                        <textarea id="question-input" rows="4" class="mt-1 block w-full bg-gray-800 border border-gray-700 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-coral" placeholder="One or two questions to get them thinking..."></textarea>
+                    </div>
+                    <div>
+                        <button type="submit" class="w-full bg-rust text-white font-bold py-3 px-6 rounded-lg hover:bg-coral transition-colors">Generate Shareable Link</button>
+                    </div>
+                </form>
+
+                <!-- Generated Link Output -->
+                <div id="link-output-section" class="hidden mt-8">
+                     <label for="generated-link-output" class="block text-sm font-medium text-gray-300">Your Guest Link:</label>
+                     <div class="mt-2 flex gap-2">
+                        <input type="text" id="generated-link-output" readonly class="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-gray-200">
+                        <button id="copy-link-btn" class="bg-coral text-white font-semibold py-2 px-4 rounded-lg hover:bg-rust">Copy</button>
+                     </div>
+                     <p id="copy-feedback" class="text-green-400 text-sm mt-2 h-4"></p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script type="module">
+        const guestDisplay = document.getElementById('guest-display-section');
+        const adminForm = document.getElementById('admin-form-section');
+        const generateLinkForm = document.getElementById('generate-link-form');
+        const linkOutputSection = document.getElementById('link-output-section');
+        const generatedLinkOutput = document.getElementById('generated-link-output');
+        const copyLinkBtn = document.getElementById('copy-link-btn');
+        const copyFeedback = document.getElementById('copy-feedback');
+
+        // Function to safely decode Base64
+        function safeAtob(base64) {
+            try {
+                // btoa and atob are the standard functions for Base64 encoding/decoding
+                return atob(base64);
+            } catch (e) {
+                console.error("Failed to decode Base64 string:", e);
+                return null;
+            }
+        }
+
+        // Check the URL on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const hash = window.location.hash.substring(1); // Get the hash string (e.g., "eyJuYW1lIjoi...")
+
+            if (hash) {
+                // We are in GUEST VIEW
+                try {
+                    const jsonString = safeAtob(hash);
+                    const data = JSON.parse(jsonString);
+
+                    if (data.n && data.v && data.t) {
+                        document.getElementById('guest-name-display').textContent = data.n;
+                        document.getElementById('venue-display').textContent = data.v;
+                        document.getElementById('time-display').textContent = data.t;
+                        document.getElementById('question-display').textContent = data.q || "We're looking forward to our conversation!"; // Fallback for question
+                        
+                        guestDisplay.classList.remove('hidden');
+                    } else {
+                        // Hash data is incomplete, show admin form
+                        adminForm.classList.remove('hidden');
+                    }
+                } catch (e) {
+                    // Invalid hash, just show the admin form
+                    console.error("Invalid data in URL hash:", e);
+                    adminForm.classList.remove('hidden');
+                }
+            } else {
+                // We are in ADMIN VIEW
+                adminForm.classList.remove('hidden');
+            }
+        });
+
+        // Handle the admin form submission
+        generateLinkForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('guest-name-input').value;
+            const venue = document.getElementById('venue-input').value;
+            const time = document.getElementById('time-input').value;
+            const question = document.getElementById('question-input').value;
+
+            // Create a compact data object
+            const data = {
+                n: name,
+                v: venue,
+                t: time,
+                q: question
+            };
+
+            // Convert object to JSON string, then to Base64
+            const jsonString = JSON.stringify(data);
+            const base64String = btoa(jsonString); // btoa = Binary-to-ASCII
+
+            // Get the clean base URL (without any old parameters or hash)
+            const baseLink = window.location.href.split('#')[0].split('?')[0];
+
+            // Build the new URL with the hash
+            const finalLink = baseLink + '#' + base64String;
+
+            // Display the new link
+            generatedLinkOutput.value = finalLink;
+            linkOutputSection.classList.remove('hidden');
+            copyFeedback.textContent = '';
+        });
+
+        // Handle the copy button
+        copyLinkBtn.addEventListener('click', () => {
+            generatedLinkOutput.select();
+            try {
+                // Use document.execCommand('copy') for broader compatibility
+                var successful = document.execCommand('copy');
+                var msg = successful ? 'Copied to clipboard!' : 'Failed to copy.';
+                copyFeedback.textContent = msg;
+                if(successful) copyFeedback.style.color = '#4ade80'; // green
+                else copyFeedback.style.color = '#f87171'; // red
+            } catch (err) {
+                copyFeedback.textContent = 'Failed to copy.';
+                copyFeedback.style.color = '#f87171'; // red
+            }
+            window.getSelection().removeAllRanges();
+        });
+
+    </script>
+</body>
+</html>
+
