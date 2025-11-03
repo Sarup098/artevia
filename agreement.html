@@ -246,9 +246,11 @@
                                 <div class="text-center">
                                     <p class="text-gray-300">Please review all details. You will be redirected to Razorpay to pay the advance of <strong id="advance-display-payment" class="text-xl text-white">₹4,000</strong>.</p>
                                     <p class="text-xs text-gray-400 mt-2">(A 2% Razorpay transaction fee may be added by the gateway)</p>
-                                    <div class="flex justify-between mt-6">
-                                        <button type="button" id="prev-step-3" class="bg-gray-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-gray-500 transition-colors">&larr; Back</button>
-                                        <button type="submit" id="pay-button" class="bg-rust text-white font-bold py-3 px-8 rounded-lg transition-colors duration-300 flex items-center justify-center gap-x-3 disabled:bg-gray-500 disabled:cursor-not-allowed" disabled>
+                                    
+                                    <!-- UPDATED: Mobile-friendly button layout -->
+                                    <div class="flex flex-col-reverse sm:flex-row sm:justify-between gap-4 mt-6">
+                                        <button type="button" id="prev-step-3" class="w-full sm:w-auto bg-gray-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-gray-500 transition-colors">&larr; Back</button>
+                                        <button type="submit" id="pay-button" class="w-full sm:w-auto bg-rust text-white font-bold py-3 px-8 rounded-lg transition-colors duration-300 flex items-center justify-center gap-x-3 disabled:bg-gray-500 disabled:cursor-not-allowed" disabled>
                                             <span id="submit-button-text">Submit & Proceed to Payment</span>
                                             <div id="submit-spinner" class="spinner hidden"></div>
                                         </button>
@@ -260,11 +262,10 @@
                     <p id="form-error" class="text-red-400 text-center text-sm mt-4 h-4"></p>
                 </div>
                 
-                <!-- Success Message -->
+                <!-- Success Message (No longer used for redirect, but kept in case) -->
                 <div id="success-message" class="hidden text-center py-16">
                     <h2 class="text-3xl font-serif font-bold text-green-400 mb-4">Project Brief Saved!</h2>
                     <p class="text-lg text-gray-200">Redirecting you to our secure Razorpay page...</p>
-                    <p class="text-lg text-gray-200 mt-4">Please enter your advance amount of <strong id="advance-display" class="text-yellow-400"></strong> to complete the confirmation.</p>
                     <div class="spinner text-rust mx-auto mt-6"></div>
                 </div>
             </div>
@@ -287,7 +288,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, addDoc, serverTimestamp, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // --- Your Firebase Config for 'palette-orders' ---
         const firebaseConfig = {
             apiKey: "AIzaSyCuepnUYt_rDEffSraYycHxYrm5sDlXM6s",
             authDomain: "palette-orders.firebaseapp.com",
@@ -347,13 +347,11 @@
         if(nextStep2Btn) nextStep2Btn.addEventListener('click', () => { 
             step2.classList.add('hidden'); 
             step3.classList.remove('hidden');
-            // Update payment amount display
             const advanceAmount = document.getElementById('advance-amount').value || "4000";
             advanceDisplayPayment.textContent = `₹${parseFloat(advanceAmount).toLocaleString('en-IN')}`;
         });
         if(prevStep3Btn) prevStep3Btn.addEventListener('click', () => { step3.classList.add('hidden'); step2.classList.remove('hidden'); });
 
-        // --- T&C Checkbox Logic ---
         function checkScrollAndEnable() {
             if (!termsBox || !termsCheckbox || !termsLabel) return;
             const isScrolled = termsBox.scrollHeight - termsBox.scrollTop <= termsBox.clientHeight + 10;
@@ -381,9 +379,8 @@
             });
         }
 
-        // --- Form Submission Logic ---
         if(agreementForm) {
-            agreementForm.addEventListener('submit', async (e) => {
+            agreementForm.addEventListener('submit', (e) => { // Removed ASYNC
                 e.preventDefault();
                 formError.textContent = '';
                 
@@ -392,7 +389,7 @@
                     return;
                 }
 
-                submitButtonText.textContent = 'Saving Brief...';
+                submitButtonText.textContent = 'Saving & Redirecting...';
                 submitSpinner.classList.remove('hidden');
                 payButton.disabled = true;
                 
@@ -413,29 +410,27 @@
                     timeline: document.getElementById('timeline').value,
                     references: document.getElementById('references').value || "N/A",
                     agreedToTerms: true,
-                    paymentStatus: "Pending", // Set as Pending
+                    paymentStatus: "Pending",
                     createdAt: serverTimestamp()
                 };
 
-                try {
-                    // Save data to Firebase "clientProjects" collection
-                    const docRef = await addDoc(collection(db, "clientProjects"), projectData);
-                    
-                    // Show success message before redirecting
-                    formContainer.classList.add('hidden');
-                    advanceDisplay.textContent = `₹${parseFloat(advanceAmount).toLocaleString('en-IN')}`;
-                    successMessage.classList.remove('hidden');
+                // Fire off the save to Firebase, but DON'T wait for it.
+                addDoc(collection(db, "clientProjects"), projectData)
+                    .then(() => {
+                        console.log("Project brief saved in background.");
+                    })
+                    .catch((error) => {
+                        console.error("CRITICAL: Background save failed: ", error);
+                        // We still redirect, but log the error for debugging.
+                    });
 
-                    // MODIFIED: Redirect immediately to generic Razorpay page
-                    window.location.href = 'https://rzp.io/rzp/artevia';
+                // Immediately hide form and show loading message
+                formContainer.classList.add('hidden');
+                advanceDisplay.textContent = `₹${parseFloat(advanceAmount).toLocaleString('en-IN')}`;
+                successMessage.classList.remove('hidden');
 
-                } catch (error) {
-                    console.error("Error adding document: ", error);
-                    formError.textContent = 'Failed to save project. Please try again.';
-                    submitButtonText.textContent = 'Submit & Proceed to Payment';
-                    submitSpinner.classList.add('hidden');
-                    payButton.disabled = false;
-                }
+                // Immediately redirect to Razorpay
+                window.location.href = 'https://rzp.io/rzp/artevia';
             });
         }
 
