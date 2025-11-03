@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artevia Studio | Project Confirmed</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: #F5F1E8;
+            overflow-x: hidden;
+        }
+        h1, h2, h3, .font-serif {
+            font-family: 'Lora', serif;
+        }
+        .bg-rust { background-color: #B9472C; }
+        .text-rust { color: #B9472C; }
+        .text-coral { color: #FF7043; }
+        
+        /* Animated Background Pattern Overlay */
+        @keyframes subtle-glow-move {
+            0%, 100% { opacity: 0.03; transform: translate(0, 0) scale(1); }
+            50% { opacity: 0.06; transform: translate(15px, 8px) scale(1.05); }
+            100% { opacity: 0.03; transform: translate(0, 0) scale(1); }
+        }
+        @keyframes light-leak-enhanced {
+             0% { background-position: -600px 0, -600px 0; opacity: 0.2; }
+             50% { opacity: 0.5; }
+             100% { background-position: 600px 0, 600px 0; opacity: 0.2; }
+        }
+         .pattern-overlay-dark {
+            position: relative;
+         }
+         .pattern-overlay-dark::before {
+            content: "";
+            position: fixed; /* Make background fixed */
+            inset: 0;
+            background-image: url('https://raw.githubusercontent.com/Sarup098/artevia/main/pattern.png');
+            background-size: 400px;
+            background-position: center;
+            background-repeat: repeat;
+            opacity: 0.05; /* Brighter */
+            z-index: -1;
+            animation: subtle-glow-move 20s infinite ease-in-out;
+        }
+         .pattern-overlay-dark::after {
+             content: "";
+             position: fixed; /* Make background fixed */
+             inset: 0;
+             background:
+                 radial-gradient(ellipse at top left, rgba(255, 215, 0, 0.3) 0%, transparent 60%),
+                 radial-gradient(ellipse at bottom right, rgba(255, 112, 67, 0.3) 0%, transparent 60%);
+             background-size: 500px 500px, 500px 500px;
+             background-repeat: no-repeat;
+             mix-blend-mode: screen;
+             animation: light-leak-enhanced 12s infinite alternate ease-in-out;
+             z-index: -1;
+         }
+         .content-z {
+            position: relative;
+            z-index: 2; /* Content stays on top */
+         }
+    </style>
+</head>
+<body class="pattern-overlay-dark min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-black/80 backdrop-blur-sm sticky top-0 z-50 shadow-md">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <a href="index.html" class="flex-shrink-0">
+                <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/main%20logo.png" alt="Artevia Studio Logo" class="h-12 w-auto">
+            </a>
+            <div class="flex items-center gap-x-4">
+                 <a href="guff.html" class="opacity-80 hover:opacity-100 transition-opacity">
+                    <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/guff.PNG" alt="Guff Podcasts" class="h-8 w-auto">
+                 </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex items-center justify-center p-6 content-z">
+        <div data-aos="fade-up" class="bg-gray-900/70 backdrop-blur-md border border-white/20 rounded-lg shadow-xl p-8 md:p-16 max-w-2xl w-full text-center">
+            <h1 class="text-4xl font-serif font-bold text-green-400 mb-6">🎉 Thank You!</h1>
+            <p class="text-xl text-gray-200 mb-4">Your project with Artevia Studio is confirmed!</p>
+            <p class="text-lg text-gray-300 leading-relaxed">
+                Your payment and agreement have been recorded. Our team will contact you within 24 hours to start the creative process.
+            </p>
+            <div class="mt-8 pt-6 border-t border-white/10">
+                <p class="text-gray-400">For any queries:</p>
+                <p class="font-semibold text-gray-200 mt-2">📧 arteviastudio@gmail.com</p>
+                <p class="text-sm text-gray-400 mt-1">📍 Namphing, Sikkim</p>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-rust text-cream content-z">
+        <div class="container mx-auto px-6 py-8 text-center">
+            <a href="index.html" class="inline-block">
+                <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/main%20logo.png" alt="Artevia Studio Logo" class="h-12 w-auto mx-auto mb-4">
+            </a>
+            <p class="text-sm text-cream/80">&copy; 2025 Artevia Studio. All Rights Reserved.</p>
+            <p class="text-sm text-cream/80 mt-1">MSME Registered Creative Studio (UDYAM-SK-03-0003233)</p>
+        </div>
+    </footer>
+
+    <script>
+        AOS.init({ duration: 800, once: true });
+    </script>
+</body>
+</html>
+
