@@ -426,10 +426,8 @@
                     advanceDisplay.textContent = `₹${parseFloat(advanceAmount).toLocaleString('en-IN')}`;
                     successMessage.classList.remove('hidden');
 
-                    // Redirect to generic Razorpay page after a delay
-                    setTimeout(() => {
-                        window.location.href = 'https://rzp.io/rzp/artevia';
-                    }, 4000); // 4-second delay
+                    // MODIFIED: Redirect immediately to generic Razorpay page
+                    window.location.href = 'https://rzp.io/rzp/artevia';
 
                 } catch (error) {
                     console.error("Error adding document: ", error);
