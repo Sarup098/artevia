@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temi Tee | Artevia Studio Wearable Art</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: #FFFFFF; /* White text */
+            overflow-x: hidden;
+        }
+        h1, h2, h3, .font-serif {
+            font-family: 'Lora', serif;
+        }
+        
+        /* Monochrome Focus */
+        .focus-ring-white:focus, .focus-ring-white:focus-within {
+            ring-color: #FFFFFF;
+            border-color: #FFFFFF;
+        }
+        .bg-rust-custom { background-color: #B9472C; } /* Custom color for Rust */
+        
+        /* Animated Background Pattern Overlay */
+        @keyframes subtle-glow-move {
+            0%, 100% { opacity: 0.03; transform: translate(0, 0) scale(1); }
+            50% { opacity: 0.05; transform: translate(15px, 8px) scale(1.05); }
+            100% { opacity: 0.03; transform: translate(0, 0) scale(1); }
+        }
+        @keyframes light-leak-enhanced {
+             0% { background-position: -600px 0, -600px 0; opacity: 0.1; }
+             50% { opacity: 0.3; }
+             100% { background-position: 600px 0, 600px 0; opacity: 0.1; }
+        }
+         .pattern-overlay-dark {
+            position: relative;
+         }
+         .pattern-overlay-dark::before {
+            content: "";
+            position: fixed; /* Make background fixed */
+            inset: 0;
+            background-image: url('https://raw.githubusercontent.com/Sarup098/artevia/main/pattern.png');
+            background-size: 400px;
+            background-position: center;
+            opacity: 0.05; 
+            filter: grayscale(100%); /* Monochrome pattern */
+            z-index: -1;
+            animation: subtle-glow-move 20s infinite ease-in-out;
+        }
+         .pattern-overlay-dark::after {
+             content: "";
+             position: fixed; /* Make background fixed */
+             inset: 0;
+             background:
+                 radial-gradient(ellipse at top left, rgba(255, 255, 255, 0.1) 0%, transparent 60%),
+                 radial-gradient(ellipse at bottom right, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+             background-size: 500px 500px, 500px 500px;
+             background-repeat: no-repeat;
+             mix-blend-mode: screen;
+             animation: light-leak-enhanced 12s infinite alternate ease-in-out;
+             z-index: -1;
+         }
+         .content-z {
+            position: relative;
+            z-index: 2; /* Content stays on top */
+         }
+
+        /* Blinking Cursor */
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .blinking-cursor {
+            animation: blink 1s step-end infinite;
+            color: #FFFFFF; /* White cursor */
+        }
+        
+        /* Custom Radio Buttons */
+        .size-radio:checked + label {
+            border-color: #FFFFFF;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #FFFFFF;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+         .color-radio:checked + label {
+            transform: scale(1.1);
+            border-color: #FFFFFF;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
+        /* Modal Styles */
+        .modal-overlay {
+            transition: opacity 0.5s ease;
+        }
+        .modal-content {
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }
+    </style>
+</head>
+<body class="pattern-overlay-dark min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-black/80 backdrop-blur-sm sticky top-0 z-40 shadow-md">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <a href="index.html" class="flex-shrink-0">
+                <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/main%20logo.png" alt="Artevia Studio Logo" class="h-12 w-auto">
+            </a>
+            <div class="flex items-center gap-x-4">
+                 <a href="https://arteviastudio.in/guff" class="opacity-80 hover:opacity-100 transition-opacity">
+                    <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/guff.PNG" alt="Guff Podcasts" class="h-8 w-auto">
+                 </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- NEW: Welcome Overlay -->
+    <div id="welcome-overlay" class="modal-overlay fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-6">
+        <div class="modal-content text-center transform scale-100 opacity-100">
+            <!-- Avatar in Yellow Circle -->
+            <div class="w-48 h-48 rounded-full bg-yellow-400 flex items-center justify-center mx-auto shadow-lg p-2 overflow-hidden">
+                <img src="https://github.com/Sarup098/artevia/blob/main/avatar.png?raw=true" alt="Sarup's Avatar" class="w-44 h-44 object-contain" style="transform: scale(1.2);">
+            </div>
+            
+            <h2 class="text-3xl font-serif font-bold text-white mt-6 mb-4">Customise Your Temi Tee</h2>
+            <p class="text-lg text-gray-300 max-w-md mx-auto mb-6">This is a one-on-one commission for your custom wearable art. Please follow these two steps:</p>
+            <div class="text-left max-w-xs mx-auto space-y-3 mb-8">
+                <p class="text-lg text-gray-100"><span class="font-bold text-white">Step 1:</span> Fill out the form & send your customization request via WhatsApp.</p>
+                <p class="text-lg text-gray-100"><span class="font-bold text-white">Step 2:</span> Confirm your commission by completing the payment.</p>
+            </div>
+            <button id="begin-btn" class="bg-white text-black font-bold py-3 px-10 rounded-full text-lg hover:bg-gray-300 transition-colors">Begin Customization</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="content-z py-12 md:py-16">
+        <div class="container mx-auto max-w-5xl p-6">
+            <div class="bg-gray-900/70 backdrop-blur-md border border-white/20 rounded-lg shadow-xl overflow-hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2">
+                    <!-- Image -->
+                    <div class="p-8 md:p-10">
+                        <!-- Square Container for Image -->
+                        <div class="aspect-square bg-gray-800 rounded-lg overflow-hidden shadow-lg">
+                            <img src="https://github.com/Sarup098/artevia/raw/main/temi.png" alt="Temi T-Shirt" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+
+                    <!-- Form -->
+                    <div class="p-8 md:p-10">
+                        <h1 class="text-3xl font-serif font-bold text-center text-white h-10 flex items-center justify-center">
+                            <span id="typing-text"></span><span class="blinking-cursor">|</span>
+                        </h1>
+                        <p class="text-center text-gray-400 mb-6">Wearable Art by Artevia Studio</p>
+                        
+                        <form id="commission-form" class="space-y-6">
+                            <!-- Size Options -->
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-200 mb-3">Choose Your Size</h3>
+                                <div class="grid grid-cols-5 gap-2">
+                                    <input type="radio" name="size" id="size-xs" value="XS" class="sr-only size-radio" required>
+                                    <label for="size-xs" class="block cursor-pointer text-center p-3 rounded-lg border border-gray-600 hover:border-white text-gray-300 transition-all">XS</label>
+                                    <input type="radio" name="size" id="size-s" value="S" class="sr-only size-radio">
+                                    <label for="size-s" class="block cursor-pointer text-center p-3 rounded-lg border border-gray-600 hover:border-white text-gray-300 transition-all">S</label>
+                                    <input type="radio" name="size" id="size-m" value="M" class="sr-only size-radio" checked>
+                                    <label for="size-m" class="block cursor-pointer text-center p-3 rounded-lg border border-gray-600 hover:border-white text-gray-300 transition-all">M</label>
+                                    <input type="radio" name="size" id="size-l" value="L" class="sr-only size-radio">
+                                    <label for="size-l" class="block cursor-pointer text-center p-3 rounded-lg border border-gray-600 hover:border-white text-gray-300 transition-all">L</label>
+                                    <input type="radio" name="size" id="size-xl" value="XL" class="sr-only size-radio">
+                                    <label for="size-xl" class="block cursor-pointer text-center p-3 rounded-lg border border-gray-600 hover:border-white text-gray-300 transition-all">XL</label>
+                                </div>
+                            </div>
+                            
+                            <!-- Color Options -->
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-200 mb-3">Choose Your Colour</h3>
+                                <div class="flex gap-4">
+                                    <input type="radio" name="color" id="color-black" value="Black" class="sr-only color-radio" required checked>
+                                    <label for="color-black" title="Black" class="w-10 h-10 rounded-full bg-black border-2 border-gray-600 cursor-pointer transition-all"></label>
+                                    <input type="radio" name="color" id="color-white" value="White" class="sr-only color-radio">
+                                    <label for="color-white" title="White" class="w-10 h-10 rounded-full bg-white border-2 border-gray-400 cursor-pointer transition-all"></label>
+                                </div>
+                            </div>
+                            
+                            <!-- Custom Text -->
+                            <div>
+                                <label for="custom-text" class="text-lg font-semibold text-gray-200">Add Custom Text (Optional)</label>
+                                <p class="text-xs text-gray-400 mb-2">Small text (max 50 chars) on the back, under the artwork.</p>
+                                <input type="text" id="custom-text" maxlength="50" class="mt-1 block w-full bg-gray-800 border border-gray-700 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-1 focus-ring-white" placeholder="e.g., 'For Ashna' or 'Sikkim 2025'">
+                                <label class="flex items-center mt-3">
+                                    <input type="checkbox" id="leave-empty" class="h-4 w-4 text-white rounded border-gray-500 focus:ring-white">
+                                    <span id="terms-label" class="ml-2 text-sm text-gray-300">Leave the back empty</span>
+                                </label>
+                            </div>
+                            
+                            <!-- Contact Info -->
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-200 mb-3">Your Details</h3>
+                                <div>
+                                    <label for="client-name" class="block text-sm font-medium text-gray-300">Your Name</label>
+                                    <input type="text" id="client-name" class="mt-1 block w-full bg-gray-800 border border-gray-700 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-1 focus-ring-white" required>
+                                </div>
+                                <div class="mt-4">
+                                    <label for="client-phone" class="block text-sm font-medium text-gray-300">Your WhatsApp Number</label>
+                                    <input type="tel" id="client-phone" class="mt-1 block w-full bg-gray-800 border border-gray-700 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-1 focus-ring-white" required>
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="pt-4 space-y-4">
+                                <p id="form-error" class="text-yellow-400 text-center text-sm mt-3 h-4"></p>
+                                
+                                <!-- Step 2: Buttons -->
+                                <div id="actions-div" class="space-y-4">
+                                    <div class="flex flex-col sm:flex-row gap-4">
+                                        <a id="whatsapp-btn" href="#" target="_blank" class="w-full sm:w-1/2 bg-gray-500 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-x-2 opacity-50 cursor-not-allowed">
+                                            Step 1: Send Request
+                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 4.315 1.731 6.086l.003.004l-1.241 4.515 4.591-1.205z"/></svg>
+                                        </a>
+                                        <a id="payment-btn" href="https://rzp.io/rzp/M8lTAZS" target="_blank" class="w-full sm:w-1/2 bg-transparent text-white border-2 border-gray-600 font-bold py-3 px-6 rounded-lg hover:bg-white hover:text-black transition-colors flex items-center justify-center gap-x-2">
+                                            Step 2: Complete Payment & Confirm
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-rust-custom text-cream content-z">
+        <div class="container mx-auto px-6 py-8 text-center">
+            <a href="index.html" class="inline-block">
+                <img src="https://raw.githubusercontent.com/Sarup098/artevia/main/main%20logo.png" alt="Artevia Studio Logo" class="h-12 w-auto mx-auto mb-4">
+            </a>
+            <p class="text-sm text-cream/80">&copy; 2025 Artevia Studio. All Rights Reserved.</p>
+            <p class="text-sm text-cream/80 mt-1">MSME Registered Creative Studio (UDYAM-SK-03-0003233)</p>
+        </div>
+    </footer>
+
+    <script>
+        const typingTextElement = document.getElementById('typing-text');
+        const commissionForm = document.getElementById('commission-form');
+        const customTextInput = document.getElementById('custom-text');
+        const leaveEmptyCheckbox = document.getElementById('leave-empty');
+        const formError = document.getElementById('form-error');
+        const whatsappBtn = document.getElementById('whatsapp-btn');
+        const paymentBtn = document.getElementById('payment-btn');
+        
+        const clientNameInput = document.getElementById('client-name');
+        const clientPhoneInput = document.getElementById('client-phone');
+        
+        // --- Overlay Logic ---
+        const welcomeOverlay = document.getElementById('welcome-overlay');
+        const beginBtn = document.getElementById('begin-btn');
+        
+        beginBtn.addEventListener('click', () => {
+            welcomeOverlay.classList.add('opacity-0', 'pointer-events-none');
+            welcomeOverlay.querySelector('.modal-content').classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                welcomeOverlay.classList.add('hidden');
+            }, 500); // Wait for animation to finish
+        });
+
+
+        // --- Title Typing Animation ---
+        function typingAnimation(element) {
+            const sequences = [
+                "T", "Te", "Tem", "Temi", "Temi ", "Temi T", "Temi Te", "Temi Tee",
+                "Temi Tee.", "Temi Tee..", "Temi Tee...",
+                "Temi Tee...", "Temi Tee...", "Temi Tee..", "Temi Tee.", "Temi Tee",
+                "Temi Te", "Temi T", "Temi ", "Temi", "Tem", "Te", "T",
+                "",
+                "त", "ते", "तेम", "तेमी", "तेमी ", "तेमी ट", "तेमी टी",
+                "तेमी टी.", "तेमी टी..", "तेमी टी...",
+                "तेमी टी...", "तेमी टी...", "तेमी टी..", "तेमी टी.", "तेमी टी",
+                "तेमी ट", "तेमी ", "तेमी", "तेम", "ते", "त",
+                ""
+            ];
+            let frameIndex = 0;
+            const typeSpeed = 100;
+            const deleteSpeed = 80;
+            const pauseEnd = 2500;
+            const pauseMid = 200;
+
+            function type() {
+                let currentFrame = sequences[frameIndex];
+                element.textContent = currentFrame;
+                let timeout;
+                if (currentFrame.endsWith('...')) {
+                    timeout = pauseEnd;
+                } else if (frameIndex < sequences.length - 1 && sequences[frameIndex+1].length < currentFrame.length) {
+                    timeout = deleteSpeed;
+                } else if(currentFrame.length === 0) {
+                    timeout = pauseMid;
+                } else {
+                    timeout = typeSpeed;
+                }
+                frameIndex = (frameIndex + 1) % sequences.length;
+                setTimeout(type, timeout);
+            }
+            setTimeout(type, 500);
+        }
+        typingAnimation(typingTextElement);
+
+        // --- Form Logic ---
+        leaveEmptyCheckbox.addEventListener('change', () => {
+            if (leaveEmptyCheckbox.checked) {
+                customTextInput.value = '';
+                customTextInput.disabled = true;
+                customTextInput.classList.add('bg-gray-600', 'opacity-50');
+            } else {
+                customTextInput.disabled = false;
+                customTextInput.classList.remove('bg-gray-600', 'opacity-50');
+            }
+            validateForm();
+        });
+        
+        customTextInput.addEventListener('input', () => {
+            if (customTextInput.value.length > 0) {
+                leaveEmptyCheckbox.checked = false;
+                leaveEmptyCheckbox.disabled = true;
+            } else {
+                 leaveEmptyCheckbox.disabled = false;
+            }
+            validateForm();
+        });
+
+        // --- Validation to enable Step 1 button ---
+        function validateForm() {
+            const clientName = clientNameInput.value.trim();
+            const clientPhone = clientPhoneInput.value.trim();
+            const phoneRegex = /^\d{10}$/;
+            const size = document.querySelector('input[name="size"]:checked');
+            const color = document.querySelector('input[name="color"]:checked');
+            
+            if (clientName && phoneRegex.test(clientPhone) && size && color) {
+                whatsappBtn.disabled = false;
+                whatsappBtn.classList.remove('disabled:opacity-50', 'disabled:cursor-not-allowed', 'bg-gray-500');
+                whatsappBtn.classList.add('bg-green-500', 'hover:bg-green-600'); // Activate Green
+                paymentBtn.classList.remove('border-gray-600');
+                paymentBtn.classList.add('border-white'); // Activate Payment Button
+                
+                formError.textContent = "You're all set!";
+                formError.style.color = "#4ade80"; // Green
+                
+                // Update WhatsApp link in real-time
+                const customText = leaveEmptyCheckbox.checked ? "None (Leave Back Empty)" : (customTextInput.value.trim() || "None");
+                const message = encodeURIComponent(
+`*New Temi Tee Commission*
+-----------------------------
+*Client Name:* ${clientName}
+*WhatsApp:* ${clientPhone}
+-----------------------------
+*Size:* ${size.value}
+*Color:* ${color.value}
+*Custom Text:* ${customText}
+-----------------------------
+Please confirm my order and send payment details. Thank you!`
+                );
+                whatsappBtn.href = `https://wa.me/919907488075?text=${message}`; // Using your contact number
+                
+            } else {
+                whatsappBtn.disabled = true;
+                whatsappBtn.classList.add('disabled:opacity-50', 'disabled:cursor-not-allowed', 'bg-gray-500');
+                whatsappBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
+                paymentBtn.classList.add('border-gray-600');
+                paymentBtn.classList.remove('border-white');
+                
+                if (clientName && !phoneRegex.test(clientPhone) && clientPhone.length > 0) {
+                    formError.textContent = "Please enter a valid 10-digit WhatsApp number.";
+                } else if (clientName && clientPhone && (!size || !color)) {
+                    formError.textContent = "Please select a size and color.";
+                } else {
+                    formError.textContent = "Please fill in all required fields.";
+                }
+                formError.style.color = "#fbbf24"; // Yellow
+            }
+        }
+        
+        // Add listeners to all inputs to check validity
+        const inputsToValidate = [
+            clientNameInput, 
+            clientPhoneInput, 
+            customTextInput,
+            leaveEmptyCheckbox,
+            ...document.querySelectorAll('input[name="size"]'),
+            ...document.querySelectorAll('input[name="color"]')
+        ];
+        
+        inputsToValidate.forEach(input => {
+            input.addEventListener('input', validateForm);
+            input.addEventListener('change', validateForm);
+        });
+
+        // Prevent form submission (we use the buttons)
+        commissionForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            validateForm(); // Re-check validation
+            if(whatsappBtn.disabled) {
+                formError.textContent = "Please fill in all required fields to send your request.";
+                formError.style.color = "#f87171"; // Red
+            }
+        });
+        
+        // Initial check
+        validateForm();
+
+    </script>
+</body>
+</html>
