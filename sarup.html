@@ -289,10 +289,9 @@
                 // Binary Stream
                 010101010101010101010101010101
                 101010101010101010101010101010
-                001100110011001100110011001100
-                110011001100110011001100110011
             `.repeat(20);
 
+            // Handle Desktop Mouse Movement
             const handleMouseMove = (e) => {
                 setMousePos({ x: e.clientX, y: e.clientY });
                 
@@ -303,17 +302,34 @@
                 }
             };
 
+            // Handle Mobile Touch Movement for Flashlight & Slider
+            const handleTouchMove = (e) => {
+                const touch = e.touches[0];
+                setMousePos({ x: touch.clientX, y: touch.clientY });
+
+                if (containerRef.current) {
+                    const rect = containerRef.current.getBoundingClientRect();
+                    const x = ((touch.clientX - rect.left) / rect.width) * 100;
+                    setSliderPos(Math.min(Math.max(x, 0), 100));
+                }
+            };
+
             useEffect(() => {
+                // Attach global listeners for full-screen flashlight effect
                 window.addEventListener('mousemove', handleMouseMove);
-                return () => window.removeEventListener('mousemove', handleMouseMove);
+                window.addEventListener('touchmove', handleTouchMove);
+                return () => {
+                    window.removeEventListener('mousemove', handleMouseMove);
+                    window.removeEventListener('touchmove', handleTouchMove);
+                };
             }, []);
 
             return (
                 <section className="hero-section relative min-h-screen flex items-center justify-center px-6 pt-20 pb-12 z-content overflow-hidden">
                     
-                    {/* --- THE FLASHLIGHT REVEAL LAYER --- */}
+                    {/* --- THE FLASHLIGHT REVEAL LAYER (Enabled for All Devices) --- */}
                     <div 
-                        className="fixed inset-0 pointer-events-none hidden md:block z-0"
+                        className="fixed inset-0 pointer-events-none z-0"
                         style={{ 
                             maskImage: `radial-gradient(circle 250px at ${mousePos.x}px ${mousePos.y}px, black 0%, transparent 100%)`,
                             WebkitMaskImage: `radial-gradient(circle 250px at ${mousePos.x}px ${mousePos.y}px, black 0%, transparent 100%)`
@@ -350,7 +366,7 @@
                                 Sarup Chettri
                             </div>
                             
-                            <h1 className="text-5xl sm:text-6xl md:text-8xl heading-font font-black text-[#1A1A1A] leading-[0.9] mb-6">
+                            <h1 className="text-4xl sm:text-6xl md:text-8xl heading-font font-black text-[#1A1A1A] leading-[0.9] mb-6">
                                 ARTIST<br />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8B3A28] to-[#D4B483]">& ENGINEER</span>
                             </h1>
@@ -364,8 +380,18 @@
                         {/* Interactive Split Image */}
                         <div className="min-h-[400px] lg:h-auto order-1 lg:order-2 flex items-center justify-center pointer-events-auto">
                             <div 
-                                className="relative w-full max-w-sm md:max-w-md aspect-[4/5] rounded-[2rem] md:rounded-[2.5rem] overflow-hidden border-4 md:border-8 border-white shadow-2xl bg-[#1A1A1A] cursor-crosshair"
+                                className="relative w-full max-w-sm md:max-w-md aspect-[4/5] rounded-[2rem] md:rounded-[2.5rem] overflow-hidden border-4 md:border-8 border-white shadow-2xl bg-[#1A1A1A] cursor-crosshair touch-none"
                                 ref={containerRef}
+                                /* Specific touch handler for slider precision */
+                                onTouchMove={(e) => {
+                                    e.stopPropagation(); 
+                                    if (containerRef.current) {
+                                        const rect = containerRef.current.getBoundingClientRect();
+                                        const touch = e.touches[0];
+                                        const x = ((touch.clientX - rect.left) / rect.width) * 100;
+                                        setSliderPos(Math.min(Math.max(x, 0), 100));
+                                    }
+                                }}
                             >
                                 {/* Layer 1: TECHNICAL */}
                                 <div className="absolute inset-0 bg-[#1e1e1e] flex flex-col font-mono p-6 text-green-400 text-xs md:text-sm overflow-hidden">
