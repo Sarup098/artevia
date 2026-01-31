@@ -171,7 +171,7 @@
                 title: "Guffari AI",
                 category: "Engineering",
                 type: "AI Conversational Agent",
-                tags: ["Gemini API", "React"],
+                tags: ["Gemini API", "HTML/CSS", "JavaScript"],
                 desc: "My custom AI conversational agent built on Gemini. It speaks the language of the hills.",
                 visualColor: "bg-[#1A1A1A]", 
                 textColor: "text-white",
@@ -254,12 +254,9 @@
                             </button>
                         ))}
                     </div>
-                    <a href={ASSETS.whatsapp} target="_blank" className="hidden md:flex items-center gap-2 bg-[#1A1A1A] text-white px-5 py-2 rounded-full text-xs font-bold hover:bg-[#8B3A28] transition-colors">
+                    <a href={ASSETS.whatsapp} target="_blank" className="flex items-center gap-2 bg-[#1A1A1A] text-white px-4 py-2 md:px-5 md:py-2 rounded-full text-[10px] md:text-xs font-bold hover:bg-[#8B3A28] transition-colors">
                         LET'S TALK
                     </a>
-                    <div className="md:hidden">
-                        <Icons.Menu size={24} />
-                    </div>
                 </div>
             </nav>
         );
@@ -366,7 +363,8 @@
                                 Sarup Chettri
                             </div>
                             
-                            <h1 className="text-4xl sm:text-6xl md:text-8xl heading-font font-black text-[#1A1A1A] leading-[0.9] mb-6">
+                            {/* Adjusted Font Sizes for Better Responsiveness on Laptops */}
+                            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-6xl xl:text-8xl heading-font font-black text-[#1A1A1A] leading-[0.9] mb-6">
                                 ARTIST<br />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8B3A28] to-[#D4B483]">& ENGINEER</span>
                             </h1>
