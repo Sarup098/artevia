@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sarup Chettri | Artist & Engineer</title>
+    
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* Base Settings */
+        body { font-family: 'Inter', sans-serif; background-color: #F5F1E8; color: #1A1A1A; overflow-x: hidden; cursor: default; }
+        
+        /* Typography */
+        h1, h2, h3, .heading-font { font-family: 'Syne', sans-serif; }
+        .subheading-font { font-family: 'Space Grotesk', sans-serif; }
+        .code-font { font-family: 'JetBrains Mono', monospace; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #F5F1E8; }
+        ::-webkit-scrollbar-thumb { background: #8B3A28; border-radius: 4px; }
+
+        /* Utilities */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .bento-card {
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .bento-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(139, 58, 40, 0.15);
+        }
+
+        .z-content { position: relative; z-index: 10; }
+        
+        /* Image Hover Effect */
+        .portrait-hover:hover {
+            transform: scale(1.02) rotate(1deg);
+            transition: transform 0.5s ease;
+        }
+
+        /* Magic Cursor Lens */
+        .magic-cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 5;
+            background: transparent; 
+            transform: translate(-50%, -50%);
+        }
+
+        /* Matrix Code Rain Animation */
+        @keyframes scrollText {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-50%); }
+        }
+        .code-scroll {
+            animation: scrollText 60s linear infinite;
+        }
+
+        /* Creative Floating Animation */
+        @keyframes float-slow {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -50px) rotate(10deg); }
+            66% { transform: translate(-20px, 20px) rotate(-5deg); }
+        }
+        @keyframes float-medium {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(-40px, 40px) rotate(-10deg); }
+        }
+        @keyframes float-fast {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(20px, -20px) rotate(5deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- YOUTUBE SHORTS IDS ---
+        const YT_CINEMATIC = "hyuTQgkMb8s";
+        const YT_GUFF_TRAILER = "Z02S9WhBQj4";
+
+        // --- ICONS ---
+        const LucideIcon = ({ name, size = 24, className, ...props }) => {
+            const iconDef = window.lucide?.icons?.[name];
+            if (!iconDef) return null;
+            return (
+                <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+                    {iconDef.map((child, idx) => React.createElement(child[0], { ...child[1], key: idx }))}
+                </svg>
+            );
+        };
+        const Icon = (name) => (props) => <LucideIcon name={name} {...props} />;
+        const Icons = {
+            ArrowRight: Icon('ArrowRight'),
+            ExternalLink: Icon('ExternalLink'),
+            Instagram: Icon('Instagram'),
+            Mail: Icon('Mail'),
+            Menu: Icon('Menu'),
+            X: Icon('X'),
+            Bot: Icon('Bot'),
+            Play: Icon('Play'),
+            ShoppingBag: Icon('ShoppingBag'),
+            Mic: Icon('Mic'),
+            Cpu: Icon('Cpu'),
+            Palette: Icon('Palette'),
+            Box: Icon('Box'),
+            Code: Icon('Code'),
+            Youtube: Icon('Youtube'),
+            User: Icon('User')
+        };
+
+        // --- ASSETS ---
+        const ASSETS = {
+            heroSplit: "https://github.com/Sarup098/artevia/blob/main/The_Split.png?raw=true",
+            merchTemi: "https://github.com/Sarup098/artevia/blob/main/black%20temi%20b.jpg?raw=true",
+            profilePhoto: "https://github.com/Sarup098/artevia/blob/main/cm%20gift.jpeg?raw=true",
+            logoStudio: "https://github.com/Sarup098/artevia/blob/main/main%20logo.png?raw=true",
+            logoGuff: "https://github.com/Sarup098/artevia/blob/main/guff.PNG?raw=true",
+            thumbSchool: "https://github.com/Sarup098/artevia/blob/main/school.png?raw=true",
+            bgPattern: "https://github.com/Sarup098/artevia/blob/main/pattern.png?raw=true",
+            bgTexture: "https://github.com/Sarup098/artevia/blob/main/bg.png?raw=true",
+            creativeFloat: "https://github.com/Sarup098/codebd/blob/main/IMG_8211.PNG?raw=true",
+            
+            linkGuffari: "https://arteviastudio.in/guffari",
+            linkShop: "https://arteviastudio.in/shop",
+            linkGuff: "https://arteviastudio.in/guff",
+            linkStudio: "https://arteviastudio.in",
+            linkSchoolLife: "https://youtu.be/ZCRODUR6opk",
+            whatsapp: "https://wa.me/919907488075",
+            
+            // YouTube Links for Guff cards
+            ytJagatguru: "https://youtu.be/GPyQPVfw5o0",
+            ytDinesh: "https://youtu.be/Rc85cgpukqw"
+        };
+
+        // --- DATA OBJECTS ---
+        const projects = [
+            {
+                id: 1,
+                title: "Guffari AI",
+                category: "Engineering",
+                type: "AI Conversational Agent",
+                tags: ["Gemini API", "React"],
+                desc: "My custom AI conversational agent built on Gemini. It speaks the language of the hills.",
+                visualColor: "bg-[#1A1A1A]", 
+                textColor: "text-white",
+                link: ASSETS.linkGuffari
+            },
+            {
+                id: 2,
+                title: "Artevia Closet",
+                category: "Creative",
+                type: "Wearable Brand",
+                tags: ["Fashion", "Branding"],
+                desc: "Himalayan Streetwear.",
+                visualColor: "bg-[#D4B483]", 
+                image: ASSETS.merchTemi,
+                textColor: "text-[#1A1A1A]",
+                link: ASSETS.linkShop
+            },
+            {
+                id: 3,
+                title: "School Life",
+                category: "Creative",
+                type: "Animation Feature",
+                tags: ["Procreate", "Final Cut Pro"],
+                desc: "Animation Feature (WIP)",
+                visualColor: "bg-[#8B3A28]", 
+                image: ASSETS.thumbSchool, 
+                textColor: "text-[#F5F1E8]",
+                link: ASSETS.linkSchoolLife
+            },
+            {
+                id: 4,
+                title: "Guff",
+                category: "Creative",
+                type: "Podcast Network",
+                tags: ["Audio", "Production"],
+                desc: "Podcast Network",
+                visualColor: "bg-white",
+                image: ASSETS.logoGuff, 
+                isLogo: true, 
+                textColor: "text-[#1A1A1A]",
+                link: ASSETS.linkGuff,
+                subLinks: [
+                    { label: "Jagatguru", url: ASSETS.ytJagatguru, icon: "User" },
+                    { label: "Dinesh (ISRO)", url: ASSETS.ytDinesh, icon: "Cpu" }
+                ]
+            }
+        ];
+
+        // --- COMPONENTS ---
+
+        const YouTubeEmbed = ({ videoId, title }) => {
+            return (
+                <div className="w-full aspect-[9/16] rounded-2xl overflow-hidden shadow-2xl border border-[#8B3A28]/20 bg-black">
+                    <iframe 
+                        className="w-full h-full"
+                        src={`https://www.youtube.com/embed/${videoId}`} 
+                        title={title}
+                        frameBorder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowFullScreen>
+                    </iframe>
+                </div>
+            );
+        };
+
+        const Navbar = ({ setPage, activePage }) => (
+            <nav className="fixed top-0 left-0 w-full z-50 px-4 md:px-6 py-4 md:py-6 pointer-events-auto">
+                <div className="max-w-7xl mx-auto flex justify-between items-center glass-card px-4 md:px-6 py-3 rounded-full shadow-sm">
+                    <div className="flex items-center gap-3 cursor-pointer" onClick={() => setPage('home')}>
+                        <span className="text-lg md:text-xl font-bold heading-font text-[#1A1A1A]">Sarup Chettri</span>
+                    </div>
+                    <div className="hidden md:flex gap-8">
+                        {['Home', 'Work', 'Artevia', 'About'].map((item) => (
+                            <button 
+                                key={item} 
+                                onClick={() => setPage(item.toLowerCase())}
+                                className={`text-sm font-bold uppercase tracking-wide transition-colors ${activePage === item.toLowerCase() ? 'text-[#8B3A28]' : 'text-[#1A1A1A]/60 hover:text-[#1A1A1A]'}`}
+                            >
+                                {item}
+                            </button>
+                        ))}
+                    </div>
+                    <a href={ASSETS.whatsapp} target="_blank" className="hidden md:flex items-center gap-2 bg-[#1A1A1A] text-white px-5 py-2 rounded-full text-xs font-bold hover:bg-[#8B3A28] transition-colors">
+                        LET'S TALK
+                    </a>
+                    <div className="md:hidden">
+                        <Icons.Menu size={24} />
+                    </div>
+                </div>
+            </nav>
+        );
+
+        const Hero = ({ setPage }) => {
+            const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+            const [sliderPos, setSliderPos] = useState(50);
+            const containerRef = useRef(null);
+
+            const codeString = `
+                public class SarupChettri {
+                    public static void main(String[] args) {
+                        System.out.println("Hello World");
+                        boolean isEngineer = true;
+                        while(isEngineer) {
+                            buildFuture();
+                            solveProblems();
+                        }
+                    }
+                    private static void buildFuture() {
+                        int[] neuralNet = new int[1024];
+                        for(int i=0; i<neuralNet.length; i++) {
+                            neuralNet[i] = Math.random() > 0.5 ? 1 : 0;
+                        }
+                    }
+                }
+                // Binary Stream
+                010101010101010101010101010101
+                101010101010101010101010101010
+                001100110011001100110011001100
+                110011001100110011001100110011
+            `.repeat(20);
+
+            const handleMouseMove = (e) => {
+                setMousePos({ x: e.clientX, y: e.clientY });
+                
+                if (containerRef.current) {
+                    const rect = containerRef.current.getBoundingClientRect();
+                    const x = ((e.clientX - rect.left) / rect.width) * 100;
+                    setSliderPos(Math.min(Math.max(x, 0), 100));
+                }
+            };
+
+            useEffect(() => {
+                window.addEventListener('mousemove', handleMouseMove);
+                return () => window.removeEventListener('mousemove', handleMouseMove);
+            }, []);
+
+            return (
+                <section className="hero-section relative min-h-screen flex items-center justify-center px-6 pt-20 pb-12 z-content overflow-hidden">
+                    
+                    {/* --- THE FLASHLIGHT REVEAL LAYER --- */}
+                    <div 
+                        className="fixed inset-0 pointer-events-none hidden md:block z-0"
+                        style={{ 
+                            maskImage: `radial-gradient(circle 250px at ${mousePos.x}px ${mousePos.y}px, black 0%, transparent 100%)`,
+                            WebkitMaskImage: `radial-gradient(circle 250px at ${mousePos.x}px ${mousePos.y}px, black 0%, transparent 100%)`
+                        }}
+                    >
+                        {/* CREATIVE SIDE */}
+                        <div className="absolute inset-0 bg-[#F5F1E8]">
+                            <img src={ASSETS.creativeFloat} className="absolute w-48 h-48 object-contain top-[15%] left-[5%] opacity-40 animate-[float-slow_12s_infinite_ease-in-out]" />
+                            <img src={ASSETS.creativeFloat} className="absolute w-64 h-64 object-contain bottom-[10%] left-[20%] opacity-30 animate-[float-medium_15s_infinite_ease-in-out]" />
+                            <img src={ASSETS.creativeFloat} className="absolute w-32 h-32 object-contain top-[40%] right-[30%] opacity-20 animate-[float-fast_10s_infinite_ease-in-out]" />
+                            <img src={ASSETS.creativeFloat} className="absolute w-56 h-56 object-contain top-[10%] right-[10%] opacity-20 animate-[float-medium_14s_infinite_ease-in-out]" />
+                            <div className="absolute inset-0 opacity-20" style={{backgroundImage: `url(${ASSETS.bgPattern})`, backgroundSize: '100px'}}></div>
+                        </div>
+
+                        {/* CODE SIDE */}
+                        <div 
+                            className="absolute inset-0 bg-[#1A1A1A] overflow-hidden"
+                            style={{
+                                maskImage: 'linear-gradient(to right, transparent 30%, black 70%)',
+                                WebkitMaskImage: 'linear-gradient(to right, transparent 30%, black 70%)'
+                            }}
+                        >
+                            <div className="w-full h-full opacity-20 code-font text-[12px] text-green-500 p-8 leading-5 break-all code-scroll">
+                                {codeString}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center z-10">
+                        {/* Text */}
+                        <div className="text-center lg:text-left order-2 lg:order-1 flex flex-col items-center lg:items-start pointer-events-none">
+                            <div className="inline-flex items-center gap-2 bg-[#8B3A28]/10 text-[#8B3A28] px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest mb-6 border border-[#8B3A28]/20 backdrop-blur-sm pointer-events-auto">
+                                <span className="w-2 h-2 rounded-full bg-[#8B3A28] animate-pulse"></span>
+                                Sarup Chettri
+                            </div>
+                            
+                            <h1 className="text-5xl sm:text-6xl md:text-8xl heading-font font-black text-[#1A1A1A] leading-[0.9] mb-6">
+                                ARTIST<br />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8B3A28] to-[#D4B483]">& ENGINEER</span>
+                            </h1>
+
+                            <p className="text-base sm:text-lg md:text-xl text-[#1A1A1A]/70 max-w-lg font-medium">
+                                Merging the logic of AI with the soul of Himalayan art. 
+                                Building <span className="text-[#8B3A28] font-bold">Artevia</span> from the ground up.
+                            </p>
+                        </div>
+
+                        {/* Interactive Split Image */}
+                        <div className="min-h-[400px] lg:h-auto order-1 lg:order-2 flex items-center justify-center pointer-events-auto">
+                            <div 
+                                className="relative w-full max-w-sm md:max-w-md aspect-[4/5] rounded-[2rem] md:rounded-[2.5rem] overflow-hidden border-4 md:border-8 border-white shadow-2xl bg-[#1A1A1A] cursor-crosshair"
+                                ref={containerRef}
+                            >
+                                {/* Layer 1: TECHNICAL */}
+                                <div className="absolute inset-0 bg-[#1e1e1e] flex flex-col font-mono p-6 text-green-400 text-xs md:text-sm overflow-hidden">
+                                    <div className="opacity-50 mb-4">import tensorflow as tf</div>
+                                    <div className="pl-4 mt-2">def build_future(self):</div>
+                                    <div className="pl-8 text-yellow-400">return "Artevia Studio"</div>
+                                    <div className="mt-8 opacity-20">010101010101010101<br/>101010101010101010</div>
+                                    <div className="absolute bottom-6 right-6 text-white bg-black/50 px-3 py-1 rounded-full uppercase tracking-widest text-[10px] font-bold border border-white/10">Logic</div>
+                                </div>
+
+                                {/* Layer 2: CREATIVE */}
+                                <div 
+                                    className="absolute inset-0 bg-[#8B3A28] overflow-hidden"
+                                    style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
+                                >
+                                    <img src={ASSETS.heroSplit} alt="Creative Side" className="absolute inset-0 w-full h-full object-cover" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                                    <div className="absolute bottom-6 left-6 text-white bg-black/20 backdrop-blur-md px-3 py-1 rounded-full uppercase tracking-widest text-[10px] font-bold border border-white/10">Creative</div>
+                                </div>
+                                
+                                <div className="absolute top-0 bottom-0 w-0.5 bg-white z-30 pointer-events-none shadow-[0_0_10px_rgba(255,255,255,0.5)]" style={{ left: `${sliderPos}%` }}>
+                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg">
+                                        <div className="w-1 h-4 bg-[#1A1A1A]/20 rounded-full mx-0.5"></div>
+                                        <div className="w-1 h-4 bg-[#1A1A1A]/20 rounded-full mx-0.5"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const BentoGrid = () => (
+            <section className="py-12 md:py-24 px-4 md:px-6 z-content max-w-7xl mx-auto">
+                <div className="mb-12">
+                    <h2 className="text-4xl md:text-5xl heading-font font-bold text-[#1A1A1A] mb-4">Selected Work</h2>
+                    <p className="text-lg text-[#1A1A1A]/60">A fusion of code, canvas, and culture.</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 grid-rows-auto md:grid-rows-2">
+                    
+                    {/* Guffari AI */}
+                    <a href={projects[0].link} target="_blank" className="bento-card md:col-span-2 bg-[#1A1A1A] rounded-3xl p-6 md:p-8 relative overflow-hidden group cursor-pointer text-white min-h-[300px]">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full blur-[80px] opacity-30 group-hover:opacity-50 transition-opacity"></div>
+                        <div className="relative z-10 h-full flex flex-col justify-between">
+                            <div>
+                                <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-4"><Icons.Bot size={24} className="text-white" /></div>
+                                <h3 className="text-3xl heading-font font-bold mb-2">{projects[0].title}</h3>
+                                <p className="text-white/60 max-w-md">{projects[0].desc}</p>
+                            </div>
+                            <div className="mt-8 flex gap-2">
+                                {projects[0].tags.map(tag => <span key={tag} className="px-3 py-1 bg-white/10 rounded-full text-xs font-mono">{tag}</span>)}
+                            </div>
+                        </div>
+                    </a>
+
+                    {/* Artevia Closet */}
+                    <a href={projects[1].link} target="_blank" className="bento-card md:row-span-2 bg-[#D4B483] rounded-3xl p-6 md:p-8 relative overflow-hidden group cursor-pointer text-[#1A1A1A] min-h-[300px]">
+                        <div className="absolute inset-0">
+                            <img src={projects[1].image} className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700 mix-blend-multiply" />
+                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#D4B483] via-transparent to-transparent"></div>
+                        <div className="relative z-10 h-full flex flex-col justify-end">
+                            <h3 className="text-3xl heading-font font-bold mb-2">{projects[1].title}</h3>
+                            <p className="text-[#1A1A1A]/80 mb-4 font-medium">{projects[1].desc}</p>
+                            <div className="w-10 h-10 bg-[#1A1A1A] rounded-full flex items-center justify-center text-white"><Icons.ShoppingBag size={18} /></div>
+                        </div>
+                    </a>
+
+                    {/* School Life */}
+                    <a href={projects[2].link} target="_blank" className="bento-card bg-[#8B3A28] rounded-3xl overflow-hidden group cursor-pointer text-[#F5F1E8] relative min-h-[250px]">
+                         <div className="absolute inset-0">
+                            <img src={projects[2].image} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="School Life" />
+                            <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors"></div>
+                         </div>
+                        <div className="relative z-10 p-6 md:p-8 h-full flex flex-col justify-end">
+                            <h3 className="text-2xl heading-font font-bold mb-1 shadow-black drop-shadow-md">{projects[2].title}</h3>
+                            <div className="flex flex-wrap gap-2 mt-2 mb-2">
+                                {projects[2].tags.map(tag => <span key={tag} className="text-[10px] uppercase tracking-wide bg-white/20 backdrop-blur-md px-2 py-1 rounded text-white">{tag}</span>)}
+                            </div>
+                            <p className="text-[#F5F1E8]/90 text-sm shadow-black drop-shadow-md">{projects[2].desc}</p>
+                        </div>
+                        <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-md p-2 rounded-full"><Icons.Play size={20} className="text-white" /></div>
+                    </a>
+
+                    {/* Guff Podcast - SPLIT INTERACTIVE CARD */}
+                    <div className="bento-card bg-white rounded-3xl relative overflow-hidden group border border-[#8B3A28]/10 text-[#1A1A1A] min-h-[250px] cursor-default">
+                        {/* Background Logo Fill */}
+                        <div className="absolute inset-0">
+                             <img src={projects[3].image} alt="Guff Logo" className="w-full h-full object-cover opacity-100" />
+                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                        </div>
+
+                        {/* Normal State Content (Visible when not hovering) */}
+                        <div className="absolute inset-0 z-10 flex flex-col h-full justify-between p-6 md:p-8 transition-opacity duration-300 group-hover:opacity-0 pointer-events-none">
+                            <div className="flex justify-between items-start">
+                                <div className="p-2 bg-white/90 backdrop-blur-sm rounded-lg"><Icons.Mic size={20} className="text-[#8B3A28]" /></div>
+                                <Icons.ExternalLink size={20} className="text-white" />
+                            </div>
+                            <div className="mt-auto pt-8">
+                                <h3 className="text-2xl heading-font font-bold mb-1 text-white">{projects[3].title}</h3>
+                                <p className="text-white/80 text-sm">{projects[3].desc}</p>
+                            </div>
+                        </div>
+
+                        {/* Hover State - 50/50 SPLIT CARDS */}
+                        <div className="absolute inset-0 z-20 flex opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <div className="absolute top-4 left-0 w-full text-center z-30 pointer-events-none">
+                                <p className="text-white/80 text-xs font-bold uppercase tracking-widest bg-black/50 inline-block px-3 py-1 rounded-full backdrop-blur-md">Watch our best conversations with</p>
+                            </div>
+                            {/* Card 1: Jagatguru */}
+                            <a href={projects[3].subLinks[0].url} target="_blank" className="w-1/2 h-full bg-[#8B3A28] hover:bg-[#6D2E20] transition-colors flex flex-col items-center justify-center p-4 text-center border-r border-white/10 group/link pt-12">
+                                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mb-2 group-hover/link:scale-110 transition-transform">
+                                    <Icons.User size={20} className="text-white" />
+                                </div>
+                                <span className="text-white font-bold text-sm md:text-base">Jagatguru</span>
+                            </a>
+                            
+                            {/* Card 2: Dinesh */}
+                            <a href={projects[3].subLinks[1].url} target="_blank" className="w-1/2 h-full bg-[#1A1A1A] hover:bg-black transition-colors flex flex-col items-center justify-center p-4 text-center group/link pt-12">
+                                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mb-2 group-hover/link:scale-110 transition-transform">
+                                    <Icons.Cpu size={20} className="text-white" />
+                                </div>
+                                <span className="text-white font-bold text-sm md:text-base">Dinesh (ISRO)</span>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        );
+
+        const ReelsSection = () => (
+            <section className="py-20 px-6 max-w-7xl mx-auto bg-[#1A1A1A] rounded-[2rem] md:rounded-[3rem] text-[#F5F1E8] mb-20 overflow-hidden relative">
+                <div className="relative z-10">
+                    <div className="text-center mb-12">
+                        <div className="inline-flex items-center gap-2 bg-[#8B3A28]/20 text-[#8B3A28] px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-4 border border-[#8B3A28]/30">
+                            <Icons.Play size={14} /> Video Production
+                        </div>
+                        <h2 className="text-3xl md:text-5xl heading-font font-bold mb-4">Visual Stories</h2>
+                        <p className="text-[#F5F1E8]/60 text-lg">Cinematic editing and storytelling from the hills.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 justify-center px-2 md:px-8">
+                        <div className="flex flex-col items-center w-full">
+                            <h3 className="text-xl font-bold mb-4 heading-font text-white/80">Cinematic Reel Edit</h3>
+                            <YouTubeEmbed videoId={YT_CINEMATIC} title="Cinematic Reel Edit" />
+                        </div>
+                        <div className="flex flex-col items-center w-full">
+                            <h3 className="text-xl font-bold mb-4 heading-font text-white/80">Jagatguru Trailer (Guff)</h3>
+                            <YouTubeEmbed videoId={YT_GUFF_TRAILER} title="Jagatguru Trailer" />
+                        </div>
+                    </div>
+                </div>
+            </section>
+        );
+
+        const About = () => (
+             <div className="pt-32 pb-20 px-6 max-w-4xl mx-auto z-content relative">
+                <h1 className="text-5xl md:text-6xl heading-font font-black mb-8 pointer-events-auto">The <span className="text-[#8B3A28]">Dual</span> Life.</h1>
+                <div className="grid md:grid-cols-2 gap-12 pointer-events-auto">
+                    <div className="space-y-6 text-lg leading-relaxed text-[#1A1A1A]/80">
+                        <p>
+                            Based in Namphing, Sikkim, my work exists at the intersection of discipline and creativity.
+                        </p>
+                        <p>
+                            As a BTech student in AI/ML, I balance academic rigor with the dynamic demands of running Artevia Studio. From coding predictive models to crafting visual identities, teaching students to editing cinematic narratives—I don't just switch hats; I blend them.
+                        </p>
+                        <p>
+                            Artevia is the result: a bridge between Himalayan tradition and modern technology.
+                        </p>
+                    </div>
+                    <div className="flex flex-col items-center">
+                        <div className="rounded-2xl overflow-hidden shadow-2xl rotate-3 hover:rotate-0 transition-transform duration-500 mb-4 w-full">
+                            <img src={ASSETS.profilePhoto} className="w-full h-full object-cover" />
+                        </div>
+                        <p className="text-sm text-[#1A1A1A]/60 italic text-center max-w-xs">
+                            With the HCM of Sikkim, receiving appreciation for my portrait art.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const Contact = () => (
+             <div className="min-h-screen flex items-center justify-center px-6 z-content relative text-center">
+                <div>
+                    <h1 className="text-6xl md:text-7xl heading-font font-black mb-6 text-[#1A1A1A]">Ready?</h1>
+                    <p className="text-lg md:text-xl text-[#1A1A1A]/60 mb-12">Let's build something impossible together.</p>
+                    <a href={ASSETS.whatsapp} target="_blank" className="inline-block bg-[#8B3A28] text-white px-10 py-5 rounded-full text-xl font-bold hover:scale-105 transition-transform shadow-xl">
+                        Chat on WhatsApp
+                    </a>
+                </div>
+            </div>
+        );
+
+        const App = () => {
+            const [page, setPage] = useState('home');
+
+            useEffect(() => {
+                window.scrollTo(0, 0);
+            }, [page]);
+
+            return (
+                <>
+                    <Navbar setPage={setPage} activePage={page} />
+                    <main>
+                        {page === 'home' && (
+                            <>
+                                <Hero setPage={setPage} />
+                                <BentoGrid />
+                                <ReelsSection />
+                            </>
+                        )}
+                        {page === 'work' && (
+                            <div className="pt-20">
+                                <BentoGrid />
+                                <ReelsSection />
+                            </div>
+                        )}
+                        {page === 'about' && <About />}
+                        {page === 'contact' && <Contact />}
+                        {page === 'artevia' && (
+                             <div className="min-h-screen flex flex-col items-center justify-center relative bg-[#8B3A28] overflow-hidden pointer-events-auto">
+                                <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: `url('${ASSETS.bgTexture}')`, backgroundSize: 'cover' }}></div>
+                                <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: `url('${ASSETS.bgPattern}')`, backgroundSize: '200px' }}></div>
+                                <div className="absolute inset-0 bg-black/40 pointer-events-none"></div>
+                                <div className="relative z-10 w-full max-w-xl px-6"><img src={ASSETS.logoStudio} alt="Artevia Studio" className="w-full h-auto object-contain drop-shadow-2xl" /></div>
+                                <div className="relative z-10 mt-12 text-center">
+                                     <p className="text-[#F5F1E8] text-xl md:text-2xl mb-8 font-medium tracking-wide">Web Design & Branding. Rooted in Sikkim.</p>
+                                     <a href={ASSETS.linkStudio} target="_blank" className="bg-[#F5F1E8] text-[#8B3A28] px-8 py-3 rounded-full font-bold hover:scale-105 transition-transform shadow-lg">Enter Studio</a>
+                                </div>
+                             </div>
+                        )}
+                    </main>
+                    <footer className="py-8 text-center text-[#1A1A1A]/40 text-sm z-content relative code-font">
+                        © 2026 Sarup Chettri.
+                    </footer>
+                </>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
