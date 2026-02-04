@@ -5,20 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sarup Chettri | Artist & Engineer</title>
     
-    <!-- React & ReactDOM -->
     <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
     
-    <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
-    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -142,8 +137,10 @@
 
         // --- ASSETS ---
         const ASSETS = {
-            heroSplit: "https://github.com/Sarup098/artevia/blob/main/creative.png?raw=true",
-            heroSpli: "https://github.com/Sarup098/artevia/blob/main/logic.png?raw=true",
+            // UPDATED IMAGES FOR SPLIT
+            heroCreative: "https://github.com/Sarup098/artevia/blob/main/creative.png?raw=true",
+            heroLogic: "https://github.com/Sarup098/artevia/blob/main/logic.png?raw=true",
+            
             merchTemi: "https://github.com/Sarup098/artevia/blob/main/black%20temi%20b.jpg?raw=true",
             profilePhoto: "https://github.com/Sarup098/artevia/blob/main/cm%20gift.jpeg?raw=true",
             logoStudio: "https://github.com/Sarup098/artevia/blob/main/main%20logo.png?raw=true",
@@ -392,27 +389,18 @@
                                     }
                                 }}
                             >
-                                {/* Layer 1: TECHNICAL */}
-                               <div 
-                                    className="absolute inset-0 bg-[#8B3A28] overflow-hidden"
-                                    style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
-                                >
-                                    <img src={ASSETS.heroSpli} alt="logic Side" className="absolute inset-0 w-full h-full object-cover" />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                                    <div className="absolute bottom-6 left-6 text-white bg-black/20 backdrop-blur-md px-3 py-1 rounded-full uppercase tracking-widest text-[10px] font-bold border border-white/10">Creative</div>
+                                {/* Layer 1: TECHNICAL (UPDATED WITH LOGIC IMAGE) */}
+                                <div className="absolute inset-0 bg-[#1e1e1e] overflow-hidden">
+                                    <img src={ASSETS.heroLogic} alt="Logic Side" className="absolute inset-0 w-full h-full object-cover" />
+                                    <div className="absolute bottom-6 right-6 text-white bg-black/50 px-3 py-1 rounded-full uppercase tracking-widest text-[10px] font-bold border border-white/10">Logic</div>
                                 </div>
-                                
-                                <div className="absolute top-0 bottom-0 w-0.5 bg-white z-30 pointer-events-none shadow-[0_0_10px_rgba(255,255,255,0.5)]" style={{ left: `${sliderPos}%` }}>
-                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg">
-                                        <div className="w-1 h-4 bg-[#1A1A1A]/20 rounded-full mx-0.5"></div>
-                                        <div className="w-1 h-4 bg-[#1A1A1A]/20 rounded-full mx-0.5"></div>
-                                    </div>
-                                {/* Layer 2: CREATIVE */}
+
+                                {/* Layer 2: CREATIVE (UPDATED WITH CREATIVE IMAGE) */}
                                 <div 
                                     className="absolute inset-0 bg-[#8B3A28] overflow-hidden"
                                     style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
                                 >
-                                    <img src={ASSETS.heroSplit} alt="Creative Side" className="absolute inset-0 w-full h-full object-cover" />
+                                    <img src={ASSETS.heroCreative} alt="Creative Side" className="absolute inset-0 w-full h-full object-cover" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                                     <div className="absolute bottom-6 left-6 text-white bg-black/20 backdrop-blur-md px-3 py-1 rounded-full uppercase tracking-widest text-[10px] font-bold border border-white/10">Creative</div>
                                 </div>
