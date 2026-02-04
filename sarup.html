@@ -143,7 +143,7 @@
         // --- ASSETS ---
         const ASSETS = {
             heroSplit: "https://github.com/Sarup098/artevia/blob/main/creative.png?raw=true",
-            heroSplit2: "https://github.com/Sarup098/artevia/blob/main/logic.png?raw=true",
+            heroSpli: "https://github.com/Sarup098/artevia/blob/main/logic.png?raw=true",
             merchTemi: "https://github.com/Sarup098/artevia/blob/main/black%20temi%20b.jpg?raw=true",
             profilePhoto: "https://github.com/Sarup098/artevia/blob/main/cm%20gift.jpeg?raw=true",
             logoStudio: "https://github.com/Sarup098/artevia/blob/main/main%20logo.png?raw=true",
@@ -397,11 +397,16 @@
                                     className="absolute inset-0 bg-[#8B3A28] overflow-hidden"
                                     style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
                                 >
-                                    <img src={ASSETS.heroSplit2} alt="Creative Side" className="absolute inset-0 w-full h-full object-cover" />
+                                    <img src={ASSETS.heroSpli} alt="logic Side" className="absolute inset-0 w-full h-full object-cover" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                                     <div className="absolute bottom-6 left-6 text-white bg-black/20 backdrop-blur-md px-3 py-1 rounded-full uppercase tracking-widest text-[10px] font-bold border border-white/10">Creative</div>
                                 </div>
-
+                                
+                                <div className="absolute top-0 bottom-0 w-0.5 bg-white z-30 pointer-events-none shadow-[0_0_10px_rgba(255,255,255,0.5)]" style={{ left: `${sliderPos}%` }}>
+                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg">
+                                        <div className="w-1 h-4 bg-[#1A1A1A]/20 rounded-full mx-0.5"></div>
+                                        <div className="w-1 h-4 bg-[#1A1A1A]/20 rounded-full mx-0.5"></div>
+                                    </div>
                                 {/* Layer 2: CREATIVE */}
                                 <div 
                                     className="absolute inset-0 bg-[#8B3A28] overflow-hidden"
