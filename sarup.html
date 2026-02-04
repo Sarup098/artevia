@@ -142,7 +142,8 @@
 
         // --- ASSETS ---
         const ASSETS = {
-            heroSplit: "https://github.com/Sarup098/artevia/blob/main/The_Split.png?raw=true",
+            heroSplit: "https://github.com/Sarup098/artevia/blob/main/creative.png?raw=true",
+            heroSplit2: "https://github.com/Sarup098/artevia/blob/main/logic.png?raw=true",
             merchTemi: "https://github.com/Sarup098/artevia/blob/main/black%20temi%20b.jpg?raw=true",
             profilePhoto: "https://github.com/Sarup098/artevia/blob/main/cm%20gift.jpeg?raw=true",
             logoStudio: "https://github.com/Sarup098/artevia/blob/main/main%20logo.png?raw=true",
@@ -392,12 +393,13 @@
                                 }}
                             >
                                 {/* Layer 1: TECHNICAL */}
-                                <div className="absolute inset-0 bg-[#1e1e1e] flex flex-col font-mono p-6 text-green-400 text-xs md:text-sm overflow-hidden">
-                                    <div className="opacity-50 mb-4">import tensorflow as tf</div>
-                                    <div className="pl-4 mt-2">def build_future(self):</div>
-                                    <div className="pl-8 text-yellow-400">return "Artevia Studio"</div>
-                                    <div className="mt-8 opacity-20">010101010101010101<br/>101010101010101010</div>
-                                    <div className="absolute bottom-6 right-6 text-white bg-black/50 px-3 py-1 rounded-full uppercase tracking-widest text-[10px] font-bold border border-white/10">Logic</div>
+                               <div 
+                                    className="absolute inset-0 bg-[#8B3A28] overflow-hidden"
+                                    style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
+                                >
+                                    <img src={ASSETS.heroSplit2} alt="Creative Side" className="absolute inset-0 w-full h-full object-cover" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                                    <div className="absolute bottom-6 left-6 text-white bg-black/20 backdrop-blur-md px-3 py-1 rounded-full uppercase tracking-widest text-[10px] font-bold border border-white/10">Creative</div>
                                 </div>
 
                                 {/* Layer 2: CREATIVE */}
