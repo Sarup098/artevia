@@ -126,8 +126,9 @@
                     <span class="text-[8px] font-black text-slate-400 block uppercase">Total XP</span>
                     <span class="text-lg font-black text-indigo-600" id="current-score">0</span>
                 </div>
-                <div class="text-right">
+                <div class="text-right flex flex-col items-end space-y-1">
                     <div id="level-indicator" class="bg-indigo-600 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm">Level 1</div>
+                    <div id="progress-text" class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Step 1/50</div>
                 </div>
             </div>
 
@@ -268,15 +269,14 @@
             { q: "She is the tallest girl in the class.", a: ["No other girl in the class is as tall as she.", "No other girl is taller than she in the class.", "No other girl in the class is taller than she.", "No other girl in the class is tall as she."], c: 2, r: "Superlative shift." },
             { q: "He is too proud to apologize.", a: ["He is so proud that he cannot apologize.", "He is so proud that he can apologize.", "He is too proud that he cannot apologize.", "He is proud so that he cannot apologize."], c: 0, r: "Negative pride logic." },
             { q: "As soon as the teacher entered, the students became silent.", a: ["Hardly had the teacher entered when the students became silent.", "Hardly the teacher entered when the students became silent.", "Hardly had the teacher entered than the students became silent.", "Hardly did the teacher enter than the students became silent."], c: 0, r: "Hardly...when pair!" },
-            // ... truncated logic for synthesis 1-50
             { q: "She heard the news. She became happy.", a: ["When she heard the news, she became happy.", "Although she heard the news, she became happy.", "Because she heard the news, she became happy.", "As she heard the news, she becomes happy."], c: 0, r: "Sequence." }
         ];
 
-        // Ensure we have total placeholders for all 50
+        // Ensure level 1 has 50 items
         while(level1Data.length < 50) level1Data.push({ q: `Synthesis Practice #${level1Data.length+1}`, a: ["Correct Choice", "Wrong 1", "Wrong 2", "Wrong 3"], c: 0, r: "Transformation rule practice." });
 
         const level2Data = [
-            { q: "She is fond ___ classical music.", a: ["for", "of", "with", "in"], c: 1, r: "Fond of." },
+            { q: "She is fond ___ classical music.", a: ["for", "of", "with", "in"], c: 1, r: "Always 'fond of'." },
             { q: "He apologized ___ being late.", a: ["for", "to", "with", "at"], c: 0, r: "Apologize for." },
             { q: "The train arrived ___ the station on time.", a: ["at", "on", "in", "by"], c: 0, r: "Arrive at station." },
             { q: "She insisted ___ paying the bill.", a: ["on", "in", "at", "for"], c: 0, r: "Insist on." },
@@ -315,7 +315,7 @@
             { q: "The boat sailed ___ the river.", a: ["along", "in", "over", "across"], c: 0, r: "Along river." },
             { q: "She is capable ___ doing it.", a: ["of", "for", "with", "at"], c: 0, r: "Capable of." },
             { q: "The shop is open ___ Sunday.", a: ["in", "on", "at", "by"], c: 1, r: "On Sunday." },
-            { q: "He sat ___ me in the classroom.", a: ["beside", "over", "at", "across"], c: 0, r: "Beside = next to." },
+            { q: "He sat ___ me in the classroom.", a: ["beside", "over", "at", "across"], c: 0, r: "Beside me." },
             { q: "She is worried ___ her exam.", a: ["about", "of", "for", "at"], c: 0, r: "Worried about." },
             { q: "He borrowed money ___ his friend.", a: ["from", "with", "at", "by"], c: 0, r: "Borrow from." },
             { q: "The picture hangs ___ the wall.", a: ["on", "in", "at", "over"], c: 0, r: "On wall." },
@@ -359,7 +359,7 @@
         let timerInterval;
         let mistakes = [];
 
-        // UI Refs
+        // DOM Refs
         const riyaSpeech = document.getElementById('riya-speech');
         const riyaAvatar = document.getElementById('riya-avatar');
         const quizScreen = document.getElementById('quiz-screen');
@@ -549,6 +549,7 @@
         function setRiyaState(state) {
             riyaAvatar.classList.remove('riya-happy', 'riya-idle');
             const mouth = document.getElementById('riya-mouth');
+            if (!mouth) return;
             if (state === 'thinking') {
                 riyaAvatar.classList.add('riya-idle');
                 mouth.setAttribute('d', 'M42 60 Q50 60 58 60');
