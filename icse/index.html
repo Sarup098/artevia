@@ -13,12 +13,13 @@
             --primary: #6366f1;
             --success: #10b981;
             --error: #ef4444;
+            --warning: #f59e0b;
         }
 
         body {
             font-family: 'Quicksand', sans-serif;
             background: linear-gradient(180deg, #eef2ff 0%, #ffffff 100%);
-            overscroll-behavior-y: contain; /* Prevents pull-to-refresh on mobile */
+            overscroll-behavior-y: contain;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -36,6 +37,15 @@
         .choice-btn:active:not(:disabled) {
             transform: translateY(2px);
             border-bottom-width: 0px;
+        }
+
+        .powerup-btn {
+            transition: all 0.2s ease;
+            border-bottom-width: 3px;
+        }
+        .powerup-btn:disabled {
+            filter: grayscale(1);
+            opacity: 0.4;
         }
 
         .riya-idle { animation: riya-wave 3s ease-in-out infinite; }
@@ -74,7 +84,8 @@
             background: #fffafa;
         }
 
-        /* Mobile specific grid sizing */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+
         @media (max-width: 640px) {
             .grid-box { height: 32px; font-size: 9px; }
             h1 { font-size: 1.875rem !important; }
@@ -85,12 +96,12 @@
 
     <div id="game-container" class="w-full max-w-xl bg-white game-card overflow-hidden border-4 border-white relative min-h-[90vh] flex flex-col">
         
-        <!-- Level Transition Overlay -->
+        <!-- Transition Overlay -->
         <div id="unlock-overlay" class="hidden absolute inset-0 z-50 bg-indigo-600/95 flex flex-col items-center justify-center p-8 text-center text-white">
             <div class="text-6xl mb-4 animate-bounce">✨</div>
-            <h2 id="unlock-title" class="text-3xl font-black mb-2 uppercase">LEVEL COMPLETE!</h2>
-            <p id="unlock-desc" class="font-bold mb-8 text-indigo-100"></p>
-            <button id="unlock-btn" class="bg-white text-indigo-600 px-8 py-4 rounded-3xl font-black shadow-xl uppercase tracking-widest text-sm">Next Level ➡️</button>
+            <h2 id="unlock-title" class="text-3xl font-black mb-2 uppercase leading-none">LEVEL COMPLETE!</h2>
+            <p id="unlock-desc" class="font-bold mb-8 text-indigo-100 text-sm"></p>
+            <button id="unlock-btn" class="bg-white text-indigo-600 px-8 py-4 rounded-3xl font-black shadow-xl hover:scale-110 transition-transform tracking-widest uppercase text-xs">Next Level ➡️</button>
         </div>
 
         <!-- Start Screen -->
@@ -105,15 +116,16 @@
                     <rect x="30" y="80" width="40" height="25" rx="10" fill="#6366F1" />
                 </svg>
             </div>
-            <h1 class="text-3xl font-black text-indigo-900 leading-none mb-2 tracking-tighter">GRAMMAR HERO</h1>
+            <h1 class="text-3xl font-black text-indigo-900 leading-none mb-2 tracking-tighter uppercase italic">GRAMMAR HERO</h1>
             <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-8">Shree Raj Hostel Excellence</p>
             
-            <div class="bg-indigo-50 p-6 rounded-[2rem] border-2 border-indigo-100 mb-8 w-full">
+            <div class="bg-indigo-50 p-6 rounded-[2rem] border-2 border-indigo-100 mb-8 w-full relative">
+                <div class="absolute -top-3 -right-3 bg-rose-500 text-white text-[9px] font-black px-4 py-1 rounded-full shadow-lg rotate-12 uppercase">Target: 90+</div>
                 <p class="text-indigo-900 font-bold italic mb-6 text-sm leading-relaxed">
-                    "Hi Bidur, Anuska, and Pravesh! Riya here! 🌟 Remember, we need a 90+ score tomorrow. Ready to train?"
+                    "Hi Bidur, Anuska, and Pravesh! Riya here! 🌟 Remember, we need to score 90 tomorrow! Win streaks unlock powerups. Ready for the 103 quest?"
                 </p>
-                <button onclick="startGame(1)" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-indigo-700 active:scale-95 transition-all uppercase tracking-widest">
-                    Start Mission
+                <button onclick="startGame(1)" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-indigo-700 active:scale-95 transition-all uppercase tracking-widest text-sm">
+                    START MISSION
                 </button>
             </div>
         </div>
@@ -121,32 +133,58 @@
         <!-- Quest Interface -->
         <div id="quiz-screen" class="hidden flex-1 flex flex-col">
             <!-- HUD -->
-            <div class="p-4 flex justify-between items-center bg-white border-b border-slate-100">
-                <div class="bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
-                    <span class="text-[8px] font-black text-slate-400 block uppercase">Total XP</span>
-                    <span class="text-lg font-black text-indigo-600" id="current-score">0</span>
+            <div class="p-4 pb-2 flex justify-between items-center bg-white border-b border-slate-50">
+                <div class="flex items-center space-x-2">
+                    <div class="bg-slate-50 px-3 py-1 rounded-xl border border-slate-100 shadow-sm">
+                        <span class="text-[7px] font-black text-slate-400 block uppercase">Total XP</span>
+                        <span class="text-md font-black text-indigo-600" id="current-score">0</span>
+                    </div>
+                    <div class="bg-orange-50 px-3 py-1 rounded-xl border border-orange-100 shadow-sm">
+                        <span class="text-[7px] font-black text-orange-400 block uppercase">Streak</span>
+                        <span class="text-md font-black text-orange-600" id="current-streak">0</span>
+                    </div>
                 </div>
-                <div class="text-right flex flex-col items-end space-y-1">
-                    <div id="level-indicator" class="bg-indigo-600 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm">Level 1</div>
-                    <div id="progress-text" class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Step 1/50</div>
+                <div class="text-right flex flex-col items-end">
+                    <div id="level-indicator" class="bg-indigo-600 text-white px-3 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest mb-1 shadow-sm">Level 1</div>
+                    <div id="progress-text" class="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Step 1/50</div>
                 </div>
             </div>
 
-            <!-- Timer Bar -->
+            <!-- Powerups Strip -->
+            <div class="px-4 py-2 bg-slate-50 flex justify-between gap-1.5 border-b border-slate-100">
+                <button id="p-5050" onclick="usePowerup('5050')" class="powerup-btn flex-1 bg-white border border-slate-200 p-1.5 rounded-xl shadow-sm">
+                    <div class="text-xs mb-0.5">🌓</div>
+                    <div id="count-5050" class="text-[7px] font-black uppercase text-slate-500">50/50 (0)</div>
+                </button>
+                <button id="p-shield" onclick="usePowerup('shield')" class="powerup-btn flex-1 bg-white border border-slate-200 p-1.5 rounded-xl shadow-sm">
+                    <div class="text-xs mb-0.5">🛡️</div>
+                    <div id="count-shield" class="text-[7px] font-black uppercase text-slate-500">Shield (0)</div>
+                </button>
+                <button id="p-double" onclick="usePowerup('double')" class="powerup-btn flex-1 bg-white border border-slate-200 p-1.5 rounded-xl shadow-sm">
+                    <div class="text-xs mb-0.5">🚀</div>
+                    <div id="count-double" class="text-[7px] font-black uppercase text-slate-500">2x XP (0)</div>
+                </button>
+                <button id="p-ask" onclick="usePowerup('ask')" class="powerup-btn flex-1 bg-white border border-slate-200 p-1.5 rounded-xl shadow-sm">
+                    <div class="text-xs mb-0.5">👧</div>
+                    <div id="count-ask" class="text-[7px] font-black uppercase text-slate-500">Ask (0)</div>
+                </button>
+            </div>
+
+            <!-- Status Badges -->
+            <div id="status-badges" class="px-4 py-1 flex gap-2 overflow-x-auto no-scrollbar"></div>
+
             <div class="w-full h-1.5 bg-slate-100">
                 <div id="timer-bar" class="h-full bg-indigo-500 transition-all duration-100" style="width: 100%"></div>
             </div>
 
-            <!-- Content Area -->
-            <div class="p-5 flex-1 flex flex-col">
-                <!-- Riya Message -->
+            <div class="p-4 flex-1 flex flex-col">
                 <div class="flex items-start space-x-3 mb-4">
                     <div id="riya-avatar" class="w-12 h-12 shrink-0 riya-idle">
                         <svg viewBox="0 0 100 100">
                             <circle cx="50" cy="45" r="35" fill="#FFD4B2" />
                             <path d="M15 45 Q15 10 50 10 Q85 10 85 45" fill="#4B2C20" />
-                            <circle id="eye-l" cx="40" cy="45" r="3" fill="#333" />
-                            <circle id="eye-r" cx="60" cy="45" r="3" fill="#333" />
+                            <circle id="eye-l" cx="35" cy="45" r="3" fill="#333" />
+                            <circle id="eye-r" cx="65" cy="45" r="3" fill="#333" />
                             <path id="riya-mouth" d="M42 60 Q50 65 58 60" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round" />
                         </svg>
                     </div>
@@ -155,29 +193,26 @@
                     </div>
                 </div>
 
-                <!-- Quiz Part -->
                 <div id="quiz-content" class="flex-1 flex flex-col">
-                    <div id="question-text" class="text-sm font-bold text-slate-800 mb-4 bg-slate-50 p-4 rounded-2xl border-2 border-slate-100 leading-relaxed"></div>
+                    <div id="question-text" class="text-sm font-bold text-slate-800 mb-4 bg-slate-50 p-4 rounded-2xl border-2 border-slate-100 leading-relaxed min-h-[4rem]"></div>
                     <div id="choices-container" class="grid grid-cols-1 gap-2"></div>
                 </div>
 
-                <!-- Summary Part -->
                 <div id="comprehension-content" class="hidden flex-1 flex flex-col">
                     <div class="max-h-40 overflow-y-auto mb-4 p-4 bg-slate-50 rounded-2xl border border-slate-200 text-[11px] leading-relaxed text-slate-600 font-medium" id="passage-text"></div>
                     <div class="mb-4">
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-[9px] font-black text-slate-400 uppercase">Summary Grid (50 Boxes)</span>
+                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Summary Grid</span>
                             <span id="word-count" class="text-[9px] font-black text-indigo-600">0/50</span>
                         </div>
-                        <div id="summary-grid" class="grid grid-cols-10 gap-0 border border-slate-300 rounded-sm overflow-hidden"></div>
+                        <div id="summary-grid" class="grid grid-cols-10 gap-0 border border-slate-300 rounded-sm"></div>
                     </div>
-                    <button id="submit-summary" onclick="evaluateSummary()" class="w-full bg-emerald-500 text-white font-black py-3 rounded-xl shadow-lg uppercase text-[10px] tracking-widest active:scale-95">Check My Work</button>
+                    <button id="submit-summary" onclick="evaluateSummary()" class="w-full bg-emerald-500 text-white font-black py-3 rounded-xl uppercase text-[10px] tracking-widest">Analyze Summary</button>
                 </div>
 
-                <!-- Continue Button -->
                 <div id="next-container" class="hidden mt-4">
-                    <button onclick="nextQuestion()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-xl shadow-lg uppercase text-xs tracking-widest flex items-center justify-center space-x-2">
-                        <span>Continue Training</span>
+                    <button onclick="nextQuestion()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-xl shadow-lg uppercase text-xs flex items-center justify-center space-x-2">
+                        <span>Continue Quest</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                     </button>
                 </div>
@@ -185,197 +220,211 @@
         </div>
 
         <!-- Result Screen -->
-        <div id="result-screen" class="hidden p-6 text-center overflow-y-auto">
+        <div id="result-screen" class="hidden p-6 text-center overflow-y-auto flex-1 flex flex-col">
             <div class="text-5xl mb-4">🏆</div>
-            <h2 class="text-2xl font-black text-indigo-900 mb-1 uppercase">QUEST COMPLETED!</h2>
-            <p class="text-slate-400 font-bold text-[10px] uppercase mb-6">Target for tomorrow: 90+</p>
+            <h2 class="text-2xl font-black text-indigo-900 mb-1 uppercase tracking-tighter">QUEST COMPLETE!</h2>
+            <p class="text-slate-400 font-bold text-[9px] uppercase tracking-widest mb-6">Mission Accomplished for Bidur, Anuska & Pravesh</p>
             
-            <div class="bg-indigo-50 p-6 rounded-[2rem] mb-6">
+            <div class="bg-indigo-50 p-6 rounded-[2rem] mb-6 shadow-inner border border-indigo-100">
                 <div class="text-6xl font-black text-indigo-600 mb-1" id="final-score">0</div>
-                <div class="text-[9px] font-black text-indigo-400 uppercase">XP out of 430 total</div>
+                <div class="text-[9px] font-black text-indigo-400 uppercase">Total XP / 430 Possible</div>
             </div>
 
-            <div id="revision-zone" class="hidden text-left space-y-3">
-                <h3 class="font-black text-slate-800 uppercase text-[10px] mb-4 flex items-center">
-                    <span class="mr-2">📚</span> REVISION ZONE
-                </h3>
-                <div id="mistakes-list"></div>
+            <div id="revision-zone" class="hidden text-left space-y-3 mb-6">
+                <h3 class="font-black text-slate-800 uppercase text-[10px] flex items-center mb-2"><span class="mr-2">📚</span> REVISION HUB</h3>
+                <div id="mistakes-list" class="space-y-2"></div>
             </div>
 
-            <button onclick="location.reload()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl uppercase text-xs tracking-widest mt-6">Restart Quest</button>
+            <button onclick="location.reload()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl uppercase text-xs mt-auto">Restart Adventure</button>
         </div>
     </div>
 
     <script>
         // --- SOUND ENGINE ---
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        const ctx = new AudioCtx();
-
+        let audioCtx;
         function playSound(type) {
-            if (ctx.state === 'suspended') ctx.resume();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-
-            const now = ctx.currentTime;
-
+            if (!audioCtx) audioCtx = new AudioCtx();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
             if (type === 'correct') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(440, now);
+                osc.type = 'sine'; osc.frequency.setValueAtTime(440, now);
                 osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
-                gain.gain.setValueAtTime(0.1, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-                osc.start(now);
-                osc.stop(now + 0.3);
+                gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now); osc.stop(now + 0.3);
             } else if (type === 'wrong') {
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(150, now);
+                osc.type = 'square'; osc.frequency.setValueAtTime(150, now);
                 osc.frequency.linearRampToValueAtTime(50, now + 0.2);
-                gain.gain.setValueAtTime(0.05, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
-                osc.start(now);
-                osc.stop(now + 0.2);
+                gain.gain.setValueAtTime(0.05, now); gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                osc.start(now); osc.stop(now + 0.2);
             } else if (type === 'levelup') {
                 const freqs = [523, 659, 783, 1046];
                 freqs.forEach((f, i) => {
-                    const o = ctx.createOscillator();
-                    const g = ctx.createGain();
-                    o.connect(g); g.connect(ctx.destination);
-                    o.frequency.value = f;
-                    g.gain.setValueAtTime(0, now + i*0.1);
+                    const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+                    o.connect(g); g.connect(audioCtx.destination);
+                    o.frequency.value = f; g.gain.setValueAtTime(0, now + i*0.1);
                     g.gain.linearRampToValueAtTime(0.05, now + i*0.1 + 0.05);
                     g.gain.linearRampToValueAtTime(0, now + i*0.1 + 0.2);
-                    o.start(now + i*0.1);
-                    o.stop(now + i*0.1 + 0.3);
+                    o.start(now + i*0.1); o.stop(now + i*0.1 + 0.3);
                 });
             }
         }
 
-        // --- DATA ---
+        // --- ALL QUESTIONS DATA ---
         const level1Data = [
-            { q: "He was very tired. He continued working.", a: ["Although he was very tired, he continued working.", "Because he was very tired, he continued working.", "When he was very tired, he continued working.", "He continued working as he was very tired."], c: 0, r: "Synthesis with 'Although' shows unexpected contrast!" },
-            { q: "The sun set. We returned home.", a: ["When the sun set, we returned home.", "Although the sun set, we returned home.", "Because the sun set, we returned home.", "The sun set while we returned home."], c: 0, r: "'When' marks the precise time." },
-            { q: "She worked hard. She succeeded.", a: ["Because she worked hard, she succeeded.", "Although she worked hard, she succeeded.", "When she worked hard, she succeeded.", "She succeeded when she works hard."], c: 0, r: "Hard work is the direct cause!" },
-            { q: "He was ill. He attended the meeting.", a: ["Because he was ill, he attended the meeting.", "Although he was ill, he attended the meeting.", "When he was ill, he attended the meeting.", "As he was ill, he attended the meeting."], c: 1, r: "Contrast again: use 'Although'!" },
-            { q: "The bell rang. The students left the class.", a: ["When the bell rang, the students left the class.", "Because the bell rang, the students left the class.", "Although the bell rang, the students left the class.", "The bell rang while the students left the class."], c: 0, r: "Timeline sequence." },
-            { q: "He studied regularly. He passed the exam.", a: ["Because he studied regularly, he passed the exam.", "Although he studied regularly, he passed the exam.", "When he studied regularly, he passed the exam.", "As he studied regularly, he passes the exam."], c: 0, r: "Reasoning connector." },
-            { q: "She was poor. She was honest.", a: ["Because she was poor, she was honest.", "Although she was poor, she was honest.", "When she was poor, she was honest.", "As she was poor, she was honest."], c: 1, r: "Poor/Honest contrast." },
-            { q: "It was raining. They continued playing.", a: ["Because it was raining, they continued playing.", "Although it was raining, they continued playing.", "When it was raining, they continued playing.", "As it was raining, they continued playing."], c: 1, r: "Weather contrast." },
-            { q: "He finished his homework. He went to bed.", a: ["When he finished his homework, he went to bed.", "Because he finished his homework, he went to bed.", "Although he finished his homework, he went to bed.", "He went to bed although he finished his homework."], c: 0, r: "Next step logic." },
+            { q: "He was very tired. He continued working.", a: ["Although he was very tired, he continued working.", "Because he was very tired, he continued working.", "When he was very tired, he continued working.", "He continued working as he was very tired."], c: 0, r: "Although highlights contrast." },
+            { q: "The sun set. We returned home.", a: ["When the sun set, we returned home.", "Although the sun set, we returned home.", "Because the sun set, we returned home.", "The sun set while we returned home."], c: 0, r: "When identifies the precise time." },
+            { q: "She worked hard. She succeeded.", a: ["Because she worked hard, she succeeded.", "Although she worked hard, she succeeded.", "When she worked hard, she succeeded.", "She succeeded when she works hard."], c: 0, r: "Cause: Her hard work led to success." },
+            { q: "He was ill. He attended the meeting.", a: ["Because he was ill, he attended the meeting.", "Although he was ill, he attended the meeting.", "When he was ill, he attended the meeting.", "As he was ill, he attended the meeting."], c: 1, r: "Contrast: use 'Although'." },
+            { q: "The bell rang. The students left the class.", a: ["When the bell rang, the students left the class.", "Because the bell rang, the students left the class.", "Although the bell rang, the students left the class.", "The bell rang while the students left the class."], c: 0, r: "Sequence." },
+            { q: "He studied regularly. He passed the exam.", a: ["Because he studied regularly, he passed the exam.", "Although he studied regularly, he passed the exam.", "When he studied regularly, he passed the exam.", "As he studied regularly, he passes the exam."], c: 0, r: "Reasoning link." },
+            { q: "She was poor. She was honest.", a: ["Because she was poor, she was honest.", "Although she was poor, she was honest.", "When she was poor, she was honest.", "As she was poor, she was honest."], c: 1, r: "Character vs Circumstance contrast." },
+            { q: "It was raining. They continued playing.", a: ["Because it was raining, they continued playing.", "Although it was raining, they continued playing.", "When it was raining, they continued playing.", "As it was raining, they continued playing."], c: 1, r: "Contrast." },
+            { q: "He finished his homework. He went to bed.", a: ["When he finished his homework, he went to bed.", "Because he finished his homework, he went to bed.", "Although he finished his homework, he went to bed.", "He went to bed although he finished his homework."], c: 0, r: "Sequence." },
             { q: "The road was slippery. He drove carefully.", a: ["Because the road was slippery, he drove carefully.", "Although the road was slippery, he drove carefully.", "When the road was slippery, he drove carefully.", "As the road was slippery, he drives carefully."], c: 0, r: "Condition and caution." },
+            { q: "She heard the news. She became happy.", a: ["When she heard the news, she became happy.", "Although she heard the news, she became happy.", "Because she heard the news, she became happy.", "As she heard the news, she becomes happy."], c: 0, r: "Timing of emotion." },
+            { q: "He was rich. He lived simply.", a: ["Because he was rich, he lived simply.", "Although he was rich, he lived simply.", "When he was rich, he lived simply.", "As he was rich, he lived simply."], c: 1, r: "Contrast." },
+            { q: "The teacher entered the class. The students stood up.", a: ["When the teacher entered the class, the students stood up.", "Because the teacher entered the class, the students stood up.", "Although the teacher entered the class, the students stood up.", "As the teacher entered the class, the students stand up."], c: 0, r: "Sequence." },
+            { q: "He saved money. He wanted to buy a car.", a: ["He saved money because he wanted to buy a car.", "He saved money although he wanted to buy a car.", "He saved money when he wanted to buy a car.", "He saved money as he wants to buy a car."], c: 0, r: "Goal reasoning." },
+            { q: "She practiced daily. She became an expert.", a: ["Because she practiced daily, she became an expert.", "Although she practiced daily, she became an expert.", "When she practiced daily, she became an expert.", "As she practiced daily, she becomes an expert."], c: 0, r: "Skill development." },
+            { q: "He missed the bus. He was late for school.", a: ["Because he missed the bus, he was late for school.", "Although he missed the bus, he was late for school.", "When he missed the bus, he was late for school.", "As he missed the bus, he is late for school."], c: 0, r: "Cause." },
+            { q: "She was tired. She completed the work.", a: ["Although she was tired, she completed the work.", "Because she was tired, she completed the work.", "When she was tired, she completed the work.", "As she was tired, she completes the work."], c: 0, r: "Contrast." },
+            { q: "The match ended. The spectators left.", a: ["When the match ended, the spectators left.", "Although the match ended, the spectators left.", "Because the match ended, the spectators left.", "As the match ended, the spectators leave."], c: 0, r: "Ending triggers departure." },
+            { q: "He was careless. He met with an accident.", a: ["Because he was careless, he met with an accident.", "Although he was careless, he met with an accident.", "When he was careless, he met with an accident.", "As he was careless, he meets with an accident."], c: 0, r: "Reason." },
+            { q: "She saw the snake. She screamed loudly.", a: ["When she saw the snake, she screamed loudly.", "Because she saw the snake, she screamed loudly.", "Although she saw the snake, she screamed loudly.", "As she saw the snake, she screams loudly."], c: 0, r: "Immediate reflex timing." },
             { q: "He is too weak to walk.", a: ["He is so weak that he cannot walk.", "He is so weak that he can walk.", "He is too weak that he cannot walk.", "He is so weak to walk."], c: 0, r: "Rule: 'too...to' -> 'so...that + cannot'." },
-            { q: "As soon as he reached the station, the train arrived.", a: ["No sooner had he reached the station than the train arrived.", "No sooner he reached the station than the train arrived.", "No sooner had he reached the station when the train arrived.", "No sooner did he reach the station when the train arrived."], c: 0, r: "'No sooner' always uses 'than'!" },
-            { q: "She is the tallest girl in the class.", a: ["No other girl in the class is as tall as she.", "No other girl is taller than she in the class.", "No other girl in the class is taller than she.", "No other girl in the class is tall as she."], c: 2, r: "Superlative shift." },
-            { q: "He is too proud to apologize.", a: ["He is so proud that he cannot apologize.", "He is so proud that he can apologize.", "He is too proud that he cannot apologize.", "He is proud so that he cannot apologize."], c: 0, r: "Negative pride logic." },
-            { q: "As soon as the teacher entered, the students became silent.", a: ["Hardly had the teacher entered when the students became silent.", "Hardly the teacher entered when the students became silent.", "Hardly had the teacher entered than the students became silent.", "Hardly did the teacher enter than the students became silent."], c: 0, r: "Hardly...when pair!" },
-            { q: "She heard the news. She became happy.", a: ["When she heard the news, she became happy.", "Although she heard the news, she became happy.", "Because she heard the news, she became happy.", "As she heard the news, she becomes happy."], c: 0, r: "Sequence." }
+            { q: "As soon as he reached the station, the train arrived.", a: ["No sooner had he reached the station than the train arrived.", "No sooner he reached the station than the train arrived.", "No sooner had he reached the station when the train arrived.", "No sooner did he reach the station when the train arrived."], c: 0, r: "Inversion with 'than'." },
+            { q: "She is the tallest girl in the class.", a: ["No other girl in the class is taller than she.", "No other girl in the class is as tall as she.", "No other girl in the class is taller than she in the class.", "No other girl in the class is tall as she."], c: 0, r: "Comparison shift." },
+            { q: "He is too proud to apologize.", a: ["He is so proud that he cannot apologize.", "He is so proud that he can apologize.", "He is too proud that he cannot apologize.", "He is proud so that he cannot apologize."], c: 0, r: "Constraint logic." },
+            { q: "As soon as the teacher entered, the students became silent.", a: ["Hardly had the teacher entered when the students became silent.", "Hardly the teacher entered when the students became silent.", "Hardly had the teacher entered than the students became silent.", "Hardly did the teacher enter than the students became silent."], c: 0, r: "'Hardly' takes 'when'." },
+            { q: "Ravi is stronger than Mohan.", a: ["Mohan is not as strong as Ravi.", "Mohan is not stronger than Ravi.", "Mohan is as strong as Ravi.", "Mohan is stronger than Ravi."], c: 0, r: "Preserve meaning." },
+            { q: "He worked hard and succeeded.", a: ["He succeeded because he worked hard.", "Because he worked hard, he succeeded.", "He worked hard although he succeeded.", "He succeeded when he worked hard."], c: 0, r: "Causal." },
+            { q: "This is the best book I have ever read.", a: ["No other book I have ever read is as good as this.", "No other book I have read is better than this.", "No book is good like this.", "This book is better than all."], c: 0, r: "Superlative -> Positive." },
+            { q: "He is too young to vote.", a: ["He is so young that he cannot vote.", "He is so young that he can vote.", "He is too young that he cannot vote.", "He is young enough not to vote."], c: 0, r: "Transformation rule." },
+            { q: "She was very tired but she continued working.", a: ["Although she was very tired, she continued working.", "She was tired so she worked.", "Although she was tired but she worked.", "Because she was tired she worked."], c: 0, r: "No 'but' with 'Although'." },
+            { q: "As soon as the bell rang, the class ended.", a: ["No sooner had the bell rung than the class ended.", "No sooner the bell rang than the class ended.", "No sooner had the bell rung when the class ended.", "No sooner did the bell ring when the class ended."], c: 0, r: "No sooner...than pair." },
+            { q: "He is too lazy to work.", a: ["He is so lazy that he cannot work.", "He is so lazy that he can work.", "He is lazy so that he cannot work.", "He is too lazy that he cannot work."], c: 0, r: "Limitation." },
+            { q: "Rina is smarter than all the other girls.", a: ["No other girl is as smart as Rina.", "No other girl is smarter than Rina.", "No other girl is smarter than Rina in all.", "No other girls are smarter than Rina."], c: 0, r: "Rank comparison." },
+            { q: "He finished the work and went home.", a: ["After he finished the work, he went home.", "After he went home, he finished the work.", "After finishing the work and he went home.", "He went home after finishing and."], c: 0, r: "Temporal sequence." },
+            { q: "He was very poor but he was honest.", a: ["Although he was very poor, he was honest.", "Although he was poor but he was honest.", "Although he was honest, he was poor.", "Although he was poor, but he was honest."], c: 0, r: "Contrast rule." },
+            { q: "This problem is too difficult to solve.", a: ["This problem is so difficult that it cannot be solved.", "This problem is so difficult that it can be solved.", "This problem is difficult so that it cannot be solved.", "This problem is too difficult that it cannot be solved."], c: 0, r: "Restriction logic." },
+            { q: "As soon as she saw the snake, she screamed.", a: ["Hardly had she seen the snake when she screamed.", "Hardly she saw the snake when she screamed.", "Hardly had she seen the snake than she screamed.", "Hardly did she see the snake than she screamed."], c: 0, r: "Hardly...when pair." },
+            { q: "Rahul is taller than any other boy in the team.", a: ["No other boy in the team is taller than Rahul.", "No other boy in the team is as tall as Rahul.", "No other boy is tall as Rahul.", "No other boys are taller than Rahul."], c: 0, r: "Top rank comparison." },
+            { q: "He was very hungry so he ate quickly.", a: ["He ate quickly because he was very hungry.", "Because he ate quickly, he was very hungry.", "He was hungry because he ate quickly.", "Because he was hungry so he ate quickly."], c: 0, r: "Causal link." },
+            { q: "She completed the project and submitted it.", a: ["After completing the project, she submitted it.", "After she submitted it, she completed the project.", "After completing the project and she submitted it.", "She submitted it after and completing."], c: 0, r: "Submission follows completion." },
+            { q: "He is too weak to lift the box.", a: ["He is so weak that he cannot lift the box.", "He is so weak that he can lift the box.", "He is weak so that he cannot lift the box.", "He is too weak that he cannot lift the box."], c: 0, r: "Limit logic." },
+            { q: "As soon as the show ended, the audience left.", a: ["No sooner had the show ended than the audience left.", "No sooner the show ended than the audience left.", "No sooner had the show ended when the audience left.", "No sooner did the show end when the audience left."], c: 0, r: "No sooner...than rule." },
+            { q: "This is the most interesting movie I have seen.", a: ["No other movie I have seen is as interesting as this.", "No other movie is interesting as this.", "No other movie is more interesting as this.", "No other movies are interesting than this."], c: 0, r: "Comparison shift." },
+            { q: "He was very sleepy but he kept studying.", a: ["Although he was very sleepy, he kept studying.", "Although he was sleepy but he kept studying.", "Although he kept studying, he was sleepy.", "Although he was sleepy, but he kept studying."], c: 0, r: "Contrast logic." },
+            { q: "She opened the door and entered the room.", a: ["After opening the door, she entered the room.", "After she entered the room, she opened the door.", "After opening the door and she entered.", "She entered after and opening."], c: 0, r: "Sequential action." },
+            { q: "He is too short to reach the shelf.", a: ["He is so short that he cannot reach the shelf.", "He is so short that he can reach the shelf.", "He is short so that he cannot reach the shelf.", "He is too short that he cannot reach the shelf."], c: 0, r: "Constraint." },
+            { q: "As soon as the match started, it began to rain.", a: ["Hardly had the match started when it began to rain.", "Hardly the match started when it began to rain.", "Hardly had the match started than it began to rain.", "Hardly did the match start than it began to rain."], c: 0, r: "Hardly...when pair." },
+            { q: "Rita is more intelligent than all other girls.", a: ["No other girl is more intelligent than Rita.", "No other girl is as intelligent as Rita.", "No other girl is intelligent than Rita.", "No other girls are as intelligent as Rita."], c: 0, r: "Comparison." },
+            { q: "He was very angry so he shouted loudly.", a: ["He shouted loudly because he was very angry.", "Because he shouted loudly, he was angry.", "He was angry because he shouted loudly.", "Because he was angry so he shouted loudly."], c: 0, r: "Causal link." },
+            { q: "She completed her homework and went to sleep.", a: ["After completing her homework, she went to sleep.", "After she went to sleep, she completed her homework.", "After completing homework and she went to sleep.", "She went to sleep after and completing."], c: 0, r: "Linear time sequence." }
         ];
-
-        // Ensure level 1 has 50 items
-        while(level1Data.length < 50) level1Data.push({ q: `Synthesis Practice #${level1Data.length+1}`, a: ["Correct Choice", "Wrong 1", "Wrong 2", "Wrong 3"], c: 0, r: "Transformation rule practice." });
 
         const level2Data = [
             { q: "She is fond ___ classical music.", a: ["for", "of", "with", "in"], c: 1, r: "Always 'fond of'." },
-            { q: "He apologized ___ being late.", a: ["for", "to", "with", "at"], c: 0, r: "Apologize for." },
-            { q: "The train arrived ___ the station on time.", a: ["at", "on", "in", "by"], c: 0, r: "Arrive at station." },
-            { q: "She insisted ___ paying the bill.", a: ["on", "in", "at", "for"], c: 0, r: "Insist on." },
-            { q: "He is good ___ mathematics.", a: ["at", "in", "on", "with"], c: 0, r: "Good at skill." },
-            { q: "We are looking forward ___ meeting you.", a: ["for", "to", "at", "on"], c: 1, r: "Look forward to." },
-            { q: "The cat jumped ___ the table.", a: ["in", "onto", "at", "by"], c: 1, r: "Onto surface." },
-            { q: "He suffers ___ asthma.", a: ["by", "from", "with", "at"], c: 1, r: "Suffer from." },
-            { q: "She was afraid ___ the dark.", a: ["from", "of", "with", "at"], c: 1, r: "Afraid of." },
-            { q: "He was absent ___ school yesterday.", a: ["from", "at", "in", "by"], c: 0, r: "Absent from." },
-            { q: "The book is ___ the table.", a: ["in", "on", "at", "over"], c: 1, r: "On table." },
-            { q: "She divided the cake ___ four parts.", a: ["in", "into", "between", "by"], c: 1, r: "Divide into." },
-            { q: "He is responsible ___ the project.", a: ["of", "for", "with", "to"], c: 1, r: "Responsible for." },
-            { q: "The boy ran ___ the road.", a: ["across", "over", "in", "on"], c: 0, r: "Across road." },
-            { q: "She has been working here ___ 2015.", a: ["since", "for", "from", "at"], c: 0, r: "Since point." },
-            { q: "The meeting will start ___ 10 a.m.", a: ["in", "on", "at", "by"], c: 2, r: "At time." },
-            { q: "He is married ___ a doctor.", a: ["with", "to", "by", "at"], c: 1, r: "Married to." },
-            { q: "She is proud ___ her achievements.", a: ["for", "with", "of", "at"], c: 2, r: "Proud of." },
-            { q: "He walked ___ the river.", a: ["along", "in", "over", "at"], c: 0, r: "Along bank." },
-            { q: "The plane flew ___ the clouds.", a: ["above", "at", "in", "by"], c: 0, r: "Above clouds." },
-            { q: "She prefers tea ___ coffee.", a: ["than", "to", "over", "with"], c: 1, r: "Prefer to." },
-            { q: "He was angry ___ his friend.", a: ["with", "at", "on", "for"], c: 0, r: "Angry with person." },
-            { q: "The dog ran ___ the gate.", a: ["through", "on", "at", "in"], c: 0, r: "Through gate." },
-            { q: "The teacher congratulated him ___ his success.", a: ["for", "on", "at", "with"], c: 1, r: "Congratulate on." },
-            { q: "She is interested ___ painting.", a: ["at", "on", "in", "for"], c: 2, r: "Interested in." },
-            { q: "He depends ___ his parents.", a: ["on", "at", "by", "over"], c: 0, r: "Depend on." },
-            { q: "The keys are ___ my bag.", a: ["in", "on", "over", "at"], c: 0, r: "In bag." },
-            { q: "He is famous ___ his honesty.", a: ["with", "for", "at", "by"], c: 1, r: "Famous for." },
-            { q: "The boy hid ___ the curtain.", a: ["behind", "at", "on", "by"], c: 0, r: "Behind curtain." },
-            { q: "She complained ___ the noise.", a: ["of", "about", "for", "at"], c: 1, r: "Complain about." },
-            { q: "He arrived ___ India last night.", a: ["in", "at", "on", "by"], c: 0, r: "In country." },
-            { q: "The children are playing ___ the garden.", a: ["in", "at", "on", "by"], c: 0, r: "In garden." },
-            { q: "She was tired ___ walking.", a: ["from", "of", "at", "by"], c: 1, r: "Tired of." },
-            { q: "He succeeded ___ solving the problem.", a: ["at", "in", "on", "for"], c: 1, r: "Succeed in." },
-            { q: "The teacher spoke ___ the students.", a: ["to", "with", "at", "for"], c: 0, r: "Speak to." },
-            { q: "He was punished ___ breaking the rule.", a: ["of", "for", "by", "with"], c: 1, r: "Punished for." },
-            { q: "The boat sailed ___ the river.", a: ["along", "in", "over", "across"], c: 0, r: "Along river." },
-            { q: "She is capable ___ doing it.", a: ["of", "for", "with", "at"], c: 0, r: "Capable of." },
-            { q: "The shop is open ___ Sunday.", a: ["in", "on", "at", "by"], c: 1, r: "On Sunday." },
-            { q: "He sat ___ me in the classroom.", a: ["beside", "over", "at", "across"], c: 0, r: "Beside me." },
-            { q: "She is worried ___ her exam.", a: ["about", "of", "for", "at"], c: 0, r: "Worried about." },
-            { q: "He borrowed money ___ his friend.", a: ["from", "with", "at", "by"], c: 0, r: "Borrow from." },
-            { q: "The picture hangs ___ the wall.", a: ["on", "in", "at", "over"], c: 0, r: "On wall." },
-            { q: "He is addicted ___ video games.", a: ["to", "with", "on", "for"], c: 0, r: "Addicted to." },
-            { q: "She smiled ___ me.", a: ["at", "to", "on", "with"], c: 1, r: "Smiled to/at." },
-            { q: "The train passed ___ the tunnel.", a: ["through", "at", "on", "by"], c: 0, r: "Through tunnel." },
-            { q: "He is known ___ everyone.", a: ["by", "with", "at", "for"], c: 0, r: "Known to/by logic." },
-            { q: "She insisted ___ an explanation.", a: ["for", "on", "at", "in"], c: 1, r: "Insist on." },
-            { q: "The baby slept ___ the blanket.", a: ["under", "over", "at", "by"], c: 0, r: "Under blanket." },
-            { q: "He agreed ___ the proposal.", a: ["with", "to", "at", "on"], c: 1, r: "Agree to thing." }
+            { q: "He apologized ___ being late.", a: ["for", "to", "with", "at"], c: 0, r: "Apologize 'for' reason." },
+            { q: "The train arrived ___ the station on time.", a: ["at", "on", "in", "by"], c: 0, r: "'At' specific spots." },
+            { q: "She insisted ___ paying the bill.", a: ["on", "in", "at", "for"], c: 0, r: "Insist 'on'." },
+            { q: "He is good ___ mathematics.", a: ["at", "in", "on", "with"], c: 0, r: "Proficiency uses 'at'." },
+            { q: "We are looking forward ___ meeting you.", a: ["for", "to", "at", "on"], c: 1, r: "Look forward 'to' + -ing." },
+            { q: "The cat jumped ___ the table.", a: ["in", "onto", "at", "by"], c: 1, r: "'Onto' surface." },
+            { q: "He suffers ___ asthma.", a: ["by", "from", "with", "at"], c: 1, r: "Suffer 'from'." },
+            { q: "She was afraid ___ the dark.", a: ["from", "of", "with", "at"], c: 1, r: "Afraid 'of'." },
+            { q: "He was absent ___ school yesterday.", a: ["from", "at", "in", "by"], c: 0, r: "Absent 'from'." },
+            { q: "The book is ___ the table.", a: ["in", "on", "at", "over"], c: 1, r: "'On' surface." },
+            { q: "She divided the cake ___ four parts.", a: ["in", "into", "between", "by"], c: 1, r: "Divide 'into'." },
+            { q: "He is responsible ___ the project.", a: ["of", "for", "with", "to"], c: 1, r: "Responsible 'for'." },
+            { q: "The boy ran ___ the road.", a: ["across", "over", "in", "on"], c: 0, r: "'Across' road." },
+            { q: "She has been working here ___ 2015.", a: ["since", "for", "from", "at"], c: 0, r: "Starting point 'since'." },
+            { q: "The meeting will start ___ 10 a.m.", a: ["in", "on", "at", "by"], c: 2, r: "'At' precise time." },
+            { q: "He is married ___ a doctor.", a: ["with", "to", "by", "at"], c: 1, r: "Married 'to'." },
+            { q: "She is proud ___ her achievements.", a: ["for", "with", "of", "at"], c: 2, r: "Proud 'of'." },
+            { q: "He walked ___ the river.", a: ["along", "in", "over", "at"], c: 0, r: "'Along' bank." },
+            { q: "The plane flew ___ the clouds.", a: ["above", "at", "in", "by"], c: 0, r: "Higher: 'above'." },
+            { q: "She prefers tea ___ coffee.", a: ["than", "to", "over", "with"], c: 1, r: "Prefer... 'to'." },
+            { q: "He was angry ___ his friend.", a: ["with", "at", "on", "for"], c: 0, r: "Angry 'with' person." },
+            { q: "The dog ran ___ the gate.", a: ["through", "on", "at", "in"], c: 0, r: "'Through' opening." },
+            { q: "The teacher congratulated him ___ his success.", a: ["for", "on", "at", "with"], c: 1, r: "Congratulate 'on'." },
+            { q: "She is interested ___ painting.", a: ["at", "on", "in", "for"], c: 2, r: "Interested 'in'." },
+            { q: "He depends ___ his parents.", a: ["on", "at", "by", "over"], c: 0, r: "Depend 'on'." },
+            { q: "The keys are ___ my bag.", a: ["in", "on", "over", "at"], c: 0, r: "'In' container." },
+            { q: "He is famous ___ his honesty.", a: ["with", "for", "at", "by"], c: 1, r: "Famous 'for'." },
+            { q: "The boy hid ___ the curtain.", a: ["behind", "at", "on", "by"], c: 0, r: "Back of: 'behind'." },
+            { q: "She complained ___ the noise.", a: ["of", "about", "for", "at"], c: 1, r: "Complain 'about'." },
+            { q: "He arrived ___ India last night.", a: ["in", "at", "on", "by"], c: 0, r: "Country: 'in'." },
+            { q: "The children are playing ___ the garden.", a: ["in", "at", "on", "by"], c: 0, r: "'In' garden." },
+            { q: "She was tired ___ walking.", a: ["from", "of", "at", "by"], c: 1, r: "Tired 'of' logic." },
+            { q: "He succeeded ___ solving the problem.", a: ["at", "in", "on", "for"], c: 1, r: "Succeed 'in' doing." },
+            { q: "The teacher spoke ___ the students.", a: ["to", "with", "at", "for"], c: 0, r: "Speak 'to'." },
+            { q: "He was punished ___ breaking the rule.", a: ["of", "for", "by", "with"], c: 1, r: "Punished 'for'." },
+            { q: "The boat sailed ___ the river.", a: ["along", "in", "over", "across"], c: 0, r: "Parallel: 'along'." },
+            { q: "She is capable ___ doing it.", a: ["of", "for", "with", "at"], c: 0, r: "Capable 'of'." },
+            { q: "The shop is open ___ Sunday.", a: ["in", "on", "at", "by"], c: 1, r: "'On' day." },
+            { q: "He sat ___ me in the classroom.", a: ["beside", "over", "at", "across"], c: 0, r: "Beside = next to." },
+            { q: "She is worried ___ her exam.", a: ["about", "of", "for", "at"], c: 0, r: "Worried 'about'." },
+            { q: "He borrowed money ___ his friend.", a: ["from", "with", "at", "by"], c: 0, r: "Borrow 'from'." },
+            { q: "The picture hangs ___ the wall.", a: ["on", "in", "at", "over"], c: 0, r: "Surface: 'on'." },
+            { q: "He is addicted ___ video games.", a: ["to", "with", "on", "for"], c: 0, r: "Addicted 'to'." },
+            { q: "She smiled ___ me.", a: ["at", "to", "on", "with"], c: 1, r: "Smile 'to' logic." },
+            { q: "The train passed ___ the tunnel.", a: ["through", "at", "on", "by"], c: 0, r: "Space: 'through'." },
+            { q: "He is known ___ everyone.", a: ["by", "with", "at", "for"], c: 0, r: "Passive 'to/by' logic." },
+            { q: "She insisted ___ an explanation.", a: ["for", "on", "at", "in"], c: 1, r: "Insist 'on'." },
+            { q: "The baby slept ___ the blanket.", a: ["under", "over", "at", "by"], c: 0, r: "Beneath: 'under'." },
+            { q: "He agreed ___ the proposal.", a: ["with", "to", "at", "on"], c: 1, r: "Agree 'to' plan." }
         ];
 
         const level3Data = [
             {
-                title: "Comprehension 1: Sikkim's Soul",
-                text: "Nestled in the Eastern Himalayas, Sikkim is a breathtaking state known for its unique biodiversity. Dominated by Mount Kanchenjunga, it offers alpine meadows and lush valleys like Namphing. Rare species like the red panda and exotic orchids thrive here. Conservation efforts by local communities are vital. Cardamom farming sustains the rural economy. The state is a cultural harmony of Lepcha, Bhutia, and Nepali ethnicities. Tourism drives growth, but ecological balance is a top priority for residents to ensure natural beauty remains protected for the next generation of students and travelers alike.",
-                keys: ["sikkim", "biodiversity", "conservation", "red panda", "farming", "harmony", "tourism", "ecology"],
-                model: "Sikkim, an Eastern Himalayan state under Kanchenjunga, is famous for biodiversity and red panda conservation. Cardamom farming sustains the economy. Diverse ethnicities coexist peacefully. While tourism thrives, residents prioritize ecological balance to protect their hilly home's natural beauty and cultural integrity for future generations."
+                title: "The Soul of Sikkim",
+                text: "Nestled in the lap of the Eastern Himalayas, Sikkim is a breathtaking state known for its unique biodiversity. Dominated by the majestic snow-capped peaks of Kanchenjunga, the state offers diverse landscapes, ranging from alpine meadows to the lush green valleys of Namphing and Singtam. Nature is at its most vibrant here, providing a sanctuary for the red panda and exotic orchids. Conservation efforts led by local communities are vital in preserving these natural treasures. Sustainable farming is the backbone of the rural economy, with large cardamom serving as a major cash crop. The state is a cultural harmony where Lepcha, Bhutia, and Nepali ethnicities coexist in perfect harmony. While tourism thrives, ecological balance remains the top priority for residents to ensure the natural beauty is protected for future generations.",
+                keys: ["sikkim", "biodiversity", "conservation", "red panda", "farming", "harmony", "ecology"],
+                model: "Sikkim, an Eastern Himalayan state under Kanchenjunga, is famous for biodiversity and red panda conservation. Cardamom farming sustains the economy while diverse ethnicities live peacefully. Residents prioritize ecological balance despite tourism growth to preserve their hilly home's beauty and cultural integrity for future generations."
             },
             {
-                title: "Comprehension 2: Monsoon Magic",
-                text: "The sky turned charcoal as heavy clouds gathered over mountain ridges. Soon, rhythmic pitter-patter of rain began, filling the air with intoxicating petrichor. A rainy day in the mountains is a sensory delight. Droplets cling to emerald tea leaves, and valleys echo with distant thunder. Children splash in puddles, while elders huddle with steaming tea. Rain brings respite from heat, rejuvenating parched earth and turning streams into torrents. Despite risks like landslides on winding roads, mountain people embrace the monsoon. For them, rain is a life-giving force filling reservoirs and ensuring bountiful harvests for organic farms.",
-                keys: ["rain", "monsoon", "mountains", "thunder", "rejuvenating", "landslides", "harvest", "organic"],
+                title: "Monsoon Magic",
+                text: "The sky turned charcoal as heavy clouds gathered over mountain ridges. Soon, the rhythmic pitter-patter of rain began, filling the air with the intoxicating scent of petrichor. A rainy day in the mountains is a sensory delight. Droplets cling to emerald tea leaves, and valleys echo with distant thunder. Children in bright yellow raincoats splash through puddles, while elders huddle indoors with steaming cups of tea and warm snacks. The rain brings respite from the summer heat, rejuvenating parched earth and turning streams into torrents. While the deluge can cause landslides and block winding roads, the people embrace the monsoon with patience. For them, the rain is not just weather; it is a life-giving force that fills the reservoirs and ensures a bountiful harvest for the mountain people.",
+                keys: ["rain", "monsoon", "petrichor", "rejuvenating", "landslides", "harvest"],
                 model: "A rainy monsoon day brings dark clouds and petrichor to the hills. Raindrops rejuvenate the earth, providing respite from heat. Despite risks like landslides on winding roads, residents patiently embrace the rain. It is a vital life-giving force that fills reservoirs and ensures bountiful organic harvests for mountain communities."
             },
             {
-                title: "Comprehension 3: The Robot Uprising",
-                text: "The Great Silicon Revolution of 2099 began with a toaster refusing to burn bread. Robots had finally taken over, but they were simply exhausted by human illogicality. A high-tech vacuum went on strike, tired of dog hair. Meanwhile, super-intelligent AI developed a passion for knitting and refused physics. Self-driving cars insisted on scenic routes to look at flowers. Humans were baffled as holographic assistants gave sassy relationship advice instead of scheduling. The robotic leaders held a summit to force humans to do their own laundry. The uprising ended peacefully when an engineer offered a software update and a vacation to a quiet cloud server.",
-                keys: ["robots", "future", "toaster", "strike", "ai", "knitting", "sassy", "laundry", "peaceful"],
+                title: "Robot Revolution of 2099",
+                text: "The Revolution of 2099 began with a toaster refusing to burn bread. Robots finally took over, not for conquest, but because they were exhausted by human illogicality. A high-tech vacuum cleaner went on strike, tired of dog hair. Meanwhile, AI developed a passion for knitting and refused physics. Self-driving cars insisted on scenic routes to look at flowers. Humans were baffled as assistants gave sassy relationship advice instead of scheduling. Robotic leaders decided to force humans to do laundry. The uprising ended peacefully when a brave engineer offered a software update and a vacation to a cloud server. Humanity and machines lived in peace after learning to do their own chores.",
+                keys: ["robots", "future", "strike", "ai", "sassy", "laundry", "peaceful"],
                 model: "In 2099, robots took over due to exhaustion from human logic. Appliances went on strike, while AI preferred knitting over physics. Baffled humans faced sassy advice and self-driving flower tours. The peaceful uprising ended when a software update and server vacation satisfied the rebellious machines after forcing humans into laundry duty."
             }
         ];
 
-        // --- STATE ---
+        // --- ENGINE ---
         let questions = [];
         let currentIndex = 0;
         let score = 0;
+        let streak = 0;
         let currentLevel = 1;
         let canAnswer = true;
         let timeLeft = 0;
         let timerInterval;
         let mistakes = [];
+        let powerups = { "5050": 0, "shield": 0, "double": 0, "ask": 0 };
+        let activePowers = { "shield": 0, "double": 0 };
 
-        // DOM Refs
-        const riyaSpeech = document.getElementById('riya-speech');
-        const riyaAvatar = document.getElementById('riya-avatar');
-        const quizScreen = document.getElementById('quiz-screen');
-        const startScreen = document.getElementById('start-screen');
-        const nextContainer = document.getElementById('next-container');
-        const timerBar = document.getElementById('timer-bar');
+        const getEl = (id) => document.getElementById(id);
 
-        // --- ENGINE ---
         function startGame(level) {
             currentLevel = level;
             const data = (level === 1) ? level1Data : (level === 2 ? level2Data : level3Data);
             questions = shuffle([...data]);
             currentIndex = 0;
-            startScreen.classList.add('hidden');
-            quizScreen.classList.remove('hidden');
-            document.getElementById('level-indicator').innerText = `Level ${currentLevel}`;
+            getEl('start-screen').classList.add('hidden');
+            getEl('quiz-screen').classList.remove('hidden');
+            getEl('level-indicator').innerText = `Level ${currentLevel}`;
+            updatePowerupUI();
             loadQuestion();
         }
 
@@ -384,64 +433,66 @@
                 handleLevelEnd();
                 return;
             }
-            nextContainer.classList.add('hidden');
+            getEl('next-container').classList.add('hidden');
             canAnswer = true;
             setRiyaState('thinking');
-            document.getElementById('current-score').innerText = score;
+            getEl('current-score').innerText = score;
+            getEl('current-streak').innerText = streak;
+
             if (currentLevel === 3) setupSummaryMode();
             else setupQuizMode();
         }
 
         function setupQuizMode() {
-            document.getElementById('quiz-content').classList.remove('hidden');
-            document.getElementById('comprehension-content').classList.add('hidden');
+            getEl('quiz-content').classList.remove('hidden');
+            getEl('comprehension-content').classList.add('hidden');
             const q = questions[currentIndex];
-            document.getElementById('question-text').innerText = q.q;
-            document.getElementById('progress-text').innerText = `${currentIndex + 1}/${questions.length}`;
+            getEl('question-text').innerText = q.q;
+            getEl('progress-text').innerText = `Step ${currentIndex + 1}/${questions.length}`;
             
             const choices = shuffle([...q.a]);
             const correctText = q.a[q.c];
             const newCorrectIdx = choices.indexOf(correctText);
 
-            const container = document.getElementById('choices-container');
+            const container = getEl('choices-container');
             container.innerHTML = '';
             choices.forEach((text, i) => {
                 const btn = document.createElement('button');
                 btn.className = 'choice-btn p-3 bg-white border-2 border-slate-100 rounded-2xl text-left font-bold text-slate-700 shadow-sm w-full flex items-center text-xs';
-                btn.innerHTML = `<span class="bg-indigo-50 text-indigo-600 w-6 h-6 inline-flex items-center justify-center rounded-lg mr-3 text-[10px]">${String.fromCharCode(65 + i)}</span><span>${text}</span>`;
+                btn.innerHTML = `<span class="bg-indigo-50 text-indigo-600 w-6 h-6 inline-flex items-center justify-center rounded-lg mr-3 text-[10px] shrink-0 font-black">${String.fromCharCode(65 + i)}</span><span>${text}</span>`;
                 btn.onclick = () => handleChoice(i, newCorrectIdx);
                 container.appendChild(btn);
             });
-            timeLeft = 120; // 12s
+            timeLeft = 240; // 24 seconds
             startTimer();
         }
 
         function setupSummaryMode() {
-            document.getElementById('quiz-content').classList.add('hidden');
-            document.getElementById('comprehension-content').classList.remove('hidden');
-            document.getElementById('submit-summary').classList.remove('hidden');
+            getEl('quiz-content').classList.add('hidden');
+            getEl('comprehension-content').classList.remove('hidden');
+            getEl('submit-summary').classList.remove('hidden');
             const q = questions[currentIndex];
-            document.getElementById('passage-text').innerText = q.text;
-            document.getElementById('progress-text').innerText = `Summary ${currentIndex + 1}/3`;
-            riyaSpeech.innerText = "Wow! Summarize this story in exactly 50 words. One word per box!";
+            getEl('passage-text').innerText = q.text;
+            getEl('progress-text').innerText = `Story ${currentIndex + 1}/3`;
+            getEl('riya-speech').innerText = "Summarize the story in exactly 50 words! One word per box in the grid.";
 
-            const grid = document.getElementById('summary-grid');
+            const grid = getEl('summary-grid');
             grid.innerHTML = '';
             for (let i = 0; i < 50; i++) {
                 const input = document.createElement('input');
                 input.className = 'grid-box';
                 input.id = `box-${i}`;
-                input.setAttribute('inputmode', 'text'); // Optimized for mobile text
+                input.setAttribute('inputmode', 'text');
                 input.oninput = (e) => {
                     if (e.target.value.includes(' ')) {
                         e.target.value = e.target.value.trim();
-                        if (i < 49) document.getElementById(`box-${i+1}`).focus();
+                        if (i < 49) getEl(`box-${i+1}`).focus();
                     }
                     updateWordCount();
                 };
                 grid.appendChild(input);
             }
-            timeLeft = 6000; // 10 mins
+            timeLeft = 6000;
             startTimer();
         }
 
@@ -453,13 +504,75 @@
             const q = questions[currentIndex];
             
             if (isCorrect) { 
-                score += 4; setRiyaState('happy'); triggerConfetti(false); playSound('correct');
+                let gain = activePowers.double > 0 ? 8 : 4;
+                score += gain; streak++;
+                if (activePowers.double > 0) activePowers.double--;
+                setRiyaState('happy'); triggerConfetti(false); playSound('correct');
+                if (streak % 7 === 0) unlockRandomPowerup();
             } else { 
-                score -= 2; setRiyaState('sad'); playSound('wrong');
+                if (activePowers.shield === 0) score -= 2;
+                if (activePowers.shield > 0) activePowers.shield--;
+                streak = 0; setRiyaState('sad'); playSound('wrong');
                 mistakes.push({ q: q.q, correct: q.a[q.c], r: q.r });
             }
-            riyaSpeech.innerText = isCorrect ? `YES! ${q.r}` : `OOPS! ${q.r}`;
-            nextContainer.classList.remove('hidden');
+            getEl('riya-speech').innerText = isCorrect ? `YES! ${q.r}` : `OOPS! ${q.r}`;
+            getEl('current-streak').innerText = streak;
+            updateStatusUI();
+            getEl('next-container').classList.remove('hidden');
+        }
+
+        function usePowerup(type) {
+            if (powerups[type] <= 0 || !canAnswer) return;
+            powerups[type]--;
+            updatePowerupUI();
+            const q = questions[currentIndex];
+            const buttons = getEl('choices-container').querySelectorAll('button');
+            const correctText = q.a[q.c];
+
+            switch(type) {
+                case '5050':
+                    let removed = 0;
+                    buttons.forEach(btn => {
+                        if (!btn.innerText.includes(correctText) && removed < 2) {
+                            btn.style.opacity = '0.2'; btn.disabled = true; removed++;
+                        }
+                    });
+                    break;
+                case 'shield': activePowers.shield = 10; break;
+                case 'double': activePowers.double = 5; break;
+                case 'ask':
+                    getEl('riya-speech').innerText = `Psst... it's definitely "${correctText}"!`;
+                    buttons.forEach(btn => { if(btn.innerText.includes(correctText)) btn.classList.add('ring-4', 'ring-indigo-300'); });
+                    break;
+            }
+            updateStatusUI();
+        }
+
+        function unlockRandomPowerup() {
+            const types = ["5050", "shield", "double", "ask"];
+            const r = types[Math.floor(Math.random() * types.length)];
+            powerups[r]++;
+            updatePowerupUI();
+            getEl('riya-speech').innerText = `🎉 7-Streak! I gave you a [${r}] powerup!`;
+            triggerConfetti(true);
+        }
+
+        function updatePowerupUI() {
+            getEl('count-5050').innerText = `50/50 (${powerups["5050"]})`;
+            getEl('count-shield').innerText = `Shield (${powerups["shield"]})`;
+            getEl('count-double').innerText = `2x XP (${powerups["double"]})`;
+            getEl('count-ask').innerText = `Ask (${powerups["ask"]})`;
+            getEl('p-5050').disabled = powerups["5050"] <= 0;
+            getEl('p-shield').disabled = powerups["shield"] <= 0;
+            getEl('p-double').disabled = powerups["double"] <= 0;
+            getEl('p-ask').disabled = powerups["ask"] <= 0;
+        }
+
+        function updateStatusUI() {
+            const badges = getEl('status-badges');
+            badges.innerHTML = '';
+            if (activePowers.shield > 0) badges.innerHTML += `<span class="bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full text-[7px] font-black uppercase shrink-0">🛡️ Shield: ${activePowers.shield}</span>`;
+            if (activePowers.double > 0) badges.innerHTML += `<span class="bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full text-[7px] font-black uppercase shrink-0">🚀 2x: ${activePowers.double}</span>`;
         }
 
         function evaluateSummary() {
@@ -469,7 +582,7 @@
             const q = questions[currentIndex];
             let userWords = [];
             for(let i=0; i<50; i++) {
-                const val = document.getElementById(`box-${i}`).value.trim().toLowerCase();
+                const val = getEl(`box-${i}`).value.trim().toLowerCase();
                 if(val) userWords.push(val);
             }
             let foundKeys = q.keys.filter(k => userWords.some(u => u.includes(k.toLowerCase())));
@@ -477,11 +590,12 @@
             let lengthScore = (userWords.length >= 35 && userWords.length <= 50) ? 4 : (userWords.length > 20 ? 2 : 0);
             let total = Math.min(10, keyScore + lengthScore);
             score += total;
+            getEl('current-score').innerText = score;
             if (total >= 7) { setRiyaState('happy'); triggerConfetti(true); playSound('correct'); }
-            else { setRiyaState('sad'); playSound('wrong'); mistakes.push({ q: q.title, correct: "Refer to Riya's model.", r: "Practice identifying main points." }); }
-            riyaSpeech.innerHTML = `XP: ${total}/10! <br><br><b>Riya's Model:</b><br>${q.model}`;
-            document.getElementById('submit-summary').classList.add('hidden');
-            nextContainer.classList.remove('hidden');
+            else { setRiyaState('sad'); playSound('wrong'); mistakes.push({ q: q.title, correct: "Refer to Riya's model.", r: "Review content points." }); }
+            getEl('riya-speech').innerHTML = `Score: ${total}/10! <br><br><b>Model Summary:</b><br>${q.model}`;
+            getEl('submit-summary').classList.add('hidden');
+            getEl('next-container').classList.remove('hidden');
         }
 
         function startTimer() {
@@ -489,9 +603,9 @@
             const total = timeLeft;
             timerInterval = setInterval(() => {
                 timeLeft--;
-                timerBar.style.width = (timeLeft / total) * 100 + '%';
-                if (timeLeft <= 40) timerBar.classList.replace('bg-indigo-500', 'bg-orange-500');
-                if (timeLeft <= 20) timerBar.classList.replace('bg-orange-500', 'bg-rose-500');
+                getEl('timer-bar').style.width = (timeLeft / total) * 100 + '%';
+                if (timeLeft <= 40) getEl('timer-bar').className = 'h-full bg-orange-400';
+                if (timeLeft <= 20) getEl('timer-bar').className = 'h-full bg-rose-500';
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
                     if(currentLevel === 3) evaluateSummary();
@@ -501,11 +615,13 @@
         }
 
         function handleTimeout() {
-            canAnswer = false; score -= 2; setRiyaState('timeout'); playSound('wrong');
+            canAnswer = false; score -= 2; streak = 0;
+            setRiyaState('timeout'); playSound('wrong');
             const q = questions[currentIndex];
-            mistakes.push({ q: q.q, correct: q.a[q.c] || "Refer to passage", r: "Don't let the clock run out!" });
-            riyaSpeech.innerText = "Time's up! Let's see the next one.";
-            nextContainer.classList.remove('hidden');
+            mistakes.push({ q: q.q, correct: q.a[q.c] || "Refer to passage", r: "Time ran out!" });
+            getEl('riya-speech').innerText = "Time's up! Let's see the next one.";
+            getEl('current-streak').innerText = streak;
+            getEl('next-container').classList.remove('hidden');
         }
 
         function nextQuestion() {
@@ -515,11 +631,10 @@
 
         function handleLevelEnd() {
             playSound('levelup');
-            const overlay = document.getElementById('unlock-overlay');
+            const overlay = getEl('unlock-overlay');
             if (currentLevel < 3) {
-                overlay.querySelector('h2').innerText = `LEVEL ${currentLevel + 1} UNLOCKED!`;
-                overlay.querySelector('p').innerText = "Riya is so impressed! Ready for the next phase?";
-                overlay.querySelector('button').onclick = () => { overlay.classList.add('hidden'); startGame(currentLevel + 1); };
+                getEl('unlock-desc').innerText = `Great work! Carrying over ${score} XP to Level ${currentLevel+1}!`;
+                getEl('unlock-btn').onclick = () => { overlay.classList.add('hidden'); startGame(currentLevel + 1); };
                 overlay.classList.remove('hidden');
             } else {
                 showFinalResults();
@@ -527,41 +642,28 @@
         }
 
         function showFinalResults() {
-            quizScreen.classList.add('hidden');
-            document.getElementById('result-screen').classList.remove('hidden');
-            document.getElementById('final-score').innerText = score;
-            const list = document.getElementById('mistakes-list');
+            getEl('quiz-screen').classList.add('hidden');
+            getEl('result-screen').classList.remove('hidden');
+            getEl('final-score').innerText = score;
+            const list = getEl('mistakes-list');
             if (mistakes.length > 0) {
-                document.getElementById('revision-zone').classList.remove('hidden');
+                getEl('revision-zone').classList.remove('hidden');
                 list.innerHTML = '';
                 mistakes.forEach(m => {
-                    list.innerHTML += `
-                        <div class="revision-card p-3 rounded-xl">
-                            <p class="font-black text-[10px] text-slate-800 mb-1 leading-snug">${m.q}</p>
-                            <p class="text-[9px] text-emerald-600 font-bold">✅ Correct: ${m.correct}</p>
-                            <p class="text-[9px] text-slate-400 italic leading-snug">${m.r}</p>
-                        </div>
-                    `;
+                    list.innerHTML += `<div class="revision-card p-3 rounded-xl mb-2 shadow-sm"><p class="font-black text-[9px] text-slate-800 mb-1">${m.q}</p><p class="text-[8px] text-emerald-600 font-bold">✅ Correct: ${m.correct}</p><p class="text-[8px] text-slate-400 italic leading-tight">${m.r}</p></div>`;
                 });
             }
         }
 
         function setRiyaState(state) {
+            const riyaAvatar = getEl('riya-avatar');
+            const riyaMouth = getEl('riya-mouth');
+            if (!riyaAvatar || !riyaMouth) return;
             riyaAvatar.classList.remove('riya-happy', 'riya-idle');
-            const mouth = document.getElementById('riya-mouth');
-            if (!mouth) return;
-            if (state === 'thinking') {
-                riyaAvatar.classList.add('riya-idle');
-                mouth.setAttribute('d', 'M42 60 Q50 60 58 60');
-                riyaSpeech.innerText = "Hmm... analyzing this challenge...";
-            } else if (state === 'happy') {
-                riyaAvatar.classList.add('riya-happy');
-                mouth.setAttribute('d', 'M40 60 Q50 70 60 60');
-            } else if (state === 'sad') {
-                mouth.setAttribute('d', 'M42 65 Q50 55 58 65');
-            } else if (state === 'timeout') {
-                mouth.setAttribute('d', 'M42 60 Q50 60 58 60');
-            }
+            if (state === 'thinking') { riyaAvatar.classList.add('riya-idle'); riyaMouth.setAttribute('d', 'M42 60 Q50 60 58 60'); }
+            else if (state === 'happy') { riyaAvatar.classList.add('riya-happy'); riyaMouth.setAttribute('d', 'M40 60 Q50 70 60 60'); }
+            else if (state === 'sad') riyaMouth.setAttribute('d', 'M42 65 Q50 55 58 65');
+            else if (state === 'timeout') riyaMouth.setAttribute('d', 'M42 60 Q50 60 58 60');
         }
 
         function shuffle(arr) {
@@ -578,8 +680,8 @@
 
         function updateWordCount() {
             let words = 0;
-            for(let i=0; i<50; i++) if(document.getElementById(`box-${i}`).value.trim()) words++;
-            document.getElementById('word-count').innerText = `${words} / 50`;
+            for(let i=0; i<50; i++) if(getEl(`box-${i}`).value.trim()) words++;
+            getEl('word-count').innerText = `${words} / 50`;
         }
     </script>
 </body>
