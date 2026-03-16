@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Artevia Brawl</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Mobile Interaction Resets */
+        body {
+            overscroll-behavior-y: none;
+            touch-action: none;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* --- Animations --- */
+        
+        /* Squish effect for the avatar when hit */
+        .squish {
+            animation: squishAnim 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+        @keyframes squishAnim {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.15, 0.85); }
+            50% { transform: scale(0.9, 1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Screen Shake for heavy hits */
+        .heavy-shake {
+            animation: heavyShakeAnim 0.2s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes heavyShakeAnim {
+            0%, 100% { transform: translate(0, 0) rotate(0); }
+            20% { transform: translate(-8px, 6px) rotate(-2deg); }
+            40% { transform: translate(8px, -6px) rotate(2deg); }
+            60% { transform: translate(-6px, 8px) rotate(-1deg); }
+            80% { transform: translate(6px, -8px) rotate(1deg); }
+        }
+
+        /* Comic Book Floating Text */
+        .dmg-text {
+            position: absolute;
+            font-family: 'Impact', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-shadow: 0 4px 0 #000, 0 -4px 0 #000, 4px 0 0 #000, -4px 0 0 #000, 6px 6px 0px rgba(0,0,0,0.4);
+            pointer-events: none;
+            z-index: 50;
+            animation: dmgPop 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes dmgPop {
+            0% { transform: translate(-50%, -50%) scale(0.5) rotate(var(--rot-start)); opacity: 0; }
+            30% { transform: translate(-50%, -100%) scale(1.2) rotate(var(--rot-mid)); opacity: 1; }
+            100% { transform: translate(-50%, -180%) scale(0.8) rotate(var(--rot-end)); opacity: 0; }
+        }
+
+        /* Flash overlay for big hits */
+        #flash-overlay {
+            position: fixed;
+            inset: 0;
+            background: red;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 100;
+            transition: opacity 0.1s ease-out;
+        }
+
+        /* Weapon Button Active State */
+        .weapon-active {
+            border-color: #0ea5e9; /* Sky 500 */
+            background-color: rgba(14, 165, 233, 0.15);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(14, 165, 233, 0.3);
+        }
+
+        /* Combo Pop Animation */
+        .combo-pop {
+            animation: comboPulse 0.3s ease-out;
+        }
+        @keyframes comboPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); color: #facc15; }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="bg-zinc-950 h-[100dvh] w-screen overflow-hidden flex flex-col font-sans text-white" id="game-root">
+
+    <div id="flash-overlay"></div>
+
+    <!-- Header / Stats -->
+    <header class="w-full p-6 pb-2 flex justify-between items-start z-20 pointer-events-none relative">
+        <!-- Damage Counter -->
+        <div class="flex flex-col">
+            <span class="text-zinc-500 text-xs font-black tracking-widest uppercase">Total Damage</span>
+            <div class="flex items-baseline gap-1">
+                <span id="score-display" class="text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white to-zinc-400">0</span>
+            </div>
+        </div>
+
+        <!-- Combo Meter -->
+        <div class="flex flex-col items-end">
+            <div id="combo-container" class="opacity-0 transition-opacity duration-300 flex flex-col items-end">
+                <span class="text-sky-400 text-xs font-bold tracking-widest uppercase mb-[-4px]">Combo</span>
+                <span id="combo-display" class="text-4xl font-black text-sky-400 italic">x1.0</span>
+            </div>
+            <div id="status-badge" class="mt-3 bg-zinc-800/80 border border-zinc-700 backdrop-blur-md rounded-full px-4 py-1.5 text-xs font-bold text-zinc-300 shadow-lg transition-colors duration-300">
+                Fresh & Ready
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Hit Area -->
+    <main class="flex-1 w-full flex items-center justify-center relative touch-none" id="hit-zone">
+        
+        <!-- Avatar Container (Handles Shake) -->
+        <div id="avatar-container" class="relative">
+            <!-- The Target Image -->
+            <img 
+                id="avatar" 
+                src="https://raw.githubusercontent.com/Sarup098/artevia/main/avatar.png" 
+                alt="Artevia Boss" 
+                class="w-64 h-64 md:w-80 md:h-80 object-cover rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-4 border-zinc-800 transition-all duration-200"
+                style="filter: brightness(1) sepia(0) saturate(1) hue-rotate(0deg);"
+                draggable="false"
+            >
+            
+            <!-- Tap prompt -->
+            <div id="instruction" class="absolute -bottom-12 left-1/2 -translate-x-1/2 text-zinc-600 font-bold tracking-widest uppercase text-sm animate-pulse whitespace-nowrap pointer-events-none">
+                Tap to Strike
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer / Weapons -->
+    <footer class="w-full px-4 pb-8 pt-6 z-20 bg-gradient-to-t from-black via-zinc-950/90 to-transparent">
+        <div class="flex justify-center gap-3 max-w-md mx-auto">
+            <!-- Slap -->
+            <button onclick="selectWeapon('slap')" id="btn-slap" class="weapon-btn weapon-active flex-1 bg-zinc-900 border-2 border-zinc-800 rounded-2xl p-3 flex flex-col items-center gap-1 transition-all duration-200">
+                <span class="text-3xl filter drop-shadow-md">👋</span>
+                <span class="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">Slap</span>
+                <span class="text-xs font-black text-white">1 DMG</span>
+            </button>
+            
+            <!-- Punch -->
+            <button onclick="selectWeapon('punch')" id="btn-punch" class="weapon-btn flex-1 bg-zinc-900 border-2 border-zinc-800 rounded-2xl p-3 flex flex-col items-center gap-1 transition-all duration-200">
+                <span class="text-3xl filter drop-shadow-md">🥊</span>
+                <span class="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">Punch</span>
+                <span class="text-xs font-black text-white">5 DMG</span>
+            </button>
+            
+            <!-- Bat -->
+            <button onclick="selectWeapon('bat')" id="btn-bat" class="weapon-btn flex-1 bg-zinc-900 border-2 border-zinc-800 rounded-2xl p-3 flex flex-col items-center gap-1 transition-all duration-200">
+                <span class="text-3xl filter drop-shadow-md">🏏</span>
+                <span class="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">Bat</span>
+                <span class="text-xs font-black text-white">15 DMG</span>
+            </button>
+        </div>
+    </footer>
+
+    <script>
+        // Game State
+        let damage = 0;
+        let hits = 0;
+        let combo = 1.0;
+        let comboHits = 0;
+        let comboTimer = null;
+        let currentWeapon = 'slap';
+
+        // DOM Elements
+        const avatar = document.getElementById('avatar');
+        const avatarContainer = document.getElementById('avatar-container');
+        const scoreDisplay = document.getElementById('score-display');
+        const comboContainer = document.getElementById('combo-container');
+        const comboDisplay = document.getElementById('combo-display');
+        const statusBadge = document.getElementById('status-badge');
+        const gameRoot = document.getElementById('game-root');
+        const flashOverlay = document.getElementById('flash-overlay');
+        const instruction = document.getElementById('instruction');
+
+        // Weapon Config
+        const weapons = {
+            slap: { power: 1, words: ['Smack!', 'Slap!', 'Bop!', 'Thwack!'], color: '#38bdf8', vibe: [30] },
+            punch: { power: 5, words: ['Pow!', 'Bam!', 'Sock!', 'Oof!'], color: '#fbbf24', vibe: [60] },
+            bat: { power: 15, words: ['WHACK!', 'CRASH!', 'BOOM!', 'SMASH!'], color: '#ef4444', vibe: [100, 30, 100] }
+        };
+
+        // --- Core Logic ---
+
+        function selectWeapon(weaponId) {
+            currentWeapon = weaponId;
+            document.querySelectorAll('.weapon-btn').forEach(btn => {
+                btn.classList.remove('weapon-active');
+                btn.classList.add('border-zinc-800');
+            });
+            const activeBtn = document.getElementById(`btn-${weaponId}`);
+            activeBtn.classList.add('weapon-active');
+            activeBtn.classList.remove('border-zinc-800');
+        }
+
+        function handleHit(e) {
+            e.preventDefault();
+            if (instruction) instruction.style.display = 'none';
+
+            // Coordinates
+            let x, y;
+            if (e.touches && e.touches.length > 0) {
+                x = e.touches[0].clientX;
+                y = e.touches[0].clientY;
+            } else {
+                x = e.clientX;
+                y = e.clientY;
+            }
+
+            const weapon = weapons[currentWeapon];
+            
+            // Manage Combo System
+            manageCombo();
+
+            // Calculate & Apply Damage
+            const actualDamage = Math.round(weapon.power * combo);
+            damage += actualDamage;
+            hits++;
+            
+            // Update UI
+            animateScore(actualDamage);
+            updateCharacterState();
+
+            // Visual/Haptic Feedback
+            triggerAnimations(weapon);
+            spawnHitText(x, y, weapon, actualDamage);
+            
+            // Haptics (Vibration API)
+            if (navigator.vibrate) {
+                navigator.vibrate(weapon.vibe);
+            }
+        }
+
+        function manageCombo() {
+            comboHits++;
+            
+            // Calculate multiplier (max 3.0x)
+            combo = Math.min(3.0, 1.0 + (comboHits * 0.1));
+            
+            if (comboHits > 2) {
+                comboContainer.style.opacity = '1';
+                comboDisplay.innerText = `x${combo.toFixed(1)}`;
+                
+                // Pop animation on the combo text
+                comboDisplay.classList.remove('combo-pop');
+                void comboDisplay.offsetWidth; 
+                comboDisplay.classList.add('combo-pop');
+            }
+
+            // Reset timer
+            clearTimeout(comboTimer);
+            comboTimer = setTimeout(() => {
+                comboHits = 0;
+                combo = 1.0;
+                comboContainer.style.opacity = '0';
+            }, 1500); // 1.5 seconds without hitting breaks the combo
+        }
+
+        // --- Visual Polish & Animations ---
+
+        function animateScore(amountAdded) {
+            scoreDisplay.innerText = damage.toLocaleString();
+            scoreDisplay.style.transform = 'scale(1.2)';
+            setTimeout(() => scoreDisplay.style.transform = 'scale(1)', 100);
+        }
+
+        function triggerAnimations(weapon) {
+            // Squish character
+            avatar.classList.remove('squish');
+            void avatar.offsetWidth;
+            avatar.classList.add('squish');
+
+            // Screen shake & flash for heavy weapons
+            if (weapon.power >= 15 || combo >= 2.0) {
+                gameRoot.classList.remove('heavy-shake');
+                void gameRoot.offsetWidth;
+                gameRoot.classList.add('heavy-shake');
+                
+                // Red screen flash
+                flashOverlay.style.opacity = '0.3';
+                setTimeout(() => flashOverlay.style.opacity = '0', 50);
+            }
+        }
+
+        function updateCharacterState() {
+            // Progressive visual damage (bruising/reddening)
+            const intensity = Math.min(damage / 1000, 1); 
+            const brightness = 1 - (intensity * 0.3); // Gets slightly darker
+            const sepia = intensity * 0.6;
+            const saturate = 1 + (intensity * 1.5);
+            const hueRotate = -40 * intensity; // Shifts to red/purple tones
+            
+            avatar.style.filter = `brightness(${brightness}) sepia(${sepia}) saturate(${saturate}) hue-rotate(${hueRotate}deg)`;
+
+            // Status Badge Updates
+            if (damage > 5000) {
+                statusBadge.innerText = "MIA / Destroyed";
+                statusBadge.className = "mt-3 bg-red-900/80 border border-red-500 backdrop-blur-md rounded-full px-4 py-1.5 text-xs font-bold text-red-100 shadow-[0_0_15px_rgba(239,68,68,0.5)]";
+            } else if (damage > 2000) {
+                statusBadge.innerText = "Critical Condition";
+                statusBadge.className = "mt-3 bg-orange-900/80 border border-orange-500 backdrop-blur-md rounded-full px-4 py-1.5 text-xs font-bold text-orange-100";
+            } else if (damage > 500) {
+                statusBadge.innerText = "Seeing Stars";
+                statusBadge.className = "mt-3 bg-yellow-900/80 border border-yellow-500 backdrop-blur-md rounded-full px-4 py-1.5 text-xs font-bold text-yellow-100";
+            } else if (damage > 100) {
+                statusBadge.innerText = "Taking Damage";
+            }
+        }
+
+        function spawnHitText(x, y, weapon, dmgDealt) {
+            const word = weapon.words[Math.floor(Math.random() * weapon.words.length)];
+            const el = document.createElement('div');
+            el.className = 'dmg-text';
+            
+            // Show the comic word + the damage number
+            el.innerHTML = `${word}<br><span style="font-size: 1.5rem; color: white;">-${dmgDealt}</span>`;
+            
+            // Random positioning offsets
+            const offsetX = (Math.random() - 0.5) * 60;
+            const offsetY = (Math.random() - 0.5) * 60;
+            
+            el.style.left = `${x + offsetX}px`;
+            el.style.top = `${y + offsetY}px`;
+            el.style.color = weapon.color;
+            
+            // Dynamic rotations for the animation variables
+            el.style.setProperty('--rot-start', `${(Math.random() - 0.5) * 40}deg`);
+            el.style.setProperty('--rot-mid', `${(Math.random() - 0.5) * 20}deg`);
+            el.style.setProperty('--rot-end', `${(Math.random() - 0.5) * 40}deg`);
+
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 700);
+        }
+
+        // --- Event Listeners ---
+        
+        const hitZone = document.getElementById('hit-zone');
+        
+        // Touch events (prioritize for mobile)
+        hitZone.addEventListener('touchstart', (e) => {
+            const rect = avatar.getBoundingClientRect();
+            const touch = e.touches[0];
+            const padding = 60; // Huge hitbox for easy mobile tapping
+            
+            if (
+                touch.clientX >= rect.left - padding &&
+                touch.clientX <= rect.right + padding &&
+                touch.clientY >= rect.top - padding &&
+                touch.clientY <= rect.bottom + padding
+            ) {
+                handleHit(e);
+            }
+        });
+
+        // Mouse events (for desktop fallback)
+        avatar.addEventListener('mousedown', handleHit);
+
+    </script>
+</body>
+</html>
