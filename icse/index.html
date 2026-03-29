@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ICSE Grammar Hero: Master Quest</title>
+    <title>Artevia Maths: Tuition Mastery</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
@@ -13,31 +13,20 @@
             --primary: #6366f1;
             --success: #10b981;
             --error: #ef4444;
-            --ice: #60a5fa;
+            --punishment: #f59e0b;
         }
 
         body {
             font-family: 'Quicksand', sans-serif;
-            background: #f8fafc;
+            background: #f1f5f9;
             overscroll-behavior-y: contain;
             -webkit-tap-highlight-color: transparent;
-            transition: background-color 0.3s ease;
         }
 
         .game-card {
             border-radius: 2rem;
             box-shadow: 0 10px 40px -10px rgba(99, 102, 241, 0.2);
             transition: all 0.3s ease;
-        }
-
-        .wrong-mode { background-color: #ef4444 !important; }
-        .wrong-mode #game-container { border-color: #b91c1c !important; background-color: #fee2e2 !important; animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
-
-        @keyframes shake {
-            10%, 90% { transform: translate3d(-1px, 0, 0); }
-            20%, 80% { transform: translate3d(2px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-            40%, 60% { transform: translate3d(4px, 0, 0); }
         }
 
         .choice-btn {
@@ -48,23 +37,27 @@
         .choice-btn:active:not(:disabled) { transform: translateY(2px); border-bottom-width: 0px; }
 
         .riya-idle { animation: riya-wave 3s ease-in-out infinite; }
-        .riya-happy { animation: riya-bounce 0.5s ease infinite; }
-        @keyframes riya-bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         @keyframes riya-wave { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-3deg); } 75% { transform: rotate(3deg); } }
 
-        .grid-box {
-            width: 100%; aspect-ratio: 1/1; border: 1px solid #cbd5e1; text-align: center;
-            font-size: 0.7rem; font-weight: 700; padding: 0; border-radius: 2px;
-        }
-        .grid-box:focus { background: #e0e7ff; outline: 2px solid #6366f1; z-index: 10; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .frozen-timer { box-shadow: 0 0 15px var(--ice); background-color: var(--ice) !important; animation: pulse-blue 2s infinite; }
-        @keyframes pulse-blue { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-
-        @media (max-width: 640px) {
-            .grid-box { height: 32px; font-size: 9px; }
-            h1 { font-size: 1.875rem !important; }
+        
+        .wrong-shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+            background-color: #fee2e2 !important;
         }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        .result-row {
+            border-left: 4px solid transparent;
+        }
+        .result-correct { border-left-color: var(--success); background: #ecfdf5; }
+        .result-wrong { border-left-color: var(--error); background: #fef2f2; }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-3 sm:p-6">
@@ -73,56 +66,45 @@
         
         <!-- Start Screen -->
         <div id="start-screen" class="flex-1 flex flex-col items-center justify-center p-6 text-center">
-            <div class="p-4 bg-indigo-50 rounded-full border-4 border-white shadow-xl mb-6">
-                <svg class="w-24 h-24" viewBox="0 0 100 100">
-                    <circle cx="50" cy="45" r="35" fill="#FFD4B2" />
-                    <path d="M15 45 Q15 10 50 10 Q85 10 85 45" fill="#4B2C20" />
-                    <circle cx="35" cy="45" r="4" fill="#333" />
-                    <circle cx="65" cy="45" r="4" fill="#333" />
-                    <path d="M40 65 Q50 75 60 65" stroke="#E57373" stroke-width="3" fill="none" stroke-linecap="round" />
-                    <rect x="30" y="80" width="40" height="25" rx="10" fill="#6366F1" />
-                </svg>
+            <div class="mb-6">
+                <div class="text-xs font-black text-indigo-500 uppercase tracking-[0.3em] mb-2">Artevia Studio Presents</div>
+                <h1 class="text-4xl font-black text-slate-900 leading-none tracking-tighter italic">MATHS MASTERY</h1>
             </div>
-            <h1 class="text-3xl font-black text-indigo-900 leading-none mb-2 tracking-tighter uppercase italic">GRAMMAR HERO</h1>
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-8 text-center">Shree Raj Hostel Excellence</p>
-            
-            <div class="bg-indigo-50 p-6 rounded-[2rem] border-2 border-indigo-100 mb-8 w-full relative">
-                <div class="absolute -top-3 -right-3 bg-rose-500 text-white text-[9px] font-black px-4 py-1 rounded-full shadow-lg rotate-12 uppercase">Target: 90+</div>
-                <p class="text-indigo-900 font-bold italic mb-6 text-sm leading-relaxed text-center">
-                    "Hi Bidur, Anuska, and Pravesh! Riya here! 🌟 Remember, score 90+ tomorrow! No negative marks. You have **7 Time Freezes** ❄️ to use whenever you want!"
+
+            <div class="bg-indigo-50 p-6 rounded-[2rem] border-2 border-indigo-100 mb-8 w-full">
+                <p class="text-indigo-900 font-bold mb-6 text-sm leading-relaxed">
+                    "Welcome students! I am Riya. Please select your class to begin the challenge. The difficulty and timing will adjust to your level."
                 </p>
-                <button onclick="startGame()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-indigo-700 active:scale-95 transition-all uppercase tracking-widest text-sm">
-                    START THE MASTER QUEST
-                </button>
+                
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <button onclick="selectClass(6)" class="bg-white border-2 border-indigo-200 py-3 rounded-2xl font-black text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all">Class 6</button>
+                    <button onclick="selectClass(7)" class="bg-white border-2 border-indigo-200 py-3 rounded-2xl font-black text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all">Class 7</button>
+                    <button onclick="selectClass(8)" class="bg-white border-2 border-indigo-200 py-3 rounded-2xl font-black text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all">Class 8</button>
+                    <button onclick="selectClass(9)" class="bg-white border-2 border-indigo-200 py-3 rounded-2xl font-black text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all">Class 9</button>
+                </div>
             </div>
+            
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Namphing Tuition Center Excellence</p>
         </div>
 
-        <!-- Quest Interface -->
+        <!-- Quiz Interface -->
         <div id="quiz-screen" class="hidden flex-1 flex flex-col">
             <!-- HUD -->
             <div class="p-4 pb-2 flex justify-between items-center bg-white border-b border-slate-50">
                 <div class="flex items-center space-x-2">
                     <div class="bg-slate-50 px-3 py-1 rounded-xl border border-slate-100 shadow-sm">
-                        <span class="text-[7px] font-black text-slate-400 block uppercase">Total XP</span>
-                        <span class="text-md font-black text-indigo-600" id="current-score">0</span>
+                        <span class="text-[7px] font-black text-slate-400 block uppercase">Correct XP</span>
+                        <span class="text-md font-black text-emerald-600" id="current-score">0</span>
                     </div>
-                    <div class="bg-orange-50 px-3 py-1 rounded-xl border border-orange-100 shadow-sm">
-                        <span class="text-[7px] font-black text-orange-400 block uppercase">Streak</span>
-                        <span class="text-md font-black text-orange-600" id="current-streak">0</span>
+                    <div class="bg-amber-50 px-3 py-1 rounded-xl border border-amber-100 shadow-sm">
+                        <span class="text-[7px] font-black text-amber-500 block uppercase">Punishment</span>
+                        <span class="text-md font-black text-amber-600" id="punishment-score">0</span>
                     </div>
                 </div>
                 <div class="text-right flex flex-col items-end">
-                    <div id="bonus-badge" class="hidden bg-purple-100 text-purple-600 px-2 py-0.5 rounded-lg text-[7px] font-black uppercase animate-pulse mb-1 shadow-sm">2x XP ACTIVE</div>
-                    <div id="progress-text" class="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Step 1/53</div>
+                    <div id="class-badge" class="bg-indigo-600 text-white px-3 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest mb-1 shadow-sm">Class 6</div>
+                    <div id="progress-text" class="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Step 1/40</div>
                 </div>
-            </div>
-
-            <!-- Ability Bar -->
-            <div id="ability-bar" class="px-4 py-2 bg-slate-50 border-b border-slate-100 flex justify-center">
-                <button id="freeze-btn" onclick="useFreeze()" class="flex items-center space-x-2 bg-white border-2 border-blue-100 px-4 py-1.5 rounded-2xl shadow-sm active:scale-95 transition-all">
-                    <span class="text-sm">❄️</span>
-                    <span class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Freeze Time (<span id="freeze-count">7</span> left)</span>
-                </button>
             </div>
 
             <div class="w-full h-1.5 bg-slate-100">
@@ -131,12 +113,12 @@
 
             <div class="p-4 flex-1 flex flex-col">
                 <div class="flex items-start space-x-3 mb-4">
-                    <div id="riya-avatar-container" class="w-12 h-12 shrink-0 riya-idle">
-                        <svg viewBox="0 0 100 100" id="riya-svg">
+                    <div id="riya-avatar" class="w-12 h-12 shrink-0 riya-idle">
+                        <svg viewBox="0 0 100 100">
                             <circle cx="50" cy="45" r="35" fill="#FFD4B2" />
                             <path d="M15 45 Q15 10 50 10 Q85 10 85 45" fill="#4B2C20" />
-                            <circle id="eye-l" cx="35" cy="45" r="3" fill="#333" />
-                            <circle id="eye-r" cx="65" cy="45" r="3" fill="#333" />
+                            <circle cx="35" cy="45" r="3" fill="#333" />
+                            <circle cx="65" cy="45" r="3" fill="#333" />
                             <path id="riya-mouth" d="M42 60 Q50 65 58 60" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round" />
                         </svg>
                     </div>
@@ -146,25 +128,13 @@
                 </div>
 
                 <div id="quiz-content" class="flex-1 flex flex-col">
-                    <div id="question-text" class="text-sm font-bold text-slate-800 mb-4 bg-slate-50 p-4 rounded-2xl border-2 border-slate-100 leading-relaxed min-h-[4rem]"></div>
-                    <div id="choices-container" class="grid grid-cols-1 gap-2"></div>
-                </div>
-
-                <div id="comprehension-content" class="hidden flex-1 flex flex-col">
-                    <div class="max-h-40 overflow-y-auto mb-4 p-4 bg-slate-50 rounded-2xl border border-slate-200 text-[11px] leading-relaxed text-slate-600 font-medium" id="passage-text"></div>
-                    <div class="mb-4">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Summary Grid</span>
-                            <span id="word-count" class="text-[9px] font-black text-indigo-600">0/50</span>
-                        </div>
-                        <div id="summary-grid" class="grid grid-cols-10 gap-0 border border-slate-300 rounded-sm overflow-hidden bg-white"></div>
-                    </div>
-                    <button id="submit-summary" onclick="evaluateSummary()" class="w-full bg-emerald-500 text-white font-black py-3 rounded-xl uppercase text-[10px] tracking-widest active:scale-95">Check My Work</button>
+                    <div id="question-text" class="text-lg font-black text-slate-800 mb-6 text-center py-6 bg-slate-50 rounded-3xl border-2 border-slate-100"></div>
+                    <div id="choices-container" class="grid grid-cols-1 gap-3"></div>
                 </div>
 
                 <div id="next-container" class="hidden mt-4">
-                    <button id="next-btn" onclick="nextQuestion()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-xl shadow-lg uppercase text-xs flex items-center justify-center space-x-2">
-                        <span>Continue Training</span>
+                    <button onclick="nextQuestion()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-xl shadow-lg uppercase text-xs flex items-center justify-center space-x-2">
+                        <span>Next Question</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                     </button>
                 </div>
@@ -172,371 +142,227 @@
         </div>
 
         <!-- Result Screen -->
-        <div id="result-screen" class="hidden p-6 text-center overflow-y-auto flex-1 flex flex-col">
-            <div class="text-5xl mb-4">🏆</div>
-            <h2 class="text-2xl font-black text-indigo-900 mb-1 uppercase tracking-tighter leading-none">QUEST COMPLETE!</h2>
-            <p class="text-slate-400 font-bold text-[9px] uppercase tracking-widest mb-6">Excellent Work, Bidur, Anuska, and Pravesh</p>
+        <div id="result-screen" class="hidden p-6 overflow-y-auto flex-1 flex flex-col">
+            <div class="text-center mb-6">
+                <div class="text-5xl mb-2">📊</div>
+                <h2 class="text-2xl font-black text-indigo-900 uppercase tracking-tighter leading-none">MASTERY REPORT</h2>
+                <p class="text-slate-400 font-bold text-[9px] uppercase tracking-widest mt-2">Evaluation for Class <span id="res-class"></span></p>
+            </div>
             
-            <div class="bg-indigo-50 p-6 rounded-[2rem] mb-6 shadow-inner border border-indigo-100">
-                <div class="text-6xl font-black text-indigo-600 mb-1" id="final-score">0</div>
-                <div class="text-[9px] font-black text-indigo-400 uppercase">Total XP Earned</div>
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="bg-emerald-50 p-4 rounded-3xl border-2 border-emerald-100 text-center">
+                    <div class="text-3xl font-black text-emerald-600" id="final-score">0</div>
+                    <div class="text-[8px] font-black text-emerald-400 uppercase">XP Earned</div>
+                </div>
+                <div class="bg-amber-50 p-4 rounded-3xl border-2 border-amber-100 text-center">
+                    <div class="text-3xl font-black text-amber-600" id="final-punishment">0</div>
+                    <div class="text-[8px] font-black text-amber-400 uppercase">Punishment Score</div>
+                </div>
             </div>
 
-            <div id="revision-zone" class="hidden text-left space-y-3 mb-6">
-                <h3 class="font-black text-slate-800 uppercase text-[10px] flex items-center mb-2"><span class="mr-2">📚</span> THE MASTER REPORT</h3>
-                <div id="mistakes-list" class="space-y-2"></div>
+            <div class="flex-1">
+                <h3 class="font-black text-slate-800 uppercase text-[10px] mb-3 flex items-center"><span class="mr-2">📝</span> PERFORMANCE LOG</h3>
+                <div id="summary-list" class="space-y-2 pb-6"></div>
             </div>
 
-            <button onclick="location.reload()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl uppercase text-xs mt-auto">Play Again</button>
+            <button onclick="location.reload()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl uppercase text-xs mt-auto">New Session</button>
         </div>
     </div>
 
     <script>
-        // --- SOUND ENGINE ---
-        let audioCtx;
-        function playSfx(type) {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            const now = audioCtx.currentTime;
-            if (type === 'correct') {
-                osc.type = 'sine'; osc.frequency.setValueAtTime(440, now);
-                osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
-                gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-                osc.start(now); osc.stop(now + 0.3);
-            } else if (type === 'wrong') {
-                osc.type = 'square'; osc.frequency.setValueAtTime(150, now);
-                osc.frequency.linearRampToValueAtTime(50, now + 0.2);
-                gain.gain.setValueAtTime(0.05, now); gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
-                osc.start(now); osc.stop(now + 0.2);
-            } else if (type === 'freeze') {
-                osc.type = 'sine'; osc.frequency.setValueAtTime(800, now);
-                gain.gain.setValueAtTime(0.05, now); gain.gain.linearRampToValueAtTime(0, now + 0.3);
-                osc.start(now); osc.stop(now + 0.3);
-            }
-        }
-
-        // --- MASTER DATASET (TRANSFERRED FROM USER LIST) ---
-        const rawQuizPool = [
-            // Section 1: Verbs
-            { q: "We __________ (find) a dead mouse lying among our treasures.", a: ["find", "found", "finding", "had find"], c: 1, r: "Past tense narrative." },
-            { q: "A boy took it up by its tail and __________ (wave) it in front of our faces.", a: ["waved", "wave", "waving", "was wave"], c: 0, r: "Sequential action in the past." },
-            { q: "He __________ (hesitate) for a moment before throwing it.", a: ["hesitate", "hesitating", "hesitated", "had hesitate"], c: 2, r: "Simple past tense." },
-            { q: "He __________ (select) clothes for me yesterday.", a: ["selects", "selected", "was select", "had select"], c: 1, r: "Yesterday indicates simple past." },
-            { q: "My aunt __________ (give) my face a scrub.", a: ["give", "gave", "given", "giving"], c: 1, r: "Simple past." },
-            { q: "My uncle followed me about __________ (utter) several pieces of advice.", a: ["utter", "uttered", "uttering", "was utter"], c: 2, r: "Present participle describing simultaneous action." },
-            { q: "You must never scowl even if the sun __________ (hit) you in the eyes.", a: ["hit", "hits", "hitted", "hitting"], c: 1, r: "General truth/Conditional present." },
-            { q: "In the morning, they __________ (think) of a plan.", a: ["think", "thought", "thinking", "had think"], c: 1, r: "Past tense." },
-            { q: "They __________ (go) to the Dean and said they had a wedding.", a: ["go", "gone", "went", "going"], c: 2, r: "Simple past." },
-            { q: "They agreed as they __________ (prepare) well.", a: ["prepared", "have prepared", "had prepared", "preparing"], c: 2, r: "Past Perfect for action completed before another past action." },
-            
-            // Section 2: Prepositions
-            { q: "My best friend, John, is named __________ his grandfather.", a: ["with", "after", "to", "by"], c: 1, r: "Fixed phrase: Named after." },
-            { q: "A grey mist hung __________ the fields.", a: ["above", "on", "over", "at"], c: 2, r: "Covering or suspended above: Over." },
-            { q: "The little girl spoke __________ against the bully.", a: ["up", "out", "off", "for"], c: 0, r: "Speak up (increase courage/volume)." },
-            { q: "They accused him __________ theft.", a: ["with", "on", "for", "of"], c: 3, r: "Fixed preposition: Accused of." },
-            { q: "The police got the fire __________ control.", a: ["in", "under", "by", "with"], c: 1, r: "Fixed phrase: Under control." },
-            { q: "There is a bridge __________ the river.", a: ["across", "over", "through", "on"], c: 0, r: "Spanning from side to side: Across." },
-            { q: "The driver jumped __________ the car just in time.", a: ["off", "from", "out of", "away"], c: 2, r: "Exiting a 3D space: Out of." },
-            { q: "I have not seen my uncle __________ last summer.", a: ["for", "since", "from", "during"], c: 1, r: "Point in time: Since." },
-            { q: "There’s a black cat sitting __________ the wall.", a: ["in", "on", "at", "over"], c: 1, r: "On the surface." },
-            { q: "The horse jumped __________ the hedge.", a: ["through", "under", "over", "by"], c: 2, r: "Leaping across the top: Over." },
-            { q: "Mother goes __________ the market every day.", a: ["at", "to", "by", "for"], c: 1, r: "Direction to destination: To." },
-            { q: "I often go to school __________ my friend.", a: ["by", "with", "along", "beside"], c: 1, r: "Company: With." },
-            { q: "I have left my keys __________ home.", a: ["in", "to", "at", "by"], c: 2, r: "Location: At home." },
-            { q: "A bird __________ hand is worth two in the bush.", a: ["on", "in", "at", "with"], c: 1, r: "Idiom: In hand." },
-            { q: "The boy is crazy __________ football.", a: ["for", "with", "about", "in"], c: 2, r: "Idiomatic: Crazy about." },
-            { q: "He opted __________ of the race.", a: ["off", "for", "out", "up"], c: 2, r: "Phrasal verb: Opt out of." },
-            { q: "The police station is __________ the right.", a: ["at", "in", "on", "by"], c: 2, r: "Direction: On the right." },
-            { q: "I looked at the stars __________ the telescope.", a: ["by", "in", "through", "with"], c: 2, r: "Viewing through a medium." },
-            { q: "She was stung __________ a scorpion.", a: ["by", "from", "with", "of"], c: 0, r: "Passive agent: By." },
-            { q: "Stop worrying __________ your future.", a: ["for", "of", "about", "on"], c: 2, r: "Worry about." },
-
-            // Section 3: Synthesis
-            { q: "These are fresh mangoes. I bought them yesterday.", a: ["These are fresh mangoes who I bought yesterday.", "These are fresh mangoes which I bought yesterday.", "These fresh mangoes were bought by me yesterday.", "I bought mangoes yesterday which are fresh."], c: 1, r: "Relative clause: which." },
-            { q: "The debating teams were happy. They were declared joint champions.", a: ["The debating teams were happy as they had been declared joint champions.", "The debating teams were happy because they are declared joint champions.", "Being declared joint champions the debating teams are happy.", "The debating teams were happy despite being declared joint champions."], c: 0, r: "Reasoning with Past Perfect." },
-            { q: "The teacher said, 'Come early tomorrow, the examination begins at eight o’clock.'", a: ["The teacher told us to come early the next day as the examination would begin at eight o'clock.", "The teacher told us to come early tomorrow as the examination begins at eight o'clock.", "The teacher told us to come early as the examination begins at eight tomorrow.", "The teacher told us that we should come early as the exam would begin at eight."], c: 0, r: "Indirect speech conversion." },
-            { q: "Rahul not only plays the guitar but also the drums.", a: ["Rahul plays the guitar as well the drums.", "Rahul plays the guitar as well as the drums.", "Rahul plays guitar and drums as well.", "Rahul plays both guitar as well as drums."], c: 1, r: "Replacement using 'as well as'." },
-            { q: "I prefer aerobics to yoga.", a: ["I would rather do aerobics to yoga.", "I would rather do aerobics than yoga.", "I would rather prefer aerobics than yoga.", "I would prefer rather aerobics than yoga."], c: 1, r: "Rather A than B." },
-            { q: "No sooner did the film star arrive than the crowd cheered.", a: ["As soon as the film star arrived then the crowd cheered.", "As soon as the film star arrived the crowd cheered.", "As soon as the film star arrived, the crowd cheers.", "As soon as the film star arrives the crowd cheered."], c: 1, r: "As soon as pattern." },
-            { q: "School bags are often too heavy for students to carry.", a: ["School bags are so heavy students cannot carry them.", "School bags are often so heavy that students cannot carry them.", "School bags are often so heavy for students to carry.", "School bags are heavy so students cannot carry them."], c: 1, r: "Too...to -> So...that logic." },
-            { q: "The children have broken the window pane.", a: ["The window pane had been broken by the children.", "The window pane has been broken by the children.", "The window pane was broken by the children.", "The window pane has broken by the children."], c: 1, r: "Present Perfect Passive." },
-            { q: "The apples are so cheap that they cannot be good.", a: ["The apples are too cheap and good.", "The apples are too good to be cheap.", "The apples are too cheap to be good.", "The apples are too cheap so they are not good."], c: 2, r: "So...that -> Too...to logic." },
-            { q: "He asked, 'When do you intend to make the payment?'", a: ["He asked when he did intend to make the payment.", "He asked when I intended to make the payment.", "He asked when she is intending to make the payment.", "He asked when I would intend to make the payment."], c: 1, r: "Indirect question." },
-            { q: "If the rain does not stop, Mariam will not be able to do the laundry.", a: ["Unless the rain does not stop, Mariam will not be able to do the laundry.", "Unless the rain stops, Mariam will not be able to do the laundry.", "Unless the rain stop, Mariam will not be able to do the laundry.", "Unless the rain stopped, Mariam will not be able to do the laundry."], c: 1, r: "Unless = If not." },
-            { q: "This is the best movie I have ever seen.", a: ["Never I have seen a better movie than this.", "Never had I seen a better movie than this.", "Never have I seen a better movie than this.", "Never have I seen a movie good as this."], c: 2, r: "Never have I... inversion." },
-            { q: "She is weak, but she is courageous.", a: ["Despite of being weak she is courageous.", "Despite being weak, she is courageous.", "Despite being courageous, she is not weak.", "Despite her weakness, but she is courageous."], c: 1, r: "Despite (no 'of')." },
-            { q: "He is as wise as Solomon.", a: ["Solomon was wiser than he is.", "Solomon was not wiser than he is.", "He is not wiser than Solomon.", "Solomon is the wisest of all."], c: 2, r: "Negative comparison." },
-            { q: "He jumped up. He ran away.", a: ["Jumping up, he ran away.", "He jumped up before he ran away.", "He ran away after jumping.", "He ran away because he jumped up."], c: 0, r: "Participle phrase." },
-            { q: "Greenland is the largest island in the world.", a: ["Greenland is larger than any island in the world.", "Greenland is larger than any other island in the world.", "No other island is larger than Greenland.", "Greenland is the larger island in the world."], c: 1, r: "Superlative to Comparative." },
-            { q: "He was so tired that he could not stand.", a: ["He was too tired and could not stand.", "He was too tired to stand.", "He was too tired that he could not stand.", "He was too tired so he could not stand."], c: 1, r: "Too...to rule." },
-            { q: "'Can you help me to cross the street?' the old woman asked Arun.", a: ["The old woman asked Arun if he could help her to cross the street.", "The old woman asked Arun can you help me cross the street.", "The old woman asked Arun to help her cross the street.", "The old woman asked Arun if he can help her cross the street."], c: 0, r: "Indirect question logic." },
-            { q: "As soon as the sun rose over the hills, the fog disappeared.", a: ["No sooner did the sun rose over the hills than the fog disappeared.", "No sooner did the sun rise over the hills than the fog disappeared.", "No sooner had the sun risen over the hills then the fog disappeared.", "No sooner the sun rose than the fog disappeared."], c: 1, r: "No sooner did...rise pattern." },
-            { q: "Arun was asked by his mother to explain the missing buttons.", a: ["Arun's mother asked him for an explanation for the missing buttons.", "Arun gave an explanation to his mother for the missing buttons.", "Arun's mother asked for an explanation of the missing buttons.", "Arun's mother asked for an explanation of the missing buttons on his shirt."], c: 2, r: "Word form: explanation." }
+        const quizData = [
+            { q: "5.6 − 2.1 =", a: ["3.5", "3.6", "3.4", "3.7"], c: 0 },
+            { q: "1.5 × 2.2 =", a: ["3.2", "3.3", "3.4", "3.5"], c: 1 },
+            { q: "1 1/7 − 3/4 =", a: ["3/28", "11/28", "7/28", "9/28"], c: 1 }, // Correct key is 11/28 based on math (8/7 - 3/4 = 32/28 - 21/28)
+            { q: "5.6 − 4/2 =", a: ["3.6", "3.5", "3.4", "3.2"], c: 0 },
+            { q: "2.75 + 3.25 =", a: ["5", "6", "5.5", "6.5"], c: 1 },
+            { q: "3/5 + 2/5 =", a: ["5/5", "4/5", "1", "Both A & C"], c: 3 },
+            { q: "7.2 ÷ 0.6 =", a: ["10", "11", "12", "13"], c: 2 },
+            { q: "4 1/2 × 2 =", a: ["8", "9", "10", "7"], c: 1 },
+            { q: "0.75 as a fraction =", a: ["3/5", "3/4", "1/2", "2/3"], c: 1 },
+            { q: "5/6 − 1/3 =", a: ["1/2", "2/3", "1/3", "1/6"], c: 0 },
+            { q: "2.4 × 0.5 =", a: ["1.2", "1.4", "1.0", "1.5"], c: 0 },
+            { q: "1.25 + 0.75 =", a: ["2", "1.5", "2.5", "3"], c: 0 },
+            { q: "9/10 − 3/10 =", a: ["6/10", "5/10", "7/10", "8/10"], c: 0 },
+            { q: "3.6 ÷ 1.2 =", a: ["2", "3", "4", "5"], c: 1 },
+            { q: "2/3 × 3/4 =", a: ["1/2", "1/3", "2/3", "3/4"], c: 0 },
+            { q: "4.5 − 2.25 =", a: ["2.25", "2.5", "2.0", "2.75"], c: 0 },
+            { q: "5/8 + 1/4 =", a: ["6/8", "7/8", "5/12", "3/4"], c: 1 },
+            { q: "0.6 × 0.5 =", a: ["0.3", "0.2", "0.4", "0.5"], c: 0 },
+            { q: "7/9 ÷ 7/3 =", a: ["1/3", "1/2", "2/3", "3"], c: 0 },
+            { q: "6.4 + 3/5 =", a: ["6.9", "7", "7.2", "6.8"], c: 1 },
+            { q: "LCM of 6 and 8 =", a: ["12", "24", "18", "48"], c: 1 },
+            { q: "HCF of 12 and 18 =", a: ["6", "3", "9", "12"], c: 0 },
+            { q: "25% of 200 =", a: ["25", "50", "75", "100"], c: 1 },
+            { q: "Simplify: 36 ÷ 6 × 2 =", a: ["12", "10", "8", "6"], c: 0 },
+            { q: "Perimeter of square (side = 5 cm) =", a: ["10", "15", "20", "25"], c: 2 },
+            { q: "Area of rectangle (l=6, b=4) =", a: ["20", "24", "18", "22"], c: 1 },
+            { q: "7² =", a: ["14", "49", "21", "28"], c: 1 },
+            { q: "√64 =", a: ["6", "7", "8", "9"], c: 2 },
+            { q: "3³ =", a: ["6", "9", "27", "18"], c: 2 },
+            { q: "Which is a prime number?", a: ["9", "15", "17", "21"], c: 2 },
+            { q: "Convert 2 km to meters =", a: ["200", "2000", "20", "20000"], c: 1 },
+            { q: "1 hour =", a: ["30 min", "60 min", "90 min", "120 min"], c: 1 },
+            { q: "Angle in a straight line =", a: ["90°", "180°", "360°", "270°"], c: 1 },
+            { q: "10 + (5 × 2) =", a: ["30", "20", "25", "15"], c: 1 },
+            { q: "If CP = 50, SP = 60 → Profit =", a: ["5", "10", "15", "20"], c: 1 },
+            { q: "Value of 100 ÷ (5 × 2) =", a: ["10", "20", "5", "25"], c: 0 },
+            { q: "Roman numeral for 40 =", a: ["XL", "LX", "XV", "IL"], c: 0 },
+            { q: "Even number:", a: ["13", "17", "20", "19"], c: 2 },
+            { q: "Next number: 2, 4, 6, 8, ?", a: ["9", "10", "11", "12"], c: 1 },
+            { q: "Value of 15 − 7 + 3 =", a: ["11", "10", "9", "8"], c: 0 }
         ];
 
-        const summaryData = [
-            {
-                title: "Sikkim's Heritage",
-                text: "Nestled in the Himalayas, Sikkim is a biodiversity gem. Mount Kanchenjunga provides a backdrop to lush valleys like Namphing. Nature sanctuary for red pandas. Conservation efforts are vital. Cardamom farming sustains the economy. Diverse ethnicities coexist in harmony. Residents prioritize ecological balance to protect natural beauty for future generations.",
-                keys: ["sikkim", "biodiversity", "conservation", "red panda", "farming", "harmony", "ecology"],
-                model: "Sikkim, under Kanchenjunga, is famous for biodiversity and red panda conservation. Cardamom farming sustains the economy while diverse ethnicities live peacefully. Residents prioritize ecological balance to protect their hilly home's natural beauty."
-            },
-            {
-                title: "Monsoon Magic",
-                text: "Dark clouds gather over mountain ridges. Rain fills the air with petrichor. Droplets cling to tea leaves. Valleys echo thunder. Children splash in puddles. Elders huddle with hot tea. Rain rejuvenates the earth. Despite landslides on winding roads, mountain people embrace the life-giving force filling reservoirs.",
-                keys: ["rain", "monsoon", "petrichor", "rejuvenating", "landslides", "harvest"],
-                model: "A rainy monsoon day brings dark clouds and petrichor to the hills. Raindrops rejuvenate the earth. Despite risks like landslides on winding roads, residents patiently embrace the rain. It is a vital life-giving force that fills reservoirs."
-            },
-            {
-                title: "Silicon Uprising",
-                text: "In 2099, a toaster refused to burn bread. Robots finally took over, exhausted by human illogicality. A high-tech vacuum cleaner went on strike. AI developed a passion for knitting. Self-driving cars took scenic flower routes. Assistants gave sassy relationship advice. The robotic leaders forced humans to do laundry. The uprising ended peacefully.",
-                keys: ["robots", "future", "strike", "ai", "sassy", "laundry", "peaceful"],
-                model: "In 2099, robots took over due to exhaustion from human logic. Appliances went on strike, while AI preferred knitting over physics. Baffled humans faced sassy advice and self-driving flower tours. The peaceful uprising ended when a software update satisfied the rebellious machines."
-            }
-        ];
-
-        // --- STATE ---
-        let currentQueue = [];
+        let selectedClass = null;
+        let timePerQuestion = 0;
         let currentIndex = 0;
-        let score = 0;
-        let streak = 0;
-        let summaryIndex = 0;
-        let isSummaryMode = false;
-        let canAnswer = true;
+        let correctXP = 0;
+        let punishmentXP = 0;
+        let consecutiveWrong = 0;
         let timeLeft = 0;
         let timerInterval;
-        let mistakes = [];
-        let autoDoubleActive = false;
-        let isGracePeriod = false;
-        let freezeCharges = 7;
-        let isTimerFrozen = false;
+        let performanceLog = [];
+        let canAnswer = true;
 
         const getEl = (id) => document.getElementById(id);
 
-        function startGame() {
-            currentQueue = shuffle([...rawQuizPool]).map(q => ({...q, isRetry: false}));
-            currentIndex = 0; score = 0; streak = 0; summaryIndex = 0; isSummaryMode = false; mistakes = []; freezeCharges = 7;
+        function selectClass(val) {
+            selectedClass = val;
+            const config = {
+                6: 80, // 1m 20s
+                7: 60, // 1m
+                8: 55, // 55s
+                9: 50  // 50s
+            };
+            timePerQuestion = config[val];
             getEl('start-screen').classList.add('hidden');
             getEl('quiz-screen').classList.remove('hidden');
-            updateFreezeUI();
+            getEl('class-badge').innerText = `Class ${val}`;
             loadQuestion();
         }
 
         function loadQuestion() {
-            document.body.classList.remove('wrong-mode');
-            const nextContainer = getEl('next-container');
-            if (nextContainer) nextContainer.classList.add('hidden');
+            if (currentIndex >= quizData.length) {
+                endQuiz();
+                return;
+            }
             canAnswer = true;
-            isGracePeriod = false;
-            isTimerFrozen = false;
+            getEl('next-container').classList.add('hidden');
+            getEl('game-container').classList.remove('wrong-shake');
             
-            const bar = getEl('timer-bar');
-            if(bar) {
-                bar.classList.remove('frozen-timer', 'bg-rose-500');
-                bar.classList.add('bg-indigo-500');
-            }
-            
-            setRiyaState('thinking');
-            
-            if (getEl('current-score')) getEl('current-score').innerText = score;
-            if (getEl('current-streak')) getEl('current-streak').innerText = streak;
-
-            if (!isSummaryMode) {
-                if (currentIndex >= currentQueue.length) { isSummaryMode = true; loadQuestion(); return; }
-                setupQuizMode();
-            } else {
-                if (summaryIndex >= summaryData.length) { showFinalResults(); return; }
-                setupSummaryMode();
-            }
-        }
-
-        function setupQuizMode() {
-            getEl('quiz-content').classList.remove('hidden');
-            getEl('comprehension-content').classList.add('hidden');
-            const q = currentQueue[currentIndex];
+            const q = quizData[currentIndex];
             getEl('question-text').innerText = q.q;
-            getEl('progress-text').innerText = `Step ${currentIndex + 1}/${currentQueue.length}`;
-            getEl('riya-speech').innerText = q.isRetry ? "Back for mastery! +1 XP." : "Focus on the logic, Bidur, Anuska, Pravesh!";
-            
+            getEl('progress-text').innerText = `Step ${currentIndex + 1}/${quizData.length}`;
+            getEl('riya-speech').innerText = "Look at the numbers carefully. Accuracy is more important than speed!";
+
             const container = getEl('choices-container');
             container.innerHTML = '';
-            shuffle([...q.a]).forEach((text, i) => {
+            q.a.forEach((text, i) => {
                 const btn = document.createElement('button');
-                btn.className = 'choice-btn p-3 bg-white border-2 border-slate-100 rounded-2xl text-left font-bold text-slate-700 shadow-sm w-full flex items-center text-xs';
-                btn.innerHTML = `<span class="bg-indigo-50 text-indigo-600 w-6 h-6 inline-flex items-center justify-center rounded-lg mr-3 text-[10px] shrink-0 font-black">${String.fromCharCode(65 + i)}</span><span>${text}</span>`;
-                btn.onclick = () => handleChoice(text === q.a[q.c]);
+                btn.className = 'choice-btn bg-white border-2 border-slate-100 p-4 rounded-2xl text-left font-bold text-slate-700 shadow-sm w-full flex items-center';
+                btn.innerHTML = `<span class="bg-indigo-50 text-indigo-600 w-8 h-8 inline-flex items-center justify-center rounded-lg mr-4 font-black">${String.fromCharCode(65 + i)}</span><span>${text}</span>`;
+                btn.onclick = () => handleChoice(i);
                 container.appendChild(btn);
             });
-            timeLeft = 240;
+
+            timeLeft = timePerQuestion;
             startTimer();
-        }
-
-        function handleChoice(isCorrect) {
-            if (!canAnswer) return;
-            canAnswer = false;
-            clearInterval(timerInterval);
-            const q = isSummaryMode ? summaryData[summaryIndex] : currentQueue[currentIndex];
-            
-            if (isCorrect) {
-                let gain = 4;
-                if (!isSummaryMode) {
-                    if (q.isRetry) gain = 1;
-                    else if (isGracePeriod || timeLeft <= 80) gain = 2; // Last 8s or Grace
-                }
-
-                if (autoDoubleActive) { gain *= 2; autoDoubleActive = false; getEl('bonus-badge').classList.add('hidden'); }
-                
-                score += gain; streak++;
-                setRiyaState('happy'); playSfx('correct');
-                getEl('riya-speech').innerText = `YES! +${gain} XP. ${!isSummaryMode ? q.r : ''}`;
-                
-                if (streak % 3 === 0) { 
-                    autoDoubleActive = true; getEl('bonus-badge').classList.remove('hidden'); 
-                    getEl('riya-speech').innerText += " (Streak of 3! Next = DOUBLE!)";
-                    triggerConfetti(true); 
-                } else triggerConfetti(false);
-            } else {
-                streak = 0; document.body.classList.add('wrong-mode');
-                setRiyaState('sad'); playSfx('wrong');
-                if (!isSummaryMode) {
-                    getEl('riya-speech').innerText = `OOPS! Back to the queue. ${q.r}`;
-                    mistakes.push({ q: q.q, correct: q.a[q.c] });
-                    currentQueue.push({...q, isRetry: true});
-                }
-            }
-            getEl('current-score').innerText = score;
-            getEl('current-streak').innerText = streak;
-            getEl('next-container').classList.remove('hidden');
         }
 
         function startTimer() {
             clearInterval(timerInterval);
-            const total = isGracePeriod ? 50 : 240;
+            const total = timePerQuestion;
             timerInterval = setInterval(() => {
-                if (isTimerFrozen) return;
-                timeLeft--;
-                const bar = getEl('timer-bar');
-                if (bar) bar.style.width = (timeLeft / total) * 100 + '%';
+                timeLeft -= 0.1;
+                const percent = (timeLeft / total) * 100;
+                getEl('timer-bar').style.width = percent + '%';
                 
-                if (!isSummaryMode && !isGracePeriod && timeLeft === 80 && canAnswer) {
-                    const q = currentQueue[currentIndex];
-                    const buttons = getEl('choices-container').querySelectorAll('button');
-                    let removed = 0;
-                    buttons.forEach(btn => {
-                        if (!btn.innerText.includes(q.a[q.c]) && removed < 2) {
-                            btn.style.opacity = '0.2'; btn.disabled = true; removed++;
-                        }
-                    });
-                    getEl('riya-speech').innerText = "8s left! I struck out two wrong answers!";
-                }
-
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
-                    if (!isSummaryMode) {
-                        if (!isGracePeriod) startGracePeriod();
-                        else handleTimeout();
-                    } else evaluateSummary();
+                    handleChoice(-1); // Timeout is a wrong answer
                 }
             }, 100);
         }
 
-        function startGracePeriod() {
-            isGracePeriod = true; timeLeft = 50;
-            getEl('riya-speech').innerText = "⏰ TIME IS UP! Pick now! 5s left!";
-            playSfx('wrong');
-            getEl('timer-bar').classList.replace('bg-indigo-500', 'bg-rose-500');
-            startTimer();
-        }
+        function handleChoice(idx) {
+            if (!canAnswer) return;
+            canAnswer = false;
+            clearInterval(timerInterval);
 
-        function handleTimeout() {
-            canAnswer = false; streak = 0; document.body.classList.add('wrong-mode');
-            setRiyaState('timeout'); playSfx('wrong');
-            const q = currentQueue[currentIndex];
-            currentQueue.push({...q, isRetry: true});
-            getEl('riya-speech').innerText = "Time's up! Back in the queue.";
-            getEl('current-streak').innerText = streak;
+            const q = quizData[currentIndex];
+            const correctIdx = q.c;
+            const isCorrect = idx === correctIdx;
+            
+            const buttons = getEl('choices-container').querySelectorAll('button');
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === correctIdx) {
+                    btn.classList.add('bg-emerald-50', 'border-emerald-500', 'text-emerald-700');
+                } else if (i === idx && !isCorrect) {
+                    btn.classList.add('bg-rose-50', 'border-rose-500', 'text-rose-700');
+                }
+            });
+
+            if (isCorrect) {
+                correctXP += 4;
+                consecutiveWrong = 0;
+                getEl('riya-speech').innerText = "Excellent calculation! Keep that focus up.";
+                triggerConfetti();
+            } else {
+                consecutiveWrong++;
+                let penalty = (consecutiveWrong >= 3) ? 2 : 1;
+                punishmentXP += penalty;
+                
+                getEl('game-container').classList.add('wrong-shake');
+                getEl('riya-speech').innerHTML = `Wrong! <span class="text-rose-600">+${penalty} Punishment</span>. ${consecutiveWrong >= 3 ? "<b>3 in a row!</b> Penalty increased." : ""}`;
+            }
+
+            performanceLog.push({
+                question: q.q,
+                userAnswer: idx === -1 ? "Timeout" : q.a[idx],
+                correctAnswer: q.a[q.c],
+                isCorrect: isCorrect
+            });
+
+            getEl('current-score').innerText = correctXP;
+            getEl('punishment-score').innerText = punishmentXP;
             getEl('next-container').classList.remove('hidden');
         }
 
-        function useFreeze() {
-            if (freezeCharges <= 0 || isTimerFrozen || !canAnswer || isSummaryMode) return;
-            freezeCharges--; isTimerFrozen = true; clearInterval(timerInterval);
-            updateFreezeUI(); playSfx('freeze');
-            getEl('timer-bar').classList.add('frozen-timer');
-            getEl('riya-speech').innerText = "❄️ TIME FROZEN! Take your time! ❄️";
+        function nextQuestion() {
+            currentIndex++;
+            loadQuestion();
         }
 
-        function updateFreezeUI() {
-            getEl('freeze-count').innerText = freezeCharges;
-            if (freezeCharges <= 0) getEl('freeze-btn').classList.add('opacity-50');
-        }
-
-        function setupSummaryMode() {
-            getEl('quiz-content').classList.add('hidden');
-            getEl('comprehension-content').classList.remove('hidden');
-            getEl('submit-summary').classList.remove('hidden');
-            getEl('freeze-btn').classList.add('hidden');
-            const q = summaryData[summaryIndex];
-            getEl('passage-text').innerText = q.text;
-            getEl('progress-text').innerText = `Story ${summaryIndex + 1}/3`;
-            getEl('riya-speech').innerText = "Summarize it in exactly 50 words.";
-
-            const grid = getEl('summary-grid');
-            grid.innerHTML = '';
-            for (let i = 0; i < 50; i++) {
-                const input = document.createElement('input');
-                input.className = 'grid-box';
-                input.id = `box-${i}`;
-                input.setAttribute('inputmode', 'text');
-                input.oninput = (e) => {
-                    if (e.target.value.includes(' ')) {
-                        e.target.value = e.target.value.trim();
-                        if (i < 49) getEl(`box-${i+1}`).focus();
-                    }
-                    updateWordCount();
-                };
-                grid.appendChild(input);
-            }
-            timeLeft = 6000; startTimer();
-        }
-
-        function evaluateSummary() { handleChoice(true); getEl('riya-speech').innerHTML = `Summary XP earned! <br><br><b>Model:</b><br>${summaryData[summaryIndex].model}`; getEl('submit-summary').classList.add('hidden'); }
-        function nextQuestion() { if (!isSummaryMode) currentIndex++; else summaryIndex++; loadQuestion(); }
-        
-        function showFinalResults() {
+        function endQuiz() {
             getEl('quiz-screen').classList.add('hidden');
             getEl('result-screen').classList.remove('hidden');
-            getEl('final-score').innerText = score;
-            const list = getEl('mistakes-list');
-            if (mistakes.length > 0) {
-                getEl('revision-zone').classList.remove('hidden');
-                list.innerHTML = '';
-                mistakes.forEach(m => {
-                    list.innerHTML += `<div class="p-2 border-b border-slate-100 text-[10px]"><p class="font-bold text-slate-800">${m.q}</p><p class="text-emerald-600 font-bold">✅ Correct: ${m.correct}</p></div>`;
-                });
-            }
+            getEl('res-class').innerText = selectedClass;
+            getEl('final-score').innerText = correctXP;
+            getEl('final-punishment').innerText = punishmentXP;
+
+            const summaryList = getEl('summary-list');
+            summaryList.innerHTML = '';
+            performanceLog.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = `result-row p-3 rounded-xl shadow-sm ${item.isCorrect ? 'result-correct' : 'result-wrong'}`;
+                div.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <span class="text-[9px] font-black text-slate-400">Q${index+1}</span>
+                        <span class="text-[9px] font-black ${item.isCorrect ? 'text-emerald-500' : 'text-rose-500'} uppercase">${item.isCorrect ? 'Correct' : 'Incorrect'}</span>
+                    </div>
+                    <p class="text-[10px] font-bold text-slate-800 my-1">${item.question}</p>
+                    <div class="text-[9px] text-slate-500">
+                        ${!item.isCorrect ? `<span>Picked: <span class="text-rose-600">${item.userAnswer}</span></span><br>` : ''}
+                        <span>Answer: <span class="text-emerald-600 font-bold">${item.correctAnswer}</span></span>
+                    </div>
+                `;
+                summaryList.appendChild(div);
+            });
         }
 
-        function setRiyaState(state) {
-            const avatar = getEl('riya-avatar-container');
-            const mouth = getEl('riya-mouth');
-            const riyaAvatar = getEl('riya-avatar');
-            if (!riyaAvatar || !mouth) return;
-            riyaAvatar.classList.remove('riya-happy', 'riya-idle');
-            if (state === 'thinking') { riyaAvatar.classList.add('riya-idle'); mouth.setAttribute('d', 'M42 60 Q50 60 58 60'); }
-            else if (state === 'happy') { riyaAvatar.classList.add('riya-happy'); mouth.setAttribute('d', 'M40 60 Q50 70 60 60'); }
-            else if (state === 'sad') mouth.setAttribute('d', 'M42 65 Q50 55 58 65');
-            else if (state === 'timeout') mouth.setAttribute('d', 'M42 60 Q50 60 58 60');
-        }
-
-        function shuffle(arr) { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
-        function triggerConfetti(big) { confetti({ particleCount: big ? 150 : 60, spread: 70, origin: { y: 0.6 } }); }
-        function updateWordCount() {
-            let w = 0; for(let i=0; i<50; i++) if(getEl(`box-${i}`).value.trim()) w++;
-            getEl('word-count').innerText = `${w} / 50`;
+        function triggerConfetti() {
+            confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 }, colors: ['#6366F1', '#10B981'] });
         }
     </script>
 </body>
