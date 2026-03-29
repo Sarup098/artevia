@@ -35,24 +35,18 @@
             border-bottom-width: 4px;
         }
         .choice-btn:active:not(:disabled) { transform: translateY(2px); border-bottom-width: 0px; }
+        .choice-btn.selected {
+            background-color: #e0e7ff !important;
+            border-color: #6366f1 !important;
+            transform: translateY(2px);
+            border-bottom-width: 0px;
+        }
 
         .riya-idle { animation: riya-wave 3s ease-in-out infinite; }
         @keyframes riya-wave { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-3deg); } 75% { transform: rotate(3deg); } }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        .wrong-shake {
-            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-            background-color: #fee2e2 !important;
-        }
-
-        @keyframes shake {
-            10%, 90% { transform: translate3d(-1px, 0, 0); }
-            20%, 80% { transform: translate3d(2px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-            40%, 60% { transform: translate3d(4px, 0, 0); }
-        }
-
         .result-row {
             border-left: 4px solid transparent;
         }
@@ -73,7 +67,7 @@
 
             <div class="bg-indigo-50 p-6 rounded-[2rem] border-2 border-indigo-100 mb-8 w-full">
                 <p class="text-indigo-900 font-bold mb-6 text-sm leading-relaxed">
-                    "Welcome students! I am Riya. Please select your class to begin the challenge. The difficulty and timing will adjust to your level."
+                    "Welcome students! I am Riya. This is a formal test. You will not see your score or correct answers until the very end. Select your class to begin."
                 </p>
                 
                 <div class="grid grid-cols-2 gap-3 mb-6">
@@ -92,13 +86,9 @@
             <!-- HUD -->
             <div class="p-4 pb-2 flex justify-between items-center bg-white border-b border-slate-50">
                 <div class="flex items-center space-x-2">
-                    <div class="bg-slate-50 px-3 py-1 rounded-xl border border-slate-100 shadow-sm">
-                        <span class="text-[7px] font-black text-slate-400 block uppercase">Correct XP</span>
-                        <span class="text-md font-black text-emerald-600" id="current-score">0</span>
-                    </div>
-                    <div class="bg-amber-50 px-3 py-1 rounded-xl border border-amber-100 shadow-sm">
-                        <span class="text-[7px] font-black text-amber-500 block uppercase">Punishment</span>
-                        <span class="text-md font-black text-amber-600" id="punishment-score">0</span>
+                    <div class="bg-slate-100 px-3 py-1 rounded-xl border border-slate-200 shadow-sm">
+                        <span class="text-[7px] font-black text-slate-400 block uppercase">Status</span>
+                        <span class="text-xs font-black text-slate-600 uppercase tracking-widest">Exam in Progress</span>
                     </div>
                 </div>
                 <div class="text-right flex flex-col items-end">
@@ -133,8 +123,8 @@
                 </div>
 
                 <div id="next-container" class="hidden mt-4">
-                    <button onclick="nextQuestion()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-xl shadow-lg uppercase text-xs flex items-center justify-center space-x-2">
-                        <span>Next Question</span>
+                    <button id="next-btn-text" onclick="nextQuestion()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-xl shadow-lg uppercase text-xs flex items-center justify-center space-x-2">
+                        <span>Save & Next</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                     </button>
                 </div>
@@ -145,14 +135,14 @@
         <div id="result-screen" class="hidden p-6 overflow-y-auto flex-1 flex flex-col">
             <div class="text-center mb-6">
                 <div class="text-5xl mb-2">📊</div>
-                <h2 class="text-2xl font-black text-indigo-900 uppercase tracking-tighter leading-none">MASTERY REPORT</h2>
-                <p class="text-slate-400 font-bold text-[9px] uppercase tracking-widest mt-2">Evaluation for Class <span id="res-class"></span></p>
+                <h2 class="text-2xl font-black text-indigo-900 uppercase tracking-tighter leading-none">FINAL MASTERY REPORT</h2>
+                <p class="text-slate-400 font-bold text-[9px] uppercase tracking-widest mt-2">Class <span id="res-class"></span> • Assessment Complete</p>
             </div>
             
             <div class="grid grid-cols-2 gap-4 mb-6">
                 <div class="bg-emerald-50 p-4 rounded-3xl border-2 border-emerald-100 text-center">
                     <div class="text-3xl font-black text-emerald-600" id="final-score">0</div>
-                    <div class="text-[8px] font-black text-emerald-400 uppercase">XP Earned</div>
+                    <div class="text-[8px] font-black text-emerald-400 uppercase">XP Score</div>
                 </div>
                 <div class="bg-amber-50 p-4 rounded-3xl border-2 border-amber-100 text-center">
                     <div class="text-3xl font-black text-amber-600" id="final-punishment">0</div>
@@ -161,19 +151,19 @@
             </div>
 
             <div class="flex-1">
-                <h3 class="font-black text-slate-800 uppercase text-[10px] mb-3 flex items-center"><span class="mr-2">📝</span> PERFORMANCE LOG</h3>
+                <h3 class="font-black text-slate-800 uppercase text-[10px] mb-3 flex items-center"><span class="mr-2">📚</span> PERFORMANCE REVIEW</h3>
                 <div id="summary-list" class="space-y-2 pb-6"></div>
             </div>
 
-            <button onclick="location.reload()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl uppercase text-xs mt-auto">New Session</button>
+            <button onclick="location.reload()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl uppercase text-xs mt-auto">New Attempt</button>
         </div>
     </div>
 
     <script>
-        const quizData = [
+        const originalQuizData = [
             { q: "5.6 − 2.1 =", a: ["3.5", "3.6", "3.4", "3.7"], c: 0 },
             { q: "1.5 × 2.2 =", a: ["3.2", "3.3", "3.4", "3.5"], c: 1 },
-            { q: "1 1/7 − 3/4 =", a: ["3/28", "11/28", "7/28", "9/28"], c: 1 }, // Correct key is 11/28 based on math (8/7 - 3/4 = 32/28 - 21/28)
+            { q: "1 1/7 − 3/4 =", a: ["3/28", "11/28", "7/28", "9/28"], c: 1 },
             { q: "5.6 − 4/2 =", a: ["3.6", "3.5", "3.4", "3.2"], c: 0 },
             { q: "2.75 + 3.25 =", a: ["5", "6", "5.5", "6.5"], c: 1 },
             { q: "3/5 + 2/5 =", a: ["5/5", "4/5", "1", "Both A & C"], c: 3 },
@@ -213,28 +203,35 @@
             { q: "Value of 15 − 7 + 3 =", a: ["11", "10", "9", "8"], c: 0 }
         ];
 
+        let shuffledQuiz = [];
+        let currentIndex = 0;
         let selectedClass = null;
         let timePerQuestion = 0;
-        let currentIndex = 0;
-        let correctXP = 0;
-        let punishmentXP = 0;
-        let consecutiveWrong = 0;
         let timeLeft = 0;
         let timerInterval;
         let performanceLog = [];
         let canAnswer = true;
+        
+        // Scoring State
+        let totalXP = 0;
+        let punishmentXP = 0;
+        let consecutiveWrong = 0;
 
         const getEl = (id) => document.getElementById(id);
 
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
         function selectClass(val) {
             selectedClass = val;
-            const config = {
-                6: 80, // 1m 20s
-                7: 60, // 1m
-                8: 55, // 55s
-                9: 50  // 50s
-            };
+            const config = { 6: 70, 7: 50, 8: 45, 9: 40 };
             timePerQuestion = config[val];
+            shuffledQuiz = shuffleArray([...originalQuizData]);
             getEl('start-screen').classList.add('hidden');
             getEl('quiz-screen').classList.remove('hidden');
             getEl('class-badge').innerText = `Class ${val}`;
@@ -242,26 +239,27 @@
         }
 
         function loadQuestion() {
-            if (currentIndex >= quizData.length) {
-                endQuiz();
+            if (currentIndex >= shuffledQuiz.length) {
+                showSubmitScreen();
                 return;
             }
             canAnswer = true;
             getEl('next-container').classList.add('hidden');
-            getEl('game-container').classList.remove('wrong-shake');
             
-            const q = quizData[currentIndex];
+            const q = shuffledQuiz[currentIndex];
             getEl('question-text').innerText = q.q;
-            getEl('progress-text').innerText = `Step ${currentIndex + 1}/${quizData.length}`;
-            getEl('riya-speech').innerText = "Look at the numbers carefully. Accuracy is more important than speed!";
+            getEl('progress-text').innerText = `Step ${currentIndex + 1}/${shuffledQuiz.length}`;
+            getEl('riya-speech').innerText = "Exam Mode Active. Choose the best answer and proceed.";
 
+            const displayOptions = shuffleArray([...q.a]);
             const container = getEl('choices-container');
             container.innerHTML = '';
-            q.a.forEach((text, i) => {
+            
+            displayOptions.forEach((text, i) => {
                 const btn = document.createElement('button');
                 btn.className = 'choice-btn bg-white border-2 border-slate-100 p-4 rounded-2xl text-left font-bold text-slate-700 shadow-sm w-full flex items-center';
-                btn.innerHTML = `<span class="bg-indigo-50 text-indigo-600 w-8 h-8 inline-flex items-center justify-center rounded-lg mr-4 font-black">${String.fromCharCode(65 + i)}</span><span>${text}</span>`;
-                btn.onclick = () => handleChoice(i);
+                btn.innerHTML = `<span class="bg-slate-50 text-slate-400 w-8 h-8 inline-flex items-center justify-center rounded-lg mr-4 font-black">${String.fromCharCode(65 + i)}</span><span>${text}</span>`;
+                btn.onclick = (e) => handleSelection(text, btn);
                 container.appendChild(btn);
             });
 
@@ -274,59 +272,45 @@
             const total = timePerQuestion;
             timerInterval = setInterval(() => {
                 timeLeft -= 0.1;
-                const percent = (timeLeft / total) * 100;
-                getEl('timer-bar').style.width = percent + '%';
-                
+                getEl('timer-bar').style.width = (timeLeft / total) * 100 + '%';
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
-                    handleChoice(-1); // Timeout is a wrong answer
+                    handleSelection("Timeout", null);
                 }
             }, 100);
         }
 
-        function handleChoice(idx) {
+        function handleSelection(pickedText, btnElement) {
             if (!canAnswer) return;
             canAnswer = false;
             clearInterval(timerInterval);
 
-            const q = quizData[currentIndex];
-            const correctIdx = q.c;
-            const isCorrect = idx === correctIdx;
-            
-            const buttons = getEl('choices-container').querySelectorAll('button');
-            buttons.forEach((btn, i) => {
-                btn.disabled = true;
-                if (i === correctIdx) {
-                    btn.classList.add('bg-emerald-50', 'border-emerald-500', 'text-emerald-700');
-                } else if (i === idx && !isCorrect) {
-                    btn.classList.add('bg-rose-50', 'border-rose-500', 'text-rose-700');
-                }
-            });
-
-            if (isCorrect) {
-                correctXP += 4;
-                consecutiveWrong = 0;
-                getEl('riya-speech').innerText = "Excellent calculation! Keep that focus up.";
-                triggerConfetti();
-            } else {
-                consecutiveWrong++;
-                let penalty = (consecutiveWrong >= 3) ? 2 : 1;
-                punishmentXP += penalty;
-                
-                getEl('game-container').classList.add('wrong-shake');
-                getEl('riya-speech').innerHTML = `Wrong! <span class="text-rose-600">+${penalty} Punishment</span>. ${consecutiveWrong >= 3 ? "<b>3 in a row!</b> Penalty increased." : ""}`;
+            // Visual feedback: only select, don't show correct/wrong
+            if (btnElement) {
+                btnElement.classList.add('selected');
             }
 
+            const q = shuffledQuiz[currentIndex];
+            const correctText = q.a[q.c];
+            const isCorrect = pickedText === correctText;
+
+            // Log internally
             performanceLog.push({
                 question: q.q,
-                userAnswer: idx === -1 ? "Timeout" : q.a[idx],
-                correctAnswer: q.a[q.c],
-                isCorrect: isCorrect
+                userAnswer: pickedText,
+                correctAnswer: correctText,
+                isCorrect: isCorrect,
+                speedBonus: timeLeft > 8 // Used for final score calculation
             });
 
-            getEl('current-score').innerText = correctXP;
-            getEl('punishment-score').innerText = punishmentXP;
+            // Update UI
+            getEl('riya-speech').innerText = "Response recorded. Click 'Next' to continue the exam.";
             getEl('next-container').classList.remove('hidden');
+            
+            // Check if last question
+            if (currentIndex === shuffledQuiz.length - 1) {
+                getEl('next-btn-text').innerHTML = "<span>Finish Exam</span>";
+            }
         }
 
         function nextQuestion() {
@@ -334,11 +318,39 @@
             loadQuestion();
         }
 
+        function showSubmitScreen() {
+            getEl('quiz-content').innerHTML = `
+                <div class="text-center py-12">
+                    <div class="text-6xl mb-4">📝</div>
+                    <h2 class="text-2xl font-black text-slate-800 mb-2">PAPER COMPLETED</h2>
+                    <p class="text-slate-500 text-sm mb-8 px-6">Are you sure you want to submit your answers for evaluation?</p>
+                    <button onclick="calculateAndEnd()" class="bg-indigo-600 text-white font-black px-12 py-4 rounded-2xl shadow-xl hover:scale-105 transition-all">SUBMIT PAPER</button>
+                </div>
+            `;
+            getEl('next-container').classList.add('hidden');
+            getEl('riya-speech').innerText = "Excellent focus. Whenever you are ready, submit your paper for the final report.";
+        }
+
+        function calculateAndEnd() {
+            // Final score calculations happen here
+            performanceLog.forEach(log => {
+                if (log.isCorrect) {
+                    totalXP += log.speedBonus ? 4 : 2;
+                    consecutiveWrong = 0;
+                } else {
+                    consecutiveWrong++;
+                    punishmentXP += (consecutiveWrong >= 3) ? 2 : 1;
+                }
+            });
+
+            endQuiz();
+        }
+
         function endQuiz() {
             getEl('quiz-screen').classList.add('hidden');
             getEl('result-screen').classList.remove('hidden');
             getEl('res-class').innerText = selectedClass;
-            getEl('final-score').innerText = correctXP;
+            getEl('final-score').innerText = totalXP;
             getEl('final-punishment').innerText = punishmentXP;
 
             const summaryList = getEl('summary-list');
@@ -353,16 +365,18 @@
                     </div>
                     <p class="text-[10px] font-bold text-slate-800 my-1">${item.question}</p>
                     <div class="text-[9px] text-slate-500">
-                        ${!item.isCorrect ? `<span>Picked: <span class="text-rose-600">${item.userAnswer}</span></span><br>` : ''}
                         <span>Answer: <span class="text-emerald-600 font-bold">${item.correctAnswer}</span></span>
+                        ${!item.isCorrect ? `<br><span>Your Choice: <span class="text-rose-600">${item.userAnswer}</span></span>` : ''}
                     </div>
                 `;
                 summaryList.appendChild(div);
             });
+
+            if (totalXP > 100) triggerConfetti();
         }
 
         function triggerConfetti() {
-            confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 }, colors: ['#6366F1', '#10B981'] });
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#6366F1', '#10B981'] });
         }
     </script>
 </body>
