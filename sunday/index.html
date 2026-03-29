@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Artevia Mastery: Tuition Quest</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap');
+        
+        :root {
+            --primary: #6366f1;
+            --success: #10b981;
+            --error: #ef4444;
+            --punishment: #f59e0b;
+            --ice: #60a5fa;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: #f1f5f9;
+            overscroll-behavior-y: contain;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .game-card {
+            border-radius: 2.5rem;
+            box-shadow: 0 10px 40px -10px rgba(99, 102, 241, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .choice-btn {
+            touch-action: manipulation;
+            transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-bottom-width: 4px;
+        }
+        .choice-btn:active:not(:disabled) { transform: translateY(2px); border-bottom-width: 0px; }
+        .choice-btn.selected {
+            background-color: #e0e7ff !important;
+            border-color: #6366f1 !important;
+            transform: translateY(2px);
+            border-bottom-width: 0px;
+        }
+
+        .riya-idle { animation: riya-wave 3s ease-in-out infinite; }
+        @keyframes riya-wave { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-3deg); } 75% { transform: rotate(3deg); } }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        .result-row { border-left: 4px solid transparent; }
+        .result-correct { border-left-color: var(--success); background: #ecfdf5; }
+        .result-wrong { border-left-color: var(--error); background: #fef2f2; }
+
+        .frozen-timer { 
+            box-shadow: 0 0 15px var(--ice); 
+            background-color: var(--ice) !important;
+            animation: pulse-blue 2s infinite;
+        }
+        @keyframes pulse-blue { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+
+        .hangman-letter {
+            display: inline-block;
+            width: 1.2rem;
+            border-bottom: 2px solid #cbd5e1;
+            margin: 0 2px;
+            text-align: center;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 14px;
+            color: #475569;
+        }
+
+        input:focus { outline: none; border-color: #6366f1; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-3 sm:p-6">
+
+    <div id="game-container" class="w-full max-w-xl bg-white game-card overflow-hidden border-4 border-white relative min-h-[90vh] flex flex-col transition-all duration-300">
+        
+        <!-- Start Screen -->
+        <div id="start-screen" class="flex-1 flex flex-col items-center justify-center p-6 text-center">
+            <div class="mb-6">
+                <div class="text-xs font-black text-indigo-500 uppercase tracking-[0.3em] mb-2">Artevia Studio Presents</div>
+                <h1 class="text-3xl font-black text-slate-900 leading-none tracking-tighter italic uppercase">Mastery Quest</h1>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">English • AI • Prompting</p>
+            </div>
+
+            <div class="bg-indigo-50 p-6 rounded-[2rem] border-2 border-indigo-100 mb-8 w-full relative">
+                <div class="absolute -top-3 -right-3 bg-rose-500 text-white text-[9px] font-black px-4 py-1 rounded-full shadow-lg rotate-12 uppercase">Target: 90+</div>
+                <p class="text-indigo-900 font-bold mb-6 text-sm leading-relaxed text-center">
+                    "Welcome students! Score 90+ to pass. Sections include Literary Devices, AI, and Prompting. Fill-in-the-blanks are <b>Hangman Style</b>. 7 Freezes ❄️ available."
+                </p>
+                
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <button onclick="selectClass(6)" class="bg-white border-2 border-indigo-200 py-3 rounded-2xl font-black text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all">Class 6 (70s)</button>
+                    <button onclick="selectClass(7)" class="bg-white border-2 border-indigo-200 py-3 rounded-2xl font-black text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all">Class 7 (50s)</button>
+                    <button onclick="selectClass(8)" class="bg-white border-2 border-indigo-200 py-3 rounded-2xl font-black text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all">Class 8 (45s)</button>
+                    <button onclick="selectClass(9)" class="bg-white border-2 border-indigo-200 py-3 rounded-2xl font-black text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all">Class 9 (40s)</button>
+                </div>
+            </div>
+            
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Namphing Tuition Center Excellence</p>
+        </div>
+
+        <!-- Quiz Interface -->
+        <div id="quiz-screen" class="hidden flex-1 flex flex-col">
+            <div class="p-4 pb-2 flex justify-between items-center bg-white border-b border-slate-50">
+                <div class="flex items-center space-x-2">
+                    <div class="bg-slate-100 px-3 py-1 rounded-xl border border-slate-200 shadow-sm">
+                        <span class="text-[7px] font-black text-slate-400 block uppercase">Status</span>
+                        <span class="text-xs font-black text-slate-600 uppercase tracking-widest">Paper in Progress</span>
+                    </div>
+                </div>
+                <div class="text-right flex flex-col items-end">
+                    <div id="class-badge" class="bg-indigo-600 text-white px-3 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest mb-1 shadow-sm">Class</div>
+                    <div id="progress-text" class="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Step 1/50</div>
+                </div>
+            </div>
+
+            <!-- Ability Bar -->
+            <div id="ability-bar" class="px-4 py-2 bg-slate-50 border-b border-slate-100 flex justify-center">
+                <button id="freeze-btn" onclick="useFreeze()" class="flex items-center space-x-2 bg-white border-2 border-blue-100 px-4 py-1.5 rounded-2xl shadow-sm active:scale-95 transition-all">
+                    <span class="text-sm">❄️</span>
+                    <span class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Freeze (<span id="freeze-count">7</span> left)</span>
+                </button>
+            </div>
+
+            <div class="w-full h-1.5 bg-slate-100">
+                <div id="timer-bar" class="h-full bg-indigo-500 transition-all duration-100" style="width: 100%"></div>
+            </div>
+
+            <div class="p-4 flex-1 flex flex-col">
+                <div class="flex items-start space-x-3 mb-4">
+                    <div id="riya-avatar" class="w-12 h-12 shrink-0 riya-idle">
+                        <svg viewBox="0 0 100 100">
+                            <circle cx="50" cy="45" r="35" fill="#FFD4B2" />
+                            <path d="M15 45 Q15 10 50 10 Q85 10 85 45" fill="#4B2C20" />
+                            <circle id="eye-l" cx="35" cy="45" r="3" fill="#333" />
+                            <circle id="eye-r" cx="65" cy="45" r="3" fill="#333" />
+                            <path id="riya-mouth" d="M42 60 Q50 65 58 60" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                    <div class="bg-indigo-50 border border-indigo-100 p-3 rounded-2xl rounded-tl-none shadow-sm flex-1">
+                        <p id="riya-speech" class="text-[10px] font-bold text-indigo-900 leading-snug"></p>
+                    </div>
+                </div>
+
+                <div id="quiz-content" class="flex-1 flex flex-col">
+                    <div id="question-text" class="text-md font-black text-slate-800 mb-6 text-center py-6 px-4 bg-slate-50 rounded-3xl border-2 border-slate-100"></div>
+                    
+                    <!-- MCQ Options Container -->
+                    <div id="choices-container" class="grid grid-cols-1 gap-3"></div>
+
+                    <!-- Hangman/Fill Container -->
+                    <div id="fill-container" class="hidden flex flex-col items-center">
+                        <div id="word-skeleton" class="mb-6 flex flex-wrap justify-center gap-y-2"></div>
+                        <input type="text" id="fill-input" class="w-full max-w-xs bg-slate-50 border-2 border-slate-200 rounded-xl p-3 text-center font-black text-lg tracking-widest uppercase" placeholder="TYPE HERE" autocomplete="off">
+                    </div>
+                </div>
+
+                <div id="next-container" class="hidden mt-4">
+                    <button id="next-btn-text" onclick="handleNextStep()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-xl shadow-lg uppercase text-xs flex items-center justify-center space-x-2">
+                        <span id="next-btn-label">Save & Next</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="hidden p-6 overflow-y-auto flex-1 flex flex-col">
+            <div class="text-center mb-6">
+                <div class="text-5xl mb-2">📊</div>
+                <h2 class="text-2xl font-black text-indigo-900 uppercase tracking-tighter leading-none">MASTERY LOG</h2>
+                <p class="text-slate-400 font-bold text-[9px] uppercase tracking-widest mt-2">Class <span id="res-class"></span> Assessment Complete</p>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="bg-emerald-50 p-4 rounded-3xl border-2 border-emerald-100 text-center">
+                    <div class="text-3xl font-black text-emerald-600" id="final-score">0</div>
+                    <div class="text-[8px] font-black text-emerald-400 uppercase">XP Score</div>
+                </div>
+                <div class="bg-amber-50 p-4 rounded-3xl border-2 border-amber-100 text-center">
+                    <div class="text-3xl font-black text-amber-600" id="final-punishment">0</div>
+                    <div class="text-[8px] font-black text-amber-400 uppercase">Punishment Score</div>
+                </div>
+            </div>
+
+            <div class="flex-1">
+                <h3 class="font-black text-slate-800 uppercase text-[10px] mb-3 flex items-center"><span class="mr-2">📚</span> PERFORMANCE REVIEW</h3>
+                <div id="summary-list" class="space-y-2 pb-6"></div>
+            </div>
+
+            <button onclick="location.reload()" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl uppercase text-xs mt-auto">New Session</button>
+        </div>
+    </div>
+
+    <script>
+        const originalQuizData = [
+            // --- Section A: Literary Devices ---
+            { type: 'mcq', q: "A simile compares two things using:", a: ["Because", "Like or As", "And", "But"], c: 1 },
+            { type: 'mcq', q: "“Time is a thief” is an example of:", a: ["Simile", "Metaphor", "Hyperbole", "Irony"], c: 1 },
+            { type: 'mcq', q: "Giving human qualities to non-living things is:", a: ["Imagery", "Personification", "Symbolism", "Oxymoron"], c: 1 },
+            { type: 'mcq', q: "“I’ve told you a million times” is:", a: ["Irony", "Hyperbole", "Alliteration", "Metaphor"], c: 1 },
+            { type: 'mcq', q: "“Deafening silence” is an example of:", a: ["Irony", "Oxymoron", "Simile", "Symbolism"], c: 1 },
+            { type: 'mcq', q: "Repetition of initial consonant sounds is:", a: ["Imagery", "Alliteration", "Onomatopoeia", "Hyperbole"], c: 1 },
+            { type: 'mcq', q: "Words like “buzz”, “bang” represent:", a: ["Imagery", "Symbolism", "Onomatopoeia", "Irony"], c: 2 },
+            { type: 'mcq', q: "“The stars danced in the sky” is:", a: ["Hyperbole", "Personification", "Metaphor", "Irony"], c: 1 },
+            { type: 'mcq', q: "Imagery helps to:", a: ["Add humor", "Create sensory experience", "Show contrast", "Show exaggeration"], c: 1 },
+            { type: 'mcq', q: "A symbol represents:", a: ["Only literal meaning", "Hidden meaning", "Sound", "Action"], c: 1 },
+            // --- AI Basics ---
+            { type: 'mcq', q: "A computer normally works on:", a: ["Emotions", "Logic and instructions", "Guesswork", "Feelings"], c: 1 },
+            { type: 'mcq', q: "Can computers think like humans?", a: ["Yes", "No", "Sometimes", "Only at night"], c: 1 },
+            { type: 'mcq', q: "Machine Learning is:", a: ["Manual coding only", "Learning from data", "Hardware building", "Internet browsing"], c: 1 },
+            { type: 'mcq', q: "Supervised learning uses:", a: ["No data", "Unlabeled data", "Labeled data", "Random guessing"], c: 2 },
+            { type: 'mcq', q: "Unsupervised learning works with:", a: ["Labeled data", "Structured answers", "Unlabeled data", "Human emotions"], c: 2 },
+            { type: 'mcq', q: "Reinforcement learning is based on:", a: ["Punishment and reward", "Copying humans", "Memory only", "Hardware"], c: 0 },
+            { type: 'mcq', q: "AI stands for:", a: ["Automatic Input", "Artificial Intelligence", "Advanced Internet", "Algorithm Interface"], c: 1 },
+            { type: 'mcq', q: "Which is NOT a type of ML?", a: ["Supervised", "Unsupervised", "Reinforcement", "Emotional Learning"], c: 3 },
+            { type: 'mcq', q: "AI systems mainly depend on:", a: ["Magic", "Data", "Dreams", "Luck"], c: 1 },
+            { type: 'mcq', q: "Computers follow:", a: ["Instinct", "Instructions", "Feelings", "Opinions"], c: 1 },
+            // --- Prompting ---
+            { type: 'mcq', q: "GPT stands for:", a: ["General Processing Tool", "Generative Pretrained Transformer", "Global Programming Tech", "Graph Processing Type"], c: 1 },
+            { type: 'mcq', q: "A good prompt must be:", a: ["Confusing", "Clear", "Short only", "Random"], c: 1 },
+            { type: 'mcq', q: "Adding details in prompts improves:", a: ["Confusion", "Output quality", "Errors", "Length only"], c: 1 },
+            { type: 'mcq', q: "Tone in a prompt means:", a: ["Grammar", "Style of response", "Length", "Topic"], c: 1 },
+            { type: 'mcq', q: "Context in a prompt means:", a: ["Extra useless info", "Background information", "Only examples", "Only format"], c: 1 },
+            { type: 'mcq', q: "Which is a good prompt?", a: ["Write something", "Explain AI clearly in 100 words for beginners", "AI", "Tell anything"], c: 1 },
+            { type: 'mcq', q: "Constraints in prompts help:", a: ["Limit response", "Increase confusion", "Remove meaning", "Delete content"], c: 0 },
+            { type: 'mcq', q: "Example-based prompts:", a: ["Reduce clarity", "Improve output", "Confuse AI", "Slow response"], c: 1 },
+            { type: 'mcq', q: "Prompt engineering is:", a: ["Coding hardware", "Writing effective prompts", "Internet surfing", "Graphic design"], c: 1 },
+            { type: 'mcq', q: "A structured prompt includes:", a: ["Only topic", "Topic + details + format", "Only keywords", "Only examples"], c: 1 },
+            // --- Section B: True/False ---
+            { type: 'tf', q: "A metaphor uses “like” or “as”.", a: ["True", "False"], c: 1 },
+            { type: 'tf', q: "Hyperbole is exaggeration.", a: ["True", "False"], c: 0 },
+            { type: 'tf', q: "Computers can think independently like humans.", a: ["True", "False"], c: 1 },
+            { type: 'tf', q: "Supervised learning uses labeled data.", a: ["True", "False"], c: 0 },
+            { type: 'tf', q: "AI depends on data.", a: ["True", "False"], c: 0 },
+            { type: 'tf', q: "Prompt clarity improves results.", a: ["True", "False"], c: 0 },
+            { type: 'tf', q: "Onomatopoeia relates to sound words.", a: ["True", "False"], c: 0 },
+            { type: 'tf', q: "Reinforcement learning uses reward systems.", a: ["True", "False"], c: 0 },
+            { type: 'tf', q: "A vague prompt gives better output.", a: ["True", "False"], c: 1 },
+            { type: 'tf', q: "Tone affects how AI responds.", a: ["True", "False"], c: 0 },
+            // --- Section C: Fill (Hangman Style) ---
+            { type: 'fill', q: "A simile uses ______ or ______ to compare.", answer: "like, as", skeleton: "L I _ E,  A _" },
+            { type: 'fill', q: "“The wind whispered” is an example of ______.", answer: "personification", skeleton: "P _ R _ _ _ _ F _ _ _ _ _ _ N" },
+            { type: 'fill', q: "ML stands for ______ ______.", answer: "machine learning", skeleton: "M _ _ H _ _ E   L _ _ _ _ _ _ G" },
+            { type: 'fill', q: "AI systems learn from ______.", answer: "data", skeleton: "D _ _ A" },
+            { type: 'fill', q: "GPT stands for Generative ______ Transformer.", answer: "pretrained", skeleton: "P _ _ T _ _ _ _ E D" },
+            { type: 'fill', q: "Repetition of sounds is called ______.", answer: "alliteration", skeleton: "A _ _ I _ _ _ _ _ _ _ N" },
+            { type: 'fill', q: "Words like “boom” are ______.", answer: "onomatopoeia", skeleton: "O _ _ M _ _ _ _ _ _ I A" },
+            { type: 'fill', q: "Giving detailed prompts improves ______.", answer: "output quality", skeleton: "O _ _ P _ T   Q _ _ _ _ _ Y" },
+            { type: 'fill', q: "Learning without labels is called ______ learning.", answer: "unsupervised", skeleton: "U _ _ _ P _ _ _ _ _ E D" },
+            { type: 'fill', q: "Background info in prompts is called ______.", answer: "context", skeleton: "C _ _ T _ _ T" }
+        ];
+
+        let shuffledQuiz = [];
+        let currentIndex = 0;
+        let selectedClass = null;
+        let timePerQuestion = 0;
+        let timeLeft = 0;
+        let timerInterval;
+        let performanceLog = [];
+        let canAnswer = true;
+        let freezeCharges = 7;
+        let isTimerFrozen = false;
+        let isGracePeriod = false;
+        
+        let totalXP = 0;
+        let punishmentXP = 0;
+        let streakCount = 0;
+        let autoDoubleActive = false;
+        let consecutiveWrong = 0;
+
+        const getEl = (id) => document.getElementById(id);
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function selectClass(val) {
+            selectedClass = val;
+            const config = { 6: 70, 7: 50, 8: 45, 9: 40 };
+            timePerQuestion = config[val];
+            shuffledQuiz = shuffleArray([...originalQuizData]).map(q => ({...q, isRetry: false}));
+            getEl('start-screen').classList.add('hidden');
+            getEl('quiz-screen').classList.remove('hidden');
+            getEl('class-badge').innerText = `Class ${val}`;
+            updateFreezeUI();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentIndex >= shuffledQuiz.length) {
+                showSubmitScreen();
+                return;
+            }
+            canAnswer = true;
+            isTimerFrozen = false;
+            isGracePeriod = false;
+            getEl('next-container').classList.add('hidden');
+            getEl('timer-bar').classList.remove('frozen-timer', 'bg-rose-500');
+            getEl('timer-bar').classList.add('bg-indigo-500');
+            
+            const q = shuffledQuiz[currentIndex];
+            getEl('question-text').innerText = q.q;
+            getEl('progress-text').innerText = `Step ${currentIndex + 1}/${shuffledQuiz.length}`;
+            getEl('riya-speech').innerText = q.isRetry ? "Mastery loop: Resolve this for 1 XP." : "Exam Mode: Feedback is deferred until submission.";
+
+            getEl('choices-container').classList.add('hidden');
+            getEl('fill-container').classList.add('hidden');
+            getEl('fill-input').value = "";
+
+            if (q.type === 'fill') {
+                getEl('fill-container').classList.remove('hidden');
+                getEl('next-container').classList.remove('hidden');
+                renderSkeleton(q.skeleton);
+            } else {
+                getEl('choices-container').classList.remove('hidden');
+                const displayOptions = (q.type === 'mcq') ? shuffleArray([...q.a]) : [...q.a];
+                const container = getEl('choices-container');
+                container.innerHTML = '';
+                displayOptions.forEach((text, i) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'choice-btn bg-white border-2 border-slate-100 p-4 rounded-2xl text-left font-bold text-slate-700 shadow-sm w-full flex items-center';
+                    btn.innerHTML = `<span class="bg-slate-50 text-slate-400 w-8 h-8 inline-flex items-center justify-center rounded-lg mr-4 font-black">${String.fromCharCode(65 + i)}</span><span>${text}</span>`;
+                    btn.onclick = () => handleSelection(text, btn);
+                    container.appendChild(btn);
+                });
+            }
+
+            timeLeft = timePerQuestion;
+            startTimer();
+        }
+
+        function renderSkeleton(skel) {
+            const container = getEl('word-skeleton');
+            container.innerHTML = '';
+            skel.split('').forEach(char => {
+                if(char === ' ' || char === ',') {
+                    const spacer = document.createElement('div');
+                    spacer.style.width = '0.5rem';
+                    spacer.innerText = char === ',' ? ',' : '';
+                    container.appendChild(spacer);
+                } else {
+                    const span = document.createElement('span');
+                    span.className = 'hangman-letter';
+                    span.innerText = (char === '_' || char === ' ') ? '' : char;
+                    container.appendChild(span);
+                }
+            });
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            const totalLimit = isGracePeriod ? 5 : timePerQuestion;
+            timerInterval = setInterval(() => {
+                if (isTimerFrozen) return;
+                timeLeft -= 0.1;
+                getEl('timer-bar').style.width = (timeLeft / totalLimit) * 100 + '%';
+                
+                if (!isGracePeriod && shuffledQuiz[currentIndex].type === 'mcq' && Math.abs(timeLeft - 8) < 0.05 && canAnswer) {
+                    triggerAuto5050();
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    if (!isGracePeriod) startGracePeriod();
+                    else handleSelection("Timeout", null);
+                }
+            }, 100);
+        }
+
+        function startGracePeriod() {
+            isGracePeriod = true;
+            timeLeft = 5;
+            getEl('riya-speech').innerText = "⏰ TIME EXPIRED! 5s grace to lock answer!";
+            getEl('timer-bar').classList.replace('bg-indigo-500', 'bg-rose-500');
+            startTimer();
+        }
+
+        function triggerAuto5050() {
+            const q = shuffledQuiz[currentIndex];
+            const buttons = Array.from(getEl('choices-container').querySelectorAll('button'));
+            const correctText = q.a[q.c];
+            let removed = 0;
+            buttons.forEach(btn => {
+                const text = btn.querySelector('span:last-child').innerText;
+                if (text !== correctText && removed < 2) {
+                    btn.style.opacity = '0.2'; btn.disabled = true; removed++;
+                }
+            });
+            getEl('riya-speech').innerText = "Speed help: Removing two incorrect options.";
+        }
+
+        function useFreeze() {
+            if (freezeCharges <= 0 || isTimerFrozen || !canAnswer) return;
+            freezeCharges--; isTimerFrozen = true;
+            updateFreezeUI();
+            getEl('timer-bar').classList.add('frozen-timer');
+            getEl('riya-speech').innerText = "❄️ TIME FROZEN! You have infinite time to think.";
+        }
+
+        function updateFreezeUI() {
+            getEl('freeze-count').innerText = freezeCharges;
+            if (freezeCharges <= 0) getEl('freeze-btn').classList.add('opacity-50');
+        }
+
+        function handleSelection(pickedText, btnElement) {
+            if (!canAnswer) return;
+            
+            const q = shuffledQuiz[currentIndex];
+            if (q.type === 'fill' && pickedText !== "Timeout") {
+                pickedText = getEl('fill-input').value.trim().toLowerCase();
+            }
+
+            canAnswer = false;
+            clearInterval(timerInterval);
+
+            if (btnElement) btnElement.classList.add('selected');
+
+            const normalize = (str) => str.toLowerCase().replace(/[^a-z0-9]/g, '');
+            const isCorrect = (q.type === 'fill') ? 
+                (normalize(pickedText) === normalize(q.answer)) : 
+                (pickedText === q.a[q.c]);
+
+            performanceLog.push({
+                question: q.q,
+                userAnswer: pickedText || "Blank",
+                correctAnswer: q.type === 'fill' ? q.answer : q.a[q.c],
+                isCorrect: isCorrect,
+                speedBonus: !isTimerFrozen && !isGracePeriod && timeLeft > 8,
+                isRetry: q.isRetry
+            });
+
+            getEl('riya-speech').innerText = "Paper response recorded. Proceed to next.";
+            getEl('next-container').classList.remove('hidden');
+            
+            if (currentIndex === shuffledQuiz.length - 1) {
+                getEl('next-btn-text').innerHTML = "<span>End Exam</span>";
+            }
+        }
+
+        function handleNextStep() {
+            if (canAnswer && shuffledQuiz[currentIndex].type === 'fill') {
+                handleSelection(getEl('fill-input').value, null);
+                return;
+            }
+            nextQuestion();
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            loadQuestion();
+        }
+
+        function showSubmitScreen() {
+            getEl('quiz-content').innerHTML = `
+                <div class="text-center py-12">
+                    <div class="text-6xl mb-4">📝</div>
+                    <h2 class="text-2xl font-black text-slate-800 mb-2">END OF EXAM</h2>
+                    <p class="text-slate-500 text-sm mb-8 px-6">Submit for evaluation and view your performance summary.</p>
+                    <button onclick="calculateAndEnd()" class="bg-indigo-600 text-white font-black px-12 py-4 rounded-2xl shadow-xl hover:scale-105 transition-all">SUBMIT QUEST</button>
+                </div>
+            `;
+            getEl('next-container').classList.add('hidden');
+            getEl('riya-speech').innerText = "Records processed. Evaluate your performance.";
+        }
+
+        function calculateAndEnd() {
+            let tempLogs = [...performanceLog];
+            let needsContinue = false;
+
+            tempLogs.forEach((log) => {
+                if (log.scored) return;
+                log.scored = true;
+
+                if (log.isCorrect) {
+                    let gain = log.isRetry ? 1 : (log.speedBonus ? 4 : 2);
+                    if (autoDoubleActive) { gain *= 2; autoDoubleActive = false; }
+                    totalXP += gain;
+                    streakCount++;
+                    if (streakCount % 3 === 0) autoDoubleActive = true;
+                    consecutiveWrong = 0;
+                } else {
+                    streakCount = 0; autoDoubleActive = false;
+                    consecutiveWrong++;
+                    punishmentXP += (consecutiveWrong >= 3) ? 2 : 1;
+                    
+                    const baseQ = originalQuizData.find(item => item.q === log.question);
+                    if (baseQ) {
+                        shuffledQuiz.push({...baseQ, isRetry: true});
+                        needsContinue = true;
+                    }
+                }
+            });
+
+            if (needsContinue) {
+                currentIndex = tempLogs.length;
+                loadQuestion();
+                getEl('quiz-screen').classList.remove('hidden');
+            } else {
+                endQuiz();
+            }
+        }
+
+        function endQuiz() {
+            getEl('quiz-screen').classList.add('hidden');
+            getEl('result-screen').classList.remove('hidden');
+            getEl('res-class').innerText = selectedClass;
+            getEl('final-score').innerText = totalXP;
+            getEl('final-punishment').innerText = punishmentXP;
+
+            const summaryList = getEl('summary-list');
+            summaryList.innerHTML = '';
+            performanceLog.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = `result-row p-3 rounded-xl shadow-sm ${item.isCorrect ? 'result-correct' : 'result-wrong'}`;
+                div.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <span class="text-[9px] font-black text-slate-400">Q${index+1}</span>
+                        <span class="text-[9px] font-black ${item.isCorrect ? 'text-emerald-500' : 'text-rose-500'} uppercase">${item.isCorrect ? 'Correct' : 'Incorrect'}</span>
+                    </div>
+                    <p class="text-[10px] font-bold text-slate-800 my-1">${item.question}</p>
+                    <div class="text-[9px] text-slate-500">
+                        <span>Answer: <span class="text-emerald-600 font-bold uppercase">${item.correctAnswer}</span></span>
+                        ${!item.isCorrect ? `<br><span>Picked: <span class="text-rose-600 uppercase">${item.userAnswer}</span></span>` : ''}
+                    </div>
+                `;
+                summaryList.appendChild(div);
+            });
+
+            if (totalXP >= 90) confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+        }
+    </script>
+</body>
+</html>
