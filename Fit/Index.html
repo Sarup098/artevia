@@ -1,0 +1,787 @@
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { initializeApp } from 'firebase/app';
+import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
+import { getFirestore, collection, onSnapshot, doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { 
+  Activity, Home, PlusCircle, BarChart3, History, Droplets, 
+  Flame, Utensils, Dumbbell, Footprints, CheckCircle2, Circle,
+  ChevronRight, Play, X, TrendingUp, AlertCircle
+} from 'lucide-react';
+
+// --- FIREBASE CONFIGURATION ---
+const userFirebaseConfig = {
+  apiKey: "AIzaSyDyzWKHLtAIyn-AsTtRCmU_MWE5GkM9-vg",
+  authDomain: "personal-77116.firebaseapp.com",
+  projectId: "personal-77116",
+  storageBucket: "personal-77116.firebasestorage.app",
+  messagingSenderId: "189105018586",
+  appId: "1:189105018586:web:58ed9b74d94719b16677e3",
+  measurementId: "G-4F0NQQ1BTC"
+};
+
+const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : userFirebaseConfig;
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'artevia-fit';
+
+// --- CONSTANTS & DATA ---
+const USER_STATS = { weight: 78, height: 179.5, age: 22, gender: 'M' };
+const BMR = 10 * USER_STATS.weight + 6.25 * USER_STATS.height - 5 * USER_STATS.age + 5; // ~1797 kcal
+
+const VEG_FOOD_DB = [
+  { id: 'f1', name: 'Daal Bhat (Standard Plate)', calories: 450, protein: 14 },
+  { id: 'f2', name: 'Veg Momo (Per Piece)', calories: 35, protein: 1.2 },
+  { id: 'f3', name: 'Aloo Paratha (1 medium)', calories: 250, protein: 5 },
+  { id: 'f4', name: 'Paneer Butter Masala (1 bowl)', calories: 350, protein: 12 },
+  { id: 'f5', name: 'Roti / Chapati (1 medium)', calories: 70, protein: 2.5 },
+  { id: 'f6', name: 'Oats with Milk & Banana', calories: 320, protein: 10 },
+  { id: 'f7', name: 'Whey Protein (1 scoop)', calories: 120, protein: 24 },
+  { id: 'f8', name: 'Chana Masala (1 bowl)', calories: 280, protein: 14 },
+];
+
+const WORKOUT_PLANS = {
+  Push: [
+    { name: 'Pushups (Warmup)', sets: 2, reps: '15' },
+    { name: 'Dumbbell Bench Press', sets: 3, reps: '8-10' },
+    { name: 'Overhead Shoulder Press', sets: 3, reps: '8-10' },
+    { name: 'Lateral Raises', sets: 3, reps: '12-15' },
+    { name: 'Tricep Overhead Extension', sets: 3, reps: '10-12' }
+  ],
+  Pull: [
+    { name: 'Pullups / Bodyweight Rows', sets: 3, reps: 'To Failure' },
+    { name: 'Dumbbell Rows', sets: 3, reps: '8-10' },
+    { name: 'Lat Pulldown (or Band)', sets: 3, reps: '10-12' },
+    { name: 'Bicep Curls', sets: 3, reps: '10-12' },
+    { name: 'Hammer Curls', sets: 3, reps: '10-12' }
+  ],
+  Legs: [
+    { name: 'Bodyweight Squats (Warmup)', sets: 2, reps: '15' },
+    { name: 'Goblet/Barbell Squats', sets: 3, reps: '8-10' },
+    { name: 'Lunges', sets: 3, reps: '10/leg' },
+    { name: 'Romanian Deadlifts (RDL)', sets: 3, reps: '10-12' },
+    { name: 'Calf Raises', sets: 4, reps: '15-20' }
+  ]
+};
+
+// --- HELPER FUNCTIONS ---
+const getTodayStr = () => new Date().toISOString().split('T')[0];
+const calculateTDEE = (goal) => {
+  const baseTDEE = BMR * 1.2;
+  if (goal === 'Lose') return Math.round(baseTDEE - 500);
+  if (goal === 'Gain') return Math.round(baseTDEE + 300);
+  return Math.round(baseTDEE);
+};
+
+// Haptic Feedback Engine
+const triggerHaptic = (type = 'light') => {
+  if (typeof navigator !== 'undefined' && navigator.vibrate) {
+    if (type === 'light') navigator.vibrate(40);
+    if (type === 'medium') navigator.vibrate(80);
+    if (type === 'heavy') navigator.vibrate([100, 50, 100]);
+    if (type === 'success') navigator.vibrate([40, 60, 40]);
+  }
+};
+
+// --- MAIN COMPONENT ---
+export default function App() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('dashboard');
+  
+  // App State
+  const [historyDocs, setHistoryDocs] = useState({});
+  const [goal, setGoal] = useState('Lose');
+  const [toast, setToast] = useState(null);
+  
+  // Today's State
+  const todayStr = getTodayStr();
+  const todayData = historyDocs[todayStr] || {
+    date: todayStr, foods: [], workouts: [], waterLiters: 0, steps: 0, habits: { moved: false, created: false }
+  };
+
+  // Toast System
+  const showToast = useCallback((message, icon = '✅', type = 'light') => {
+    triggerHaptic(type);
+    setToast({ message, icon, id: Date.now() });
+    setTimeout(() => setToast(current => current?.id === toast?.id ? null : current), 2500);
+  }, [toast]);
+
+  // --- AUTH & FETCHING ---
+  useEffect(() => {
+    const initAuth = async () => {
+      try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
+      } catch (err) { console.error("Auth error:", err); }
+    };
+    initAuth();
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      if (!currentUser) setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    const logsRef = collection(db, 'artifacts', appId, 'users', user.uid, 'dailyLogs');
+    const unsubscribe = onSnapshot(logsRef, (snapshot) => {
+      const data = {};
+      snapshot.forEach(doc => { data[doc.id] = doc.data(); });
+      setHistoryDocs(data);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, [user]);
+
+  // --- DB WRITE HELPER ---
+  const updateTodayData = async (updates) => {
+    if (!user) return;
+    const newData = { ...todayData, ...updates, updatedAt: serverTimestamp() };
+    const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'dailyLogs', todayStr);
+    await setDoc(docRef, newData, { merge: true });
+  };
+
+  // --- DERIVED METRICS ---
+  const dailyTarget = calculateTDEE(goal);
+  const caloriesConsumed = todayData.foods.reduce((sum, f) => sum + (f.calories * f.qty), 0);
+  const proteinConsumed = todayData.foods.reduce((sum, f) => sum + (f.protein * f.qty), 0);
+  const caloriesBurned = (todayData.steps * 0.04) + todayData.workouts.reduce((sum, w) => sum + w.caloriesBurned, 0);
+  const netCalories = caloriesConsumed - caloriesBurned;
+
+  const generateSuggestions = useMemo(() => {
+    const suggestions = [];
+    if (todayData.waterLiters < 3) suggestions.push("Hydration alert: Drink a glass of water now.");
+    if (proteinConsumed < 120) suggestions.push("Add a protein-rich snack to hit your muscle goals.");
+    if (todayData.steps < 5000) suggestions.push("Take a 15-minute walk around Namphing.");
+    if (!todayData.habits.created) suggestions.push("Don't forget Artevia Studio! Create something today.");
+    return suggestions;
+  }, [todayData, proteinConsumed]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 text-gray-900 font-sans pb-24 max-w-md mx-auto relative shadow-2xl overflow-hidden">
+      
+      {/* GLOBAL TOAST NOTIFICATION */}
+      {toast && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-bounce" style={{ animation: 'slideDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards' }}>
+          <div className="bg-gray-900/95 backdrop-blur-md text-white px-5 py-3 rounded-full shadow-2xl flex items-center gap-3 text-sm font-semibold border border-gray-700">
+            <span className="text-lg">{toast.icon}</span>
+            {toast.message}
+          </div>
+        </div>
+      )}
+
+      {/* HEADER */}
+      <div className="pt-12 pb-4 px-6 bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-10 flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900">Artevia Fit</h1>
+          <p className="text-sm text-gray-500 font-medium">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>
+        </div>
+        <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center shadow-inner">
+          <span className="text-emerald-700 font-bold text-lg">ST</span>
+        </div>
+      </div>
+
+      {/* TAB CONTENT */}
+      <div className="px-4 py-6 overflow-y-auto h-[calc(100vh-140px)]">
+        {activeTab === 'dashboard' && (
+          <DashboardTab 
+            todayData={todayData} updateTodayData={updateTodayData}
+            dailyTarget={dailyTarget} netCalories={netCalories} proteinConsumed={proteinConsumed} 
+            goal={goal} setGoal={(g) => { setGoal(g); showToast(`Goal set to ${g}`, '🎯'); }}
+            suggestions={generateSuggestions} showToast={showToast}
+          />
+        )}
+        {activeTab === 'add' && (
+          <AddTab todayData={todayData} updateTodayData={updateTodayData} historyDocs={historyDocs} showToast={showToast} />
+        )}
+        {activeTab === 'analytics' && <AnalyticsTab historyDocs={historyDocs} dailyTarget={dailyTarget} />}
+        {activeTab === 'history' && <HistoryTab historyDocs={historyDocs} />}
+      </div>
+
+      {/* BOTTOM NAVIGATION */}
+      <div className="fixed bottom-0 w-full max-w-md bg-white border-t border-gray-100 px-6 py-4 flex justify-between items-center z-20 pb-safe">
+        <NavIcon icon={Home} label="Today" active={activeTab === 'dashboard'} onClick={() => { setActiveTab('dashboard'); triggerHaptic(); }} />
+        <NavIcon icon={PlusCircle} label="Add" active={activeTab === 'add'} onClick={() => { setActiveTab('add'); triggerHaptic(); }} />
+        <NavIcon icon={BarChart3} label="Analytics" active={activeTab === 'analytics'} onClick={() => { setActiveTab('analytics'); triggerHaptic(); }} />
+        <NavIcon icon={History} label="History" active={activeTab === 'history'} onClick={() => { setActiveTab('history'); triggerHaptic(); }} />
+      </div>
+
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes slideDown {
+          0% { transform: translate(-50%, -150%); opacity: 0; }
+          100% { transform: translate(-50%, 0); opacity: 1; }
+        }
+      `}} />
+    </div>
+  );
+}
+
+// ==========================================
+// SUB-COMPONENTS
+// ==========================================
+
+function NavIcon({ icon: Icon, label, active, onClick }) {
+  return (
+    <button onClick={onClick} className={`flex flex-col items-center gap-1 transition-all duration-200 active:scale-90 ${active ? 'text-emerald-600 scale-105' : 'text-gray-400 hover:text-gray-600'}`}>
+      <Icon className={`w-6 h-6 transition-colors ${active ? 'fill-emerald-50' : ''}`} />
+      <span className="text-[10px] font-semibold">{label}</span>
+    </button>
+  );
+}
+
+// --- DASHBOARD TAB ---
+function DashboardTab({ todayData, updateTodayData, dailyTarget, netCalories, proteinConsumed, goal, setGoal, suggestions, showToast }) {
+  
+  const handleHabitToggle = (habit) => {
+    const isNowDone = !todayData.habits[habit];
+    updateTodayData({ habits: { ...todayData.habits, [habit]: isNowDone } });
+    
+    if (habit === 'moved') {
+      showToast(isNowDone ? "Trekking ready! 🏔️" : "Rest day logged", isNowDone ? '🏃‍♂️' : '🛌', isNowDone ? 'success' : 'light');
+    } else {
+      showToast(isNowDone ? "Artevia Studio leveled up! 🎨" : "Creative break taken", isNowDone ? '✨' : '☕', isNowDone ? 'success' : 'light');
+    }
+  };
+
+  const handleWaterUpdate = (delta) => {
+    const newVal = Math.max(0, Number((todayData.waterLiters + delta).toFixed(1)));
+    updateTodayData({ waterLiters: newVal });
+    if (delta > 0) showToast(`Hydrated! (${newVal}L)`, '💧', 'medium');
+    else showToast("Water removed", '📉', 'light');
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Metric Cards */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-2 mb-2 text-emerald-600">
+            <Flame className="w-5 h-5" />
+            <span className="font-semibold text-sm">Net Calories</span>
+          </div>
+          <div className="text-3xl font-bold text-gray-900">{Math.round(netCalories)}</div>
+          <div className="text-xs text-gray-500 mt-1">Target: {dailyTarget} kcal</div>
+          <div className="w-full bg-gray-100 h-2 rounded-full mt-3 overflow-hidden">
+            <div className={`h-full rounded-full transition-all duration-1000 ease-out ${netCalories > dailyTarget ? 'bg-red-500' : 'bg-emerald-500'}`} style={{ width: `${Math.min((netCalories / dailyTarget) * 100, 100)}%` }}></div>
+          </div>
+        </div>
+
+        <div className="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-2 mb-2 text-blue-600">
+            <Utensils className="w-5 h-5" />
+            <span className="font-semibold text-sm">Protein</span>
+          </div>
+          <div className="text-3xl font-bold text-gray-900">{Math.round(proteinConsumed)}<span className="text-lg text-gray-500 font-medium">g</span></div>
+          <div className="text-xs text-gray-500 mt-1">Goal: ~140g</div>
+          <div className="w-full bg-gray-100 h-2 rounded-full mt-3 overflow-hidden">
+            <div className="h-full rounded-full bg-blue-500 transition-all duration-1000 ease-out" style={{ width: `${Math.min((proteinConsumed / 140) * 100, 100)}%` }}></div>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Stats Row */}
+      <div className="grid grid-cols-3 gap-3">
+        <div className="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center">
+          <Footprints className="w-5 h-5 text-orange-500 mb-1" />
+          <span className="text-xs text-gray-500">Steps</span>
+          <span className="font-bold text-gray-900">{todayData.steps}</span>
+        </div>
+        <div className="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center">
+          <Activity className="w-5 h-5 text-purple-500 mb-1" />
+          <span className="text-xs text-gray-500">Active</span>
+          <span className="font-bold text-gray-900">{todayData.workouts.reduce((sum,w)=>sum+w.duration,0)}m</span>
+        </div>
+        <div className="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center">
+          <Droplets className="w-5 h-5 text-cyan-500 mb-1" />
+          <span className="text-xs text-gray-500">Water</span>
+          <span className="font-bold text-gray-900">{todayData.waterLiters}L</span>
+        </div>
+      </div>
+
+      {/* Smart Suggestions */}
+      {suggestions.length > 0 && (
+        <div className="bg-amber-50 rounded-2xl p-4 border border-amber-100">
+          <div className="flex items-center gap-2 text-amber-800 font-semibold mb-2">
+            <AlertCircle className="w-4 h-4" /> Artevia AI Insights
+          </div>
+          <ul className="space-y-2">
+            {suggestions.slice(0, 2).map((sugg, i) => (
+              <li key={i} className="text-sm text-amber-700 flex items-start gap-2">
+                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0"></span> {sugg}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Daily Habits & Quick Inputs */}
+      <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 space-y-5">
+        <h3 className="font-bold text-gray-900">Daily Tracking</h3>
+        
+        {/* Water Tracker */}
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-cyan-100 rounded-xl text-cyan-600"><Droplets className="w-5 h-5" /></div>
+            <div>
+              <div className="font-semibold text-sm">Water Intake</div>
+              <div className="text-xs text-gray-500">Target: 3.5 Liters</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={() => handleWaterUpdate(-0.5)} className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 font-bold active:scale-90 transition-transform text-lg border border-gray-200 shadow-sm">-</button>
+            <span className="font-bold w-10 text-center text-lg">{todayData.waterLiters}</span>
+            <button onClick={() => handleWaterUpdate(0.5)} className="w-10 h-10 rounded-full bg-cyan-100 flex items-center justify-center text-cyan-700 font-bold active:scale-90 transition-transform text-lg shadow-sm">+</button>
+          </div>
+        </div>
+
+        {/* Habits */}
+        <div className="flex justify-between items-center cursor-pointer active:scale-[0.98] transition-transform p-1 -m-1 rounded-xl" onClick={() => handleHabitToggle('moved')}>
+          <div className="flex items-center gap-3">
+            <div className={`p-2 rounded-xl transition-colors duration-300 ${todayData.habits.moved ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-100 text-gray-400'}`}>
+              <Footprints className="w-5 h-5" />
+            </div>
+            <span className={`font-semibold text-sm transition-colors duration-300 ${todayData.habits.moved ? 'text-gray-900' : 'text-gray-500'}`}>Moved body today</span>
+          </div>
+          <div className="relative w-6 h-6">
+            <Circle className={`absolute inset-0 w-6 h-6 text-gray-200 transition-opacity duration-300 ${todayData.habits.moved ? 'opacity-0' : 'opacity-100'}`} />
+            <CheckCircle2 className={`absolute inset-0 w-6 h-6 text-emerald-500 transition-all duration-300 ${todayData.habits.moved ? 'scale-100 opacity-100' : 'scale-50 opacity-0'}`} />
+          </div>
+        </div>
+
+        <div className="flex justify-between items-center cursor-pointer active:scale-[0.98] transition-transform p-1 -m-1 rounded-xl" onClick={() => handleHabitToggle('created')}>
+          <div className="flex items-center gap-3">
+            <div className={`p-2 rounded-xl transition-colors duration-300 ${todayData.habits.created ? 'bg-purple-100 text-purple-600' : 'bg-gray-100 text-gray-400'}`}>
+              <Activity className="w-5 h-5" />
+            </div>
+            <span className={`font-semibold text-sm transition-colors duration-300 ${todayData.habits.created ? 'text-gray-900' : 'text-gray-500'}`}>Created something (Artevia)</span>
+          </div>
+          <div className="relative w-6 h-6">
+            <Circle className={`absolute inset-0 w-6 h-6 text-gray-200 transition-opacity duration-300 ${todayData.habits.created ? 'opacity-0' : 'opacity-100'}`} />
+            <CheckCircle2 className={`absolute inset-0 w-6 h-6 text-purple-500 transition-all duration-300 ${todayData.habits.created ? 'scale-100 opacity-100' : 'scale-50 opacity-0'}`} />
+          </div>
+        </div>
+      </div>
+
+      {/* Goal Selector */}
+      <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 flex justify-between items-center">
+        <div>
+          <h3 className="font-bold text-gray-900 text-sm">Current Phase</h3>
+          <p className="text-xs text-gray-500">Adjusts calorie target</p>
+        </div>
+        <select 
+          value={goal} 
+          onChange={(e) => setGoal(e.target.value)}
+          className="bg-gray-50 border border-gray-200 text-sm rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500 font-semibold"
+        >
+          <option value="Lose">Lose Fat (Cut)</option>
+          <option value="Maintain">Maintain</option>
+          <option value="Gain">Build Muscle (Bulk)</option>
+        </select>
+      </div>
+    </div>
+  );
+}
+
+// --- ADD TAB (Food & Workout) ---
+function AddTab({ todayData, updateTodayData, historyDocs, showToast }) {
+  const [subTab, setSubTab] = useState('food'); 
+
+  return (
+    <div className="space-y-6 h-full flex flex-col">
+      {/* Sub Tabs */}
+      <div className="flex bg-gray-200 p-1.5 rounded-xl shrink-0">
+        {['food', 'workout', 'steps'].map(tab => (
+          <button 
+            key={tab}
+            onClick={() => { setSubTab(tab); triggerHaptic('light'); }} 
+            className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 active:scale-95 capitalize ${subTab === tab ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+
+      {subTab === 'food' && <FoodSection todayData={todayData} updateTodayData={updateTodayData} showToast={showToast} />}
+      {subTab === 'workout' && <WorkoutSection todayData={todayData} updateTodayData={updateTodayData} historyDocs={historyDocs} showToast={showToast} />}
+      {subTab === 'steps' && (
+        <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm animate-fade-in">
+          <h3 className="font-bold text-gray-900 mb-4 text-center">Log Daily Steps</h3>
+          <input 
+            type="number" 
+            placeholder="e.g. 8500"
+            className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-4 mb-4 outline-none focus:ring-2 focus:ring-emerald-500 text-3xl font-bold text-center transition-shadow"
+            value={todayData.steps || ''}
+            onChange={(e) => updateTodayData({ steps: Number(e.target.value) })}
+          />
+          <p className="text-sm text-gray-500 text-center">Steps burn ~40 calories per 1000 steps.</p>
+          <button 
+            onClick={() => showToast("Steps updated!", "🚶‍♂️", "success")}
+            className="w-full mt-6 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl py-4 transition-all active:scale-95 shadow-lg shadow-emerald-200"
+          >
+            Save Steps
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function FoodSection({ todayData, updateTodayData, showToast }) {
+  const [manual, setManual] = useState({ name: '', calories: '', protein: '' });
+
+  const handleAddFood = (food, qty = 1) => {
+    updateTodayData({ foods: [...todayData.foods, { ...food, qty, addedAt: new Date().toISOString() }] });
+    showToast(`Added ${food.name}`, '🍛', 'success');
+  };
+
+  const handleManualSubmit = (e) => {
+    e.preventDefault();
+    if (!manual.name || !manual.calories) return;
+    handleAddFood({ id: 'm_' + Date.now(), name: manual.name, calories: Number(manual.calories), protein: Number(manual.protein || 0) });
+    setManual({ name: '', calories: '', protein: '' });
+  };
+
+  return (
+    <div className="flex-1 overflow-y-auto space-y-6 pb-4">
+      <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm">
+        <h3 className="font-bold text-gray-900 mb-4">Quick Add (Veg/Local)</h3>
+        <div className="space-y-3">
+          {VEG_FOOD_DB.map(food => (
+            <div key={food.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-2xl hover:bg-emerald-50 transition-colors border border-transparent hover:border-emerald-100">
+              <div>
+                <div className="font-semibold text-sm text-gray-900">{food.name}</div>
+                <div className="text-xs text-gray-500 font-medium mt-0.5">{food.calories} kcal • {food.protein}g protein</div>
+              </div>
+              <button 
+                onClick={() => handleAddFood(food)} 
+                className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center transition-all duration-200 active:scale-75 active:bg-emerald-200"
+              >
+                <PlusCircle className="w-6 h-6" />
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm">
+        <h3 className="font-bold text-gray-900 mb-4">Manual Entry</h3>
+        <form onSubmit={handleManualSubmit} className="space-y-4">
+          <input required type="text" placeholder="Food Name" value={manual.name} onChange={e=>setManual({...manual, name: e.target.value})} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-emerald-500 font-medium" />
+          <div className="flex gap-3">
+            <input required type="number" placeholder="Calories" value={manual.calories} onChange={e=>setManual({...manual, calories: e.target.value})} className="w-1/2 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-emerald-500 font-medium" />
+            <input type="number" placeholder="Protein (g)" value={manual.protein} onChange={e=>setManual({...manual, protein: e.target.value})} className="w-1/2 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-emerald-500 font-medium" />
+          </div>
+          <button type="submit" className="w-full bg-gray-900 text-white font-bold rounded-xl py-4 text-sm hover:bg-gray-800 transition-all active:scale-95 shadow-md">Add Custom Food</button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// --- GUIDED WORKOUT ---
+function WorkoutSection({ todayData, updateTodayData, historyDocs, showToast }) {
+  const [phase, setPhase] = useState('setup'); 
+  const [setup, setSetup] = useState({ split: 'Push', duration: 45 });
+  const [activeWorkout, setActiveWorkout] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  
+  const [weightUsed, setWeightUsed] = useState('');
+  const [feedback, setFeedback] = useState('Completed'); 
+
+  const getSuggestedWeight = (exerciseName) => {
+    let lastWeight = null;
+    const sortedDates = Object.keys(historyDocs).sort().reverse();
+    for (let date of sortedDates) {
+      if (date === getTodayStr()) continue; 
+      const workouts = historyDocs[date].workouts || [];
+      for (let w of workouts) {
+        const logs = w.logs || [];
+        const match = logs.find(l => l.name === exerciseName);
+        if (match && match.weightUsed) { lastWeight = match.weightUsed; break; }
+      }
+      if (lastWeight) break;
+    }
+    return lastWeight;
+  };
+
+  const startWorkout = () => {
+    let template = [...WORKOUT_PLANS[setup.split]];
+    if (setup.duration === 30) template = template.slice(0, 3);
+    
+    const session = template.map(ex => ({ ...ex, suggestedWeight: getSuggestedWeight(ex.name) }));
+    setActiveWorkout(session);
+    setCurrentIndex(0);
+    setPhase('active');
+    setWeightUsed('');
+    showToast(`Started ${setup.split} Day!`, '🏋️‍♂️', 'success');
+  };
+
+  const nextExercise = () => {
+    const currentEx = activeWorkout[currentIndex];
+    currentEx.log = { name: currentEx.name, weightUsed: Number(weightUsed), feedback };
+    
+    if (currentIndex < activeWorkout.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+      setWeightUsed('');
+      setFeedback('Completed');
+      showToast("Great set! Next up.", '💪', 'medium');
+    } else {
+      finishWorkout();
+    }
+  };
+
+  const finishWorkout = () => {
+    const caloriesBurned = Math.round(setup.duration * 6.5); 
+    const newWorkout = {
+      name: `${setup.split} Day`, duration: setup.duration, caloriesBurned,
+      logs: activeWorkout.map(aw => aw.log || { name: aw.name, feedback: 'Skipped' }),
+      completedAt: new Date().toISOString()
+    };
+    
+    updateTodayData({ workouts: [...todayData.workouts, newWorkout] });
+    setPhase('complete');
+    showToast("Workout crushed! Awesome job.", '🔥', 'heavy');
+  };
+
+  if (phase === 'setup') {
+    return (
+      <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex flex-col gap-6 animate-fade-in">
+        <h3 className="font-bold text-xl text-gray-900 flex items-center gap-2"><Dumbbell className="text-orange-500 w-6 h-6"/> Start Session</h3>
+        
+        <div>
+          <label className="text-sm font-semibold text-gray-600 block mb-3">Select Split</label>
+          <div className="grid grid-cols-3 gap-3">
+            {['Push', 'Pull', 'Legs'].map(type => (
+              <button 
+                key={type} onClick={() => { setSetup({...setup, split: type}); triggerHaptic('light'); }}
+                className={`py-3 rounded-2xl text-sm font-bold border-2 transition-all active:scale-95 ${setup.split === type ? 'bg-orange-50 text-orange-600 border-orange-500 shadow-sm' : 'bg-white text-gray-500 border-gray-100 hover:border-gray-200'}`}
+              >
+                {type}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <label className="text-sm font-semibold text-gray-600 block mb-3">Duration (mins)</label>
+          <div className="grid grid-cols-3 gap-3">
+            {[30, 45, 60].map(mins => (
+              <button 
+                key={mins} onClick={() => { setSetup({...setup, duration: mins}); triggerHaptic('light'); }}
+                className={`py-3 rounded-2xl text-sm font-bold border-2 transition-all active:scale-95 ${setup.duration === mins ? 'bg-gray-900 text-white border-gray-900 shadow-sm' : 'bg-white text-gray-500 border-gray-100 hover:border-gray-200'}`}
+              >
+                {mins}m
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <button onClick={startWorkout} className="w-full mt-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl py-4 flex items-center justify-center gap-2 shadow-lg shadow-emerald-200 transition-all active:scale-95">
+          <Play className="fill-white w-5 h-5" /> Start Workout
+        </button>
+      </div>
+    );
+  }
+
+  if (phase === 'active') {
+    const ex = activeWorkout[currentIndex];
+    const progress = ((currentIndex) / activeWorkout.length) * 100;
+
+    return (
+      <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex flex-col min-h-[450px] animate-fade-in">
+        <div className="flex justify-between items-center mb-4">
+          <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Exercise {currentIndex + 1} of {activeWorkout.length}</span>
+          <button onClick={() => setPhase('setup')} className="text-gray-400 p-2 -m-2 active:scale-90 transition-transform"><X className="w-5 h-5"/></button>
+        </div>
+        <div className="w-full bg-gray-100 h-2 rounded-full mb-8 overflow-hidden">
+          <div className="bg-orange-500 h-full rounded-full transition-all duration-500 ease-out" style={{width: `${progress}%`}}></div>
+        </div>
+
+        <div className="flex-1 text-center flex flex-col justify-center">
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-3 tracking-tight">{ex.name}</h2>
+          <div className="inline-block bg-orange-100 text-orange-700 px-5 py-2 rounded-full font-bold text-lg mx-auto mb-6 shadow-sm border border-orange-200">
+            {ex.sets} Sets × {ex.reps}
+          </div>
+          
+          {ex.suggestedWeight && (
+            <div className="text-sm text-gray-500 mb-6 flex items-center justify-center gap-1.5 bg-gray-50 py-2 px-4 rounded-xl inline-flex mx-auto border border-gray-100">
+              <TrendingUp className="w-4 h-4 text-orange-500" /> Last time: <b>{ex.suggestedWeight}kg</b>
+            </div>
+          )}
+
+          <div className="bg-gray-50 p-5 rounded-3xl border border-gray-100 text-left space-y-5">
+            <div>
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-2 ml-1">Weight Used (kg)</label>
+              <input 
+                type="number" placeholder="e.g. 15" value={weightUsed} onChange={(e)=>setWeightUsed(e.target.value)}
+                className="w-full bg-white border border-gray-200 rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-orange-500 text-xl font-bold transition-shadow"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-2 ml-1">Status</label>
+              <div className="flex gap-2">
+                {['Completed', 'Partial', 'Skipped'].map(status => (
+                  <button 
+                    key={status} onClick={() => { setFeedback(status); triggerHaptic('light'); }}
+                    className={`flex-1 py-3 rounded-xl text-xs font-bold border-2 transition-all active:scale-95 ${feedback === status ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-500 border-gray-100'}`}
+                  >
+                    {status}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button onClick={nextExercise} className="w-full mt-6 bg-gray-900 text-white font-bold rounded-2xl py-4 flex items-center justify-center gap-2 active:scale-95 transition-all shadow-md">
+          {currentIndex === activeWorkout.length - 1 ? 'Finish Workout' : 'Next Exercise'} <ChevronRight className="w-5 h-5" />
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-emerald-50 p-8 rounded-3xl border border-emerald-100 text-center shadow-sm h-full flex flex-col items-center justify-center animate-fade-in">
+      <div className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-emerald-200 animate-bounce">
+        <CheckCircle2 className="w-10 h-10 text-white" />
+      </div>
+      <h3 className="font-extrabold text-2xl text-emerald-900 mb-3 tracking-tight">Workout Complete!</h3>
+      <p className="text-emerald-700 text-sm mb-8 font-medium">Great job hitting {setup.split} day. Consistency is key.</p>
+      <button onClick={() => setPhase('setup')} className="bg-white text-emerald-700 font-bold border-2 border-emerald-200 rounded-2xl px-8 py-3 text-sm active:scale-95 transition-all shadow-sm">Log Another</button>
+    </div>
+  );
+}
+
+// --- ANALYTICS TAB ---
+function AnalyticsTab({ historyDocs, dailyTarget }) {
+  const today = new Date();
+  const past30Days = Array.from({length: 30}, (_, i) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() - (29 - i));
+    return d.toISOString().split('T')[0];
+  });
+
+  const chartData = past30Days.map(dateStr => {
+    const data = historyDocs[dateStr] || { foods: [], workouts: [], steps: 0, waterLiters: 0, habits: { moved: false, created: false } };
+    const calIn = data.foods.reduce((sum, f) => sum + (f.calories * f.qty), 0);
+    const calOut = (data.steps * 0.04) + data.workouts.reduce((sum, w) => sum + w.caloriesBurned, 0);
+    const protein = data.foods.reduce((sum, f) => sum + (f.protein * f.qty), 0);
+    return { date: dateStr, calIn, calOut, protein, water: data.waterLiters, active: data.workouts.length > 0 || data.habits.moved };
+  });
+
+  const activeDaysCount = chartData.filter(d => d.active).length;
+  const avgProtein = Math.round(chartData.reduce((s,d)=>s+d.protein,0) / 30);
+  const avgWater = (chartData.reduce((s,d)=>s+d.water,0) / 30).toFixed(1);
+  const maxCalIn = Math.max(...chartData.map(d => d.calIn), dailyTarget + 500, 2500);
+
+  return (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-gray-900 px-2 tracking-tight">Last 30 Days</h2>
+      
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm text-center">
+          <div className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-2">Consistency</div>
+          <div className="text-3xl font-extrabold text-emerald-600">{activeDaysCount}<span className="text-base text-gray-300 font-medium">/30</span></div>
+          <div className="text-[10px] text-gray-500 mt-2 font-medium">Active Days</div>
+        </div>
+        <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm text-center">
+          <div className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-2">Avg Protein</div>
+          <div className="text-3xl font-extrabold text-blue-600">{avgProtein}g</div>
+          <div className="text-[10px] text-gray-500 mt-2 font-medium">Per Day</div>
+        </div>
+      </div>
+
+      <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+        <div className="flex items-center justify-between mb-8">
+          <h3 className="font-bold text-gray-900 text-sm">Caloric Intake Trend</h3>
+          <div className="text-[10px] text-gray-500 font-medium flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-orange-400"></span> Intake
+            <span className="w-2 h-2 rounded-full bg-emerald-400 ml-2"></span> Burned
+          </div>
+        </div>
+        
+        <div className="h-44 flex items-end gap-1.5">
+          {chartData.map((day, i) => {
+            const inHeight = Math.max((day.calIn / maxCalIn) * 100, 2);
+            return (
+              <div key={day.date} className="flex-1 flex flex-col justify-end group relative cursor-pointer">
+                <div 
+                  className={`w-full rounded-sm transition-all duration-300 hover:opacity-80 ${day.calIn > dailyTarget ? 'bg-red-400' : 'bg-orange-300'}`} 
+                  style={{height: `${inHeight}%`, minHeight: '4px'}}
+                ></div>
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute bottom-full mb-2 bg-gray-900 text-white text-[10px] px-2 py-1 rounded-md whitespace-nowrap z-10 left-1/2 -translate-x-1/2 pointer-events-none shadow-lg font-medium">
+                  {day.date.split('-').slice(1).join('/')}: {Math.round(day.calIn)}kcal
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="flex justify-between text-[10px] text-gray-400 mt-3 font-semibold uppercase tracking-wider">
+          <span>{chartData[0].date.split('-').slice(1).join('/')}</span>
+          <span className="text-gray-300">— Target: {dailyTarget} —</span>
+          <span>Today</span>
+        </div>
+      </div>
+
+      <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-5">
+        <div className="w-14 h-14 rounded-full bg-cyan-50 flex items-center justify-center text-cyan-600 shadow-inner">
+          <Droplets className="w-7 h-7" />
+        </div>
+        <div>
+          <div className="font-extrabold text-gray-900 text-lg">Avg {avgWater}L Water/Day</div>
+          <div className="text-sm text-gray-500 font-medium">Keep aiming for 3.5L!</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// --- HISTORY TAB ---
+function HistoryTab({ historyDocs }) {
+  const dates = Object.keys(historyDocs).sort().reverse();
+
+  return (
+    <div className="space-y-4 pb-4">
+      <h2 className="text-2xl font-bold text-gray-900 px-2 mb-6 tracking-tight">Past Logs</h2>
+      {dates.length === 0 && <p className="text-gray-500 text-center py-10 font-medium">No logs found yet.</p>}
+      
+      {dates.map(date => {
+        const data = historyDocs[date];
+        const calIn = data.foods?.reduce((sum, f) => sum + (f.calories * f.qty), 0) || 0;
+        const calOut = ((data.steps || 0) * 0.04) + (data.workouts?.reduce((sum, w) => sum + w.caloriesBurned, 0) || 0);
+        const hasWorkout = data.workouts?.length > 0;
+
+        return (
+          <div key={date} className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between active:scale-[0.98] transition-transform cursor-pointer">
+            <div>
+              <div className="font-bold text-gray-900 text-lg">{new Date(date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</div>
+              <div className="text-xs text-gray-500 mt-1.5 flex gap-3 font-medium">
+                <span className="bg-orange-50 px-2 py-0.5 rounded text-orange-700">In: {Math.round(calIn)}</span>
+                <span className="bg-emerald-50 px-2 py-0.5 rounded text-emerald-700">Out: {Math.round(calOut)}</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              {hasWorkout && <span className="px-3 py-1 bg-gray-900 text-white text-[10px] font-extrabold rounded-full uppercase tracking-wide">Workout</span>}
+              {data.habits?.created && <span className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center"><Activity className="w-4 h-4"/></span>}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+
